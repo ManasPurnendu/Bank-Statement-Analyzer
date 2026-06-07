@@ -68,9 +68,9 @@ def parse_pdf_statement(file_path, original_filename, password=None):
     metadata = {
         "file_name": original_filename,
         "file_type": "PDF",
-        "account_holder": "Manas Purnendu",
-        "account_number": "XXXX-XXXX-1234",
-        "bank_name": "Standard Bank",
+        "account_holder": "Unknown",
+        "account_number": "Unknown",
+        "bank_name": "Unknown",
         "statement_month": None,
         "start_date": None,
         "end_date": None,
@@ -82,41 +82,9 @@ def parse_pdf_statement(file_path, original_filename, password=None):
     
     try:
         with pdfplumber.open(parse_target) as pdf:
-            # 1. Inspect first page for metadata
+            # 1. Inspect first pages for metadata (simpler extraction)
             first_page_text = pdf.pages[0].extract_text() or ""
             text_lines = first_page_text.split('\n')
-            
-            for line in text_lines[:20]:
-                # Look for account holder (using lookbehind to ensure 'Name' isn't preceded by 'Bank')
-                holder_match = re.search(r'(?:Account Holder|Customer Name|(?<!Bank\s)(?<!Bank)\bName)[:\s]+([A-Za-z\s]{3,30})', line, re.IGNORECASE)
-                if holder_match:
-                    metadata["account_holder"] = holder_match.group(1).strip()
-                    
-                # Look for account number
-                acc_match = re.search(r'(?:Account Number|Account No|A/c No|A/c)[:\s]+([0-9A-Za-z\-]{6,20})', line, re.IGNORECASE)
-                if acc_match:
-                    metadata["account_number"] = acc_match.group(1).strip()
-                    
-                # Look for bank name
-                bank_match = re.search(r'(?:Bank Name|Bank)[:\s]+([A-Za-z\s]{3,20})', line, re.IGNORECASE)
-                if bank_match:
-                    metadata["bank_name"] = bank_match.group(1).strip()
-                    
-                # Look for opening balance
-                op_match = re.search(r'(?:Opening Balance|Start Balance)[:\s]+([0-9,]+\.?[0-9]*)', line, re.IGNORECASE)
-                if op_match:
-                    try:
-                        metadata["opening_balance"] = float(op_match.group(1).replace(",", ""))
-                    except ValueError:
-                        pass
-                        
-                # Look for closing balance
-                cl_match = re.search(r'(?:Closing Balance|End Balance|Balance)[:\s]+([0-9,]+\.?[0-9]*)', line, re.IGNORECASE)
-                if cl_match:
-                    try:
-                        metadata["closing_balance"] = float(cl_match.group(1).replace(",", ""))
-                    except ValueError:
-                        pass
 
             # 2. Extract transaction table rows
             # Try strategy A: extract_tables
@@ -124,6 +92,10 @@ def parse_pdf_statement(file_path, original_filename, password=None):
             for page in pdf.pages:
                 tables = page.extract_tables()
                 for table in tables:
+                    if table:
+                        print("\nTABLE FOUND")
+                        for r in table[:5]:
+                            print(r)
                     for row in table:
                         # Clean row values
                         row_vals = [str(val).strip() if val is not None else "" for val in row]
@@ -164,7 +136,7 @@ def parse_pdf_statement(file_path, original_filename, password=None):
                     break
             
             date_col_idx = 0
-            desc_col_idx = 1
+            desc_col_idx = 2
             debit_col_idx = -1
             credit_col_idx = -1
             amount_col_idx = -1
@@ -340,6 +312,7 @@ def parse_pdf_statement(file_path, original_filename, password=None):
     
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the PDF file.")
+    print(f"Parsed transactions: {len(transactions)}")
         
     dates = [t["transaction_date"] for t in transactions]
     metadata["start_date"] = min(dates)

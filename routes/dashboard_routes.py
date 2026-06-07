@@ -19,6 +19,11 @@ def get_dashboard_data():
             "insights": insights
         })
     except Exception as e:
+        print("DASHBOARD ERROR:", str(e))
+
+        import traceback
+        traceback.print_exc()
+
         return jsonify({
             "success": False,
             "message": f"Error loading dashboard: {str(e)}"
