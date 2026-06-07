@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4" id="analytics-filled-state">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-extrabold m-0" style="font-family: var(--font-heading);">Financial Analytics</h2>
+            <p class="text-secondary small m-0">In-depth breakdown of payment methods, merchant shares, active subscriptions, and spending cycles</p>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" id="analyticsDateFilterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-calendar3"></i>
+                <span id="analytics-date-label">01 Jan 2025 - 31 May 2025</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="analyticsDateFilterBtn" id="analytics-date-dropdown">
+                <li><button class="dropdown-item" type="button" data-range="all">All Time</button></li>
+                <li><button class="dropdown-item" type="button" data-range="this-year">This Year</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-year">Last Year</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-6-months">Last 6 Months</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-3-months">Last 3 Months</button></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Analytics KPIs -->
+    <div class="kpi-grid">
+        <div class="card-premium kpi-card accent-primary">
+            <div class="kpi-header">
+                <span class="kpi-title">Total Spending</span>
+                <div class="kpi-icon-wrapper danger"><i class="bi bi-cart-fill"></i></div>
+            </div>
+            <div class="kpi-value text-danger" id="analytics-total-spend">₹0.00</div>
+            <div class="kpi-trend text-muted small" id="analytics-spend-timeline">Jan - May 2025</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Avg. Monthly Spending</span>
+                <div class="kpi-icon-wrapper primary"><i class="bi bi-calculator-fill"></i></div>
+            </div>
+            <div class="kpi-value" id="analytics-avg-spend">₹0.00</div>
+            <div class="kpi-trend text-muted small">averaged across months</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Highest Category</span>
+                <div class="kpi-icon-wrapper warning"><i class="bi bi-tag-fill"></i></div>
+            </div>
+            <div class="kpi-value" id="analytics-highest-cat">Shopping</div>
+            <div class="kpi-trend text-muted small" id="analytics-highest-cat-amount">₹0.00 total</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Busiest Day</span>
+                <div class="kpi-icon-wrapper success"><i class="bi bi-calendar-event-fill"></i></div>
+            </div>
+            <div class="kpi-value" id="analytics-busiest-day">Saturday</div>
+            <div class="kpi-trend text-muted small" id="analytics-busiest-day-amount">₹0.00 spent</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Total Transactions</span>
+                <div class="kpi-icon-wrapper primary"><i class="bi bi-file-text-fill"></i></div>
+            </div>
+            <div class="kpi-value" id="analytics-total-txs">0</div>
+            <div class="kpi-trend text-muted small" id="analytics-avg-txs-month">0 per month</div>
+        </div>
+    </div>
+
+    <!-- Row 1: Timeline, Category, Merchants -->
+    <div class="row mb-4">
+        <!-- Spending Overview (Line Chart) -->
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-graph-up text-primary me-2"></i> Spending Overview</span>
+                    <select class="form-select form-select-sm w-auto" id="spendingOverviewTimeline">
+                        <option value="all">All Time</option>
+                        <option value="this-year" selected>This Year</option>
+                        <option value="last-year">Last Year</option>
+                        <option value="last-6-months">Last 6 Months</option>
+                        <option value="last-3-months">Last 3 Months</option>
+                    </select>
+                </div>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="spendingOverviewChart"></canvas>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-3 border-top pt-3 small text-muted">
+                    <div>Highest: <strong class="text-danger" id="overview-highest-month">Mar 2025 (₹1,18,340)</strong></div>
+                    <div>Lowest: <strong class="text-success" id="overview-lowest-month">Apr 2025 (₹1,05,120)</strong></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Pie Chart -->
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-pie-chart-fill text-primary me-2"></i> Spending by Category</span>
+                </div>
+                <div style="height: 200px; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <canvas id="spendingCategoryChart"></canvas>
+                </div>
+                <div class="text-center mt-3 pt-2 border-top small text-muted">
+                    Total Spending: <strong id="spending-category-total">₹0.00</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Merchants List -->
+        <div class="col-lg-4">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-shop text-primary me-2"></i> Top Merchants</span>
+                </div>
+                <div class="list-premium" id="analytics-merchants-list">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Combined Trends, Payment Mode, Heatmap -->
+    <div class="row mb-4">
+        <!-- Spending Trends vs Transaction Count (Bar + Line combo) -->
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-bar-chart-steps text-primary me-2"></i> Spending Trends</span>
+                </div>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="spendingTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Mode Donut -->
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-wallet2 text-primary me-2"></i> Spending by Payment Mode</span>
+                </div>
+                <div style="height: 200px; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <canvas id="paymentModeChart"></canvas>
+                </div>
+                <div class="text-center mt-3 pt-2 border-top small text-muted">
+                    Primary: <strong id="analytics-primary-payment">UPI (56.9%)</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Heatmap Calendar -->
+        <div class="col-lg-4">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-calendar3 text-primary me-2"></i> Spending by Day of Week</span>
+                </div>
+                <div class="heatmap-grid" id="analytics-heatmap-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top small text-muted">
+                    <span>Low Spending</span>
+                    <div class="d-flex gap-1">
+                        <span class="d-inline-block rounded" style="width: 12px; height: 12px; background-color: var(--border-color)"></span>
+                        <span class="d-inline-block rounded" style="width: 12px; height: 12px; background-color: rgba(59, 130, 246, 0.25)"></span>
+                        <span class="d-inline-block rounded" style="width: 12px; height: 12px; background-color: rgba(59, 130, 246, 0.6)"></span>
+                        <span class="d-inline-block rounded" style="width: 12px; height: 12px; background-color: var(--primary)"></span>
+                    </div>
+                    <span>High Spending</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Subscriptions & Insights -->
+    <div class="row">
+        <!-- Subscriptions List -->
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="chart-title"><i class="bi bi-arrow-repeat text-primary me-2"></i> Subscription Detection</span>
+                    <a href="{{ url_for('transactions_page', category_id=5) }}" class="small text-decoration-none">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-premium text-nowrap align-middle">
+                        <thead>
+                            <tr>
+                                <th>Merchant</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Frequency</th>
+                                <th>Next Billing</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analytics-subscriptions-rows">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center py-4" id="subscriptions-empty-state" style="display: none;">
+                    <i class="bi bi-arrow-repeat text-muted fs-2 mb-2"></i>
+                    <h6 class="text-secondary fw-bold">No Subscriptions Detected</h6>
+                    <p class="small text-muted mb-0">We scan recurring transactions to find active subscriptions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Key Insights List -->
+        <div class="col-lg-6">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-cpu-fill text-primary me-2"></i> Key Insights</span>
+                </div>
+                <div id="analytics-insights-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

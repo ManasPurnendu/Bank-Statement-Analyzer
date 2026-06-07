@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4" id="upload-panel">
+    <!-- Top Header Navigation -->
+    <header class="landing-navbar">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-bar-chart-fill brand-icon"></i>
+            <div class="brand-text">
+                <span class="brand-title">Bank Statement</span>
+                <span class="brand-subtitle">Analyzer</span>
+            </div>
+        </div>
+        <ul class="landing-nav-links d-none d-lg-flex">
+            <li><a href="#features" class="landing-nav-link">Features</a></li>
+            <li><a href="#how-it-works" class="landing-nav-link">How It Works</a></li>
+            <li><a href="#security" class="landing-nav-link">Security</a></li>
+            <li><a href="#faq" class="landing-nav-link">FAQ</a></li>
+            <li><a href="#pricing" class="landing-nav-link">Pricing</a></li>
+        </ul>
+        <button type="button" class="btn btn-primary px-4 py-2 rounded-pill" id="navUploadBtn">
+            <i class="bi bi-cloud-arrow-up me-2"></i> Upload Statement
+        </button>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="row align-items-center landing-hero mb-5">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <span class="badge-ai">
+                <i class="bi bi-stars"></i> AI-Powered Financial Insights
+            </span>
+            <h1 class="display-4 fw-extrabold mb-3 lh-sm" style="font-family: var(--font-heading); font-size: 3.25rem;">
+                Understand Your <br><span class="text-primary">Finances Better</span>
+            </h1>
+            <p class="lead text-secondary mb-4" style="font-size: 1.15rem;">
+                Upload your bank statements and get intelligent insights about your income, expenses, savings and more.
+            </p>
+            <div class="hero-pill-badges">
+                <span class="hero-pill-badge"><i class="bi bi-shield-check text-success"></i> 100% Secure</span>
+                <span class="hero-pill-badge"><i class="bi bi-cpu-fill text-primary"></i> AI-Powered</span>
+                <span class="hero-pill-badge"><i class="bi bi-eye-slash-fill text-primary"></i> Private & Confidential</span>
+            </div>
+            
+            <!-- Upload Box Card -->
+            <div class="card p-3 border-dashed rounded-4 bg-surface" style="border: 2px dashed var(--primary-light-border); box-shadow: var(--shadow-sm);">
+                <div class="upload-dropzone" id="dropzone" style="border: none; padding: 20px;">
+                    <i class="bi bi-cloud-arrow-up upload-icon mb-2" style="font-size: 40px;"></i>
+                    <h5 class="fw-bold m-0" style="font-size: 1.1rem;">Upload Bank Statement</h5>
+                    <p class="text-secondary small mb-2">Drag and drop your PDF statement here, or</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.xls,.xlsx" style="display: none;">
+                    <button type="button" class="btn btn-primary px-4 py-2 mb-2" id="browseBtn">
+                        Choose File
+                    </button>
+                    <p class="text-muted small m-0" style="font-size: 0.75rem;">Supports PDF & Excel formats • Max file size 20MB</p>
+                </div>
+            </div>
+
+            <!-- Load Demo Button Wrapper -->
+            <div class="d-flex align-items-center mt-3 gap-2 px-2">
+                <span class="small text-secondary">No statement? Test features with</span>
+                <button type="button" class="btn btn-link btn-sm p-0 fw-semibold text-primary" id="loadDemoBtn" style="text-decoration: none;">
+                    <i class="bi bi-magic me-1"></i> Demo Statement Data
+                </button>
+            </div>
+        </div>
+        
+        <!-- Dashboard Mockup Viewport -->
+        <div class="col-lg-6">
+            <div class="dashboard-mockup-wrapper">
+                <!-- Mock Sidebar -->
+                <div class="mock-sidebar">
+                    <div class="mock-sidebar-logo">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Bank Statement<br><span style="color:var(--text-muted)">Analyzer</span></span>
+                    </div>
+                    <div class="mock-nav-item active">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="mock-nav-item">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Transactions</span>
+                    </div>
+                    <div class="mock-nav-item">
+                        <i class="bi bi-pie-chart-fill"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="mock-nav-item">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <span>Forecasts</span>
+                    </div>
+                    <div class="mock-nav-item">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                        <span>Reports</span>
+                    </div>
+                </div>
+                
+                <!-- Mock Main Viewport -->
+                <div class="mock-main">
+                    <div class="mock-header">
+                        <div>
+                            <div class="mock-title">Welcome, Manas 👋</div>
+                            <div class="mock-subtitle">Here's your financial overview for May 2025</div>
+                        </div>
+                        <div class="mock-date">
+                            01 May 2025 - 31 May 2025 <i class="bi bi-chevron-down ms-1" style="font-size:8px"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- KPI Row -->
+                    <div class="mock-kpis">
+                        <div class="mock-kpi-card" style="border-left: 2px solid var(--primary)">
+                            <div class="mock-kpi-title">Current Balance</div>
+                            <div class="mock-kpi-val">₹ 45,680.50</div>
+                            <div class="mock-kpi-sub" style="color:var(--text-muted); font-size:6px">as on 31 May 2025</div>
+                        </div>
+                        <div class="mock-kpi-card" style="border-left: 2px solid var(--success)">
+                            <div class="mock-kpi-title">Total Income</div>
+                            <div class="mock-kpi-val">₹ 1,24,560.00</div>
+                            <div class="mock-kpi-sub"><i class="bi bi-arrow-up-short"></i> 18.6% vs Apr</div>
+                        </div>
+                        <div class="mock-kpi-card" style="border-left: 2px solid var(--danger)">
+                            <div class="mock-kpi-title">Total Expenses</div>
+                            <div class="mock-kpi-val">₹ 78,879.50</div>
+                            <div class="mock-kpi-sub" style="color:var(--danger)"><i class="bi bi-arrow-up-short"></i> 12.3% vs Apr</div>
+                        </div>
+                        <div class="mock-kpi-card" style="border-left: 2px solid #7c3aed">
+                            <div class="mock-kpi-title">Savings Rate</div>
+                            <div class="mock-kpi-val">28.6%</div>
+                            <div class="mock-kpi-sub"><i class="bi bi-arrow-up-short"></i> 6.2% vs Apr</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="mock-charts">
+                        <div class="mock-chart-card">
+                            <div class="mock-chart-title">Income vs Expenses</div>
+                            <div class="mock-bars">
+                                <div class="mock-bar-pair">
+                                    <div class="mock-bar-in" style="height: 35px"></div>
+                                    <div class="mock-bar-out" style="height: 25px"></div>
+                                </div>
+                                <div class="mock-bar-pair">
+                                    <div class="mock-bar-in" style="height: 42px"></div>
+                                    <div class="mock-bar-out" style="height: 28px"></div>
+                                </div>
+                                <div class="mock-bar-pair">
+                                    <div class="mock-bar-in" style="height: 48px"></div>
+                                    <div class="mock-bar-out" style="height: 52px"></div>
+                                </div>
+                                <div class="mock-bar-pair">
+                                    <div class="mock-bar-in" style="height: 50px"></div>
+                                    <div class="mock-bar-out" style="height: 35px"></div>
+                                </div>
+                                <div class="mock-bar-pair">
+                                    <div class="mock-bar-in" style="height: 58px; background-color: var(--primary)"></div>
+                                    <div class="mock-bar-out" style="height: 40px; background-color: var(--danger)"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mock-chart-card">
+                            <div class="mock-chart-title">Expenses by Category</div>
+                            <div class="mock-donut-wrapper">
+                                <div class="mock-donut">
+                                    <div class="mock-donut-inner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Transactions Table -->
+                    <div class="mock-table-card">
+                        <div class="mock-chart-title mb-2">Recent Transactions</div>
+                        <table class="mock-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>31 May 2025</td>
+                                    <td>Salary Credit</td>
+                                    <td><span style="color:var(--success)">Income</span></td>
+                                    <td><span class="mock-amount-credit">+ ₹ 75,000.00</span></td>
+                                </tr>
+                                <tr>
+                                    <td>30 May 2025</td>
+                                    <td>Amazon Pay</td>
+                                    <td><span style="color:var(--primary)">Shopping</span></td>
+                                    <td><span class="mock-amount-debit">- ₹ 2,450.00</span></td>
+                                </tr>
+                                <tr>
+                                    <td>30 May 2025</td>
+                                    <td>Swiggy</td>
+                                    <td><span style="color:var(--warning)">Food & Dining</span></td>
+                                    <td><span class="mock-amount-debit">- ₹ 518.00</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="text-center mt-5 pt-3" id="features">
+        <h3 class="fw-bold mb-1" style="font-family: var(--font-heading);">Why Choose Bank Statement Analyzer?</h3>
+        <p class="text-secondary small mb-4">Complete client-side local financial intelligence with zero privacy trade-offs</p>
+        <div class="landing-feature-grid">
+            <div class="landing-feature-card">
+                <i class="bi bi-file-text text-primary fs-2 mb-2 d-inline-block"></i>
+                <h6 class="fw-bold">AI-Powered Insights</h6>
+                <p class="small text-secondary mb-0">Get intelligent analysis and insights powered by advanced logic and rule engines.</p>
+            </div>
+            <div class="landing-feature-card">
+                <i class="bi bi-shield-check text-success fs-2 mb-2 d-inline-block"></i>
+                <h6 class="fw-bold">Bank-Level Security</h6>
+                <p class="small text-secondary mb-0">Your data is encrypted and processed securely. We never store your bank credentials.</p>
+            </div>
+            <div class="landing-feature-card">
+                <i class="bi bi-pie-chart text-primary fs-2 mb-2 d-inline-block"></i>
+                <h6 class="fw-bold">Detailed Analytics</h6>
+                <p class="small text-secondary mb-0">Understand your spending patterns with beautiful charts and detailed reports.</p>
+            </div>
+            <div class="landing-feature-card">
+                <i class="bi bi-graph-up-arrow text-warning fs-2 mb-2 d-inline-block"></i>
+                <h6 class="fw-bold">Save More</h6>
+                <p class="small text-secondary mb-0">Identify opportunities to save money and achieve your financial goals.</p>
+            </div>
+            <div class="landing-feature-card">
+                <i class="bi bi-file-earmark-pdf text-danger fs-2 mb-2 d-inline-block"></i>
+                <h6 class="fw-bold">Export Reports</h6>
+                <p class="small text-secondary mb-0">Generate and export professional reports in PDF format with just one click.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="mt-5 pt-5" id="how-it-works">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-1">How It Works</h3>
+            <p class="text-secondary small">Analyze your statements in 4 simple steps</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3">
+                <div class="card-premium h-100 text-center p-4">
+                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-upload fs-3"></i>
+                    </div>
+                    <h6 class="fw-bold">1. Upload Statement</h6>
+                    <p class="text-secondary small mb-0">Drag and drop your PDF or Excel statement. Encrypted statements are supported.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-premium h-100 text-center p-4">
+                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-shield-lock fs-3"></i>
+                    </div>
+                    <h6 class="fw-bold">2. Local Decryption</h6>
+                    <p class="text-secondary small mb-0">Password-protected files are decrypted in-memory locally. No data leaves your machine.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-premium h-100 text-center p-4">
+                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-cpu fs-3"></i>
+                    </div>
+                    <h6 class="fw-bold">3. Auto-Categorization</h6>
+                    <p class="text-secondary small mb-0">Transactions are auto-tagged by category. Create custom rules to classify future items.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-premium h-100 text-center p-4">
+                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-magic fs-3"></i>
+                    </div>
+                    <h6 class="fw-bold">4. Analytics & Forecast</h6>
+                    <p class="text-secondary small mb-0">Explore spending trends, subscription protection, future cash flows, and generate PDFs.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Section -->
+    <div class="mt-5 pt-5" id="security">
+        <div class="card-premium p-5" style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--primary-light) 100%); border: 1px solid var(--primary-light-border);">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <span class="badge bg-success text-white mb-3 px-3 py-2 rounded-pill"><i class="bi bi-shield-fill-check me-1"></i> Bank-Grade Privacy</span>
+                    <h3 class="fw-bold mb-3" style="font-family: var(--font-heading);">Your Financial Privacy is Non-Negotiable</h3>
+                    <p class="text-secondary mb-4">Unlike other personal finance apps that upload your sensitive bank statements to cloud databases and share your data with advertisers, <strong>Bank Statement Analyzer works 100% locally.</strong></p>
+                    <div class="row g-3">
+                        <div class="col-sm-6 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Local SQLite DB</h6>
+                                <p class="text-secondary small mb-0">Data is kept in a local SQLite file on your device.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Zero API Uploads</h6>
+                                <p class="text-secondary small mb-0">All parsing and ML-like rule matching is executed offline.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Immediate File Purge</h6>
+                                <p class="text-secondary small mb-0">Uploaded statement PDFs/Excel sheets are deleted after parsing.</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">No Third-Party Access</h6>
+                                <p class="text-secondary small mb-0">Your bank transactions are never visible to anyone else.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block">
+                    <i class="bi bi-shield-lock-fill text-primary" style="font-size: 140px; filter: drop-shadow(0 10px 15px rgba(37, 99, 235, 0.2));"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="mt-5 pt-5" id="faq">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-1">Frequently Asked Questions</h3>
+            <p class="text-secondary small">Everything you need to know about Bank Statement Analyzer</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    <div class="accordion-item bg-transparent border-bottom py-3">
+                        <h2 class="accordion-header" id="faq-h1">
+                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c1" aria-expanded="false" aria-controls="faq-c1">
+                                Is my data uploaded to external servers?
+                            </button>
+                        </h2>
+                        <div id="faq-c1" class="accordion-collapse collapse" aria-labelledby="faq-h1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body px-0 py-3 text-secondary small">
+                                No. The entire application runs locally on your computer. Your statements are parsed, analyzed, and stored in a local SQLite database file on your hard drive. No transaction data leaves your machine.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item bg-transparent border-bottom py-3">
+                        <h2 class="accordion-header" id="faq-h2">
+                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c2" aria-expanded="false" aria-controls="faq-c2">
+                                How does PDF statement decryption work?
+                            </button>
+                        </h2>
+                        <div id="faq-c2" class="accordion-collapse collapse" aria-labelledby="faq-h2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body px-0 py-3 text-secondary small">
+                                If your bank statement PDF is password-protected, the app will prompt you for the password. Decryption is performed in-memory on your computer. The password is never stored, logged, or shared.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item bg-transparent border-bottom py-3">
+                        <h2 class="accordion-header" id="faq-h3">
+                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c3" aria-expanded="false" aria-controls="faq-c3">
+                                Can I delete a statement after importing it?
+                            </button>
+                        </h2>
+                        <div id="faq-c3" class="accordion-collapse collapse" aria-labelledby="faq-h3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body px-0 py-3 text-secondary small">
+                                Yes. You can click the Trash icon next to any loaded statement in the sidebar. This immediately deletes the statement and all its transactions from your local database, updating the entire dashboard and charts.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-transparent border-bottom py-3">
+                        <h2 class="accordion-header" id="faq-h4">
+                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c4" aria-expanded="false" aria-controls="faq-c4">
+                                Which statement formats are supported?
+                            </button>
+                        </h2>
+                        <div id="faq-c4" class="accordion-collapse collapse" aria-labelledby="faq-h4" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body px-0 py-3 text-secondary small">
+                                We support standard bank statement PDF formats and Excel exports (e.g., HDFC, ICICI, SBI, Axis, etc.). The parser automatically identifies transaction columns, deposits, withdrawals, dates, and balances.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="mt-5 pt-5 mb-5" id="pricing">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-1">Simple, Transparent Pricing</h3>
+            <p class="text-secondary small">Free, private, and unlimited local processing</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card-premium text-center p-5 border-primary" style="border: 2px solid var(--primary);">
+                    <span class="badge bg-primary text-white mb-2 px-3 py-1 text-uppercase rounded-pill" style="font-size: 10px;">Offline Forever</span>
+                    <h4 class="fw-bold my-2">Local Free Tier</h4>
+                    <div class="my-4">
+                        <span class="display-5 fw-extrabold text-primary">₹0</span>
+                        <span class="text-muted">/ lifetime</span>
+                    </div>
+                    <ul class="list-unstyled text-start mb-4 px-3 d-flex flex-column gap-2" style="font-size: 14px;">
+                        <li><i class="bi bi-check-lg text-success me-2"></i> <strong>100% private</strong> local analytics</li>
+                        <li><i class="bi bi-check-lg text-success me-2"></i> Unlimited statements processing</li>
+                        <li><i class="bi bi-check-lg text-success me-2"></i> Custom categorization rules</li>
+                        <li><i class="bi bi-check-lg text-success me-2"></i> Subscription protection filters</li>
+                        <li><i class="bi bi-check-lg text-success me-2"></i> Cash flow forecasting</li>
+                        <li><i class="bi bi-check-lg text-success me-2"></i> High-quality PDF reports</li>
+                    </ul>
+                    <a href="#upload-panel" class="btn btn-primary w-100 py-2 rounded-pill" style="text-decoration: none;">
+                        Get Started Free
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Footer band -->
+    <footer class="landing-footer">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-lock-fill text-muted me-2" style="font-size: 16px;"></i>
+            <span>Your privacy is our priority. Your data is processed locally and never shared with third parties.</span>
+        </div>
+        <a href="#security" class="text-primary fw-semibold text-decoration-none">
+            Learn more about our security <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </footer>
+</div>
+
+<!-- Decryption Password Prompt Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-shield-lock-fill text-warning me-2"></i> PDF is Encrypted</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="text-secondary small mb-3">The PDF file you uploaded is password-protected. Please enter the decryption password below. This password is processed strictly in-memory and is never saved.</p>
+                <div class="form-group mb-3">
+                    <label class="form-label fw-bold">Statement Password</label>
+                    <input type="password" class="form-control" id="pdfPassword" placeholder="Enter password...">
+                    <div class="invalid-feedback" id="passwordError">Incorrect password. Please try again.</div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary px-4 py-2" id="submitPasswordBtn">Decrypt & Parse</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Statement Action Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Statement Already Exists</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="text-secondary small mb-1" id="duplicateDetails">This statement appears to have been uploaded previously.</p>
+                <p class="text-secondary small">Would you like to overwrite it with the new file or skip processing?</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary px-3 py-2" id="duplicateSkipBtn">Skip File</button>
+                <button type="button" class="btn btn-danger px-4 py-2" id="duplicateReplaceBtn">Replace Existing</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Processing Page (Transition screen visible after file ingestion) -->
+<div class="container" id="processing-panel" style="display: none;">
+    <div class="processing-container">
+        <div class="spinner-premium"></div>
+        <h3 class="fw-bold m-0" id="processing-title">Uploading Files...</h3>
+        <p class="text-secondary">Please keep this browser window open while the parser normalizes your bank statement.</p>
+        
+        <div class="processing-steps">
+            <div class="processing-step active" id="step-upload">
+                <i class="bi bi-circle"></i>
+                <span>Uploading Files...</span>
+            </div>
+            <div class="processing-step" id="step-analyze">
+                <i class="bi bi-circle"></i>
+                <span>Analyzing Statements...</span>
+            </div>
+            <div class="processing-step" id="step-extract">
+                <i class="bi bi-circle"></i>
+                <span>Extracting Transactions...</span>
+            </div>
+            <div class="processing-step" id="step-categorize">
+                <i class="bi bi-circle"></i>
+                <span>Categorizing Transactions...</span>
+            </div>
+            <div class="processing-step" id="step-insights">
+                <i class="bi bi-circle"></i>
+                <span>Generating Insights...</span>
+            </div>
+            <div class="processing-step" id="step-ready">
+                <i class="bi bi-circle"></i>
+                <span>Preparing Dashboard...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

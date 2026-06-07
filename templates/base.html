@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Statement Analyzer</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-theme="light">
+    <div class="app-container {% if request.path == '/' or request.path == '' %}no-sidebar{% endif %}">
+        {% if request.path != '/' and request.path != '' %}
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="bi bi-bar-chart-fill brand-icon"></i>
+                <div class="brand-text">
+                    <span class="brand-title">Bank Statement</span>
+                    <span class="brand-subtitle">Analyzer</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard_page') }}" class="nav-item" id="nav-dashboard">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('transactions_page') }}" class="nav-item" id="nav-transactions">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Transactions</span>
+                </a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-item" id="nav-analytics">
+                    <i class="bi bi-pie-chart-fill"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="{{ url_for('forecast_page') }}" class="nav-item" id="nav-forecasts">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Forecasts</span>
+                </a>
+                <a href="{{ url_for('reports_page') }}" class="nav-item" id="nav-reports">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar dynamic lists (Shown only if statements are uploaded) -->
+            <div class="sidebar-sections" id="sidebar-dynamic-sections" style="display: none;">
+                <hr class="sidebar-divider">
+                <div class="sidebar-section-title">Uploaded Statements</div>
+                <div class="sidebar-list" id="sidebar-statements-list">
+                    <!-- Statements populated via JS -->
+                </div>
+                
+                <a href="{{ url_for('landing_page') }}" class="btn btn-outline-primary btn-sm w-100 mt-2 py-2" id="sidebar-upload-btn">
+                    <i class="bi bi-plus-lg me-1"></i> Upload More
+                </a>
+
+                <hr class="sidebar-divider">
+                <div class="sidebar-section-title">Data Coverage</div>
+                <div class="sidebar-list" id="sidebar-coverage-list">
+                    <!-- Months populated via JS -->
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="dark-mode-toggle-wrapper">
+                    <div class="dark-mode-label">
+                        <i class="bi bi-moon-fill me-2"></i>
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                    </div>
+                </div>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ range(1, 100000) | random }}"></script>
+</body>
+</html>

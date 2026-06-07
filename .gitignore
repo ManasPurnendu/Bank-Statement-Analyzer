@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Environment variables
+.env
+
+# Generated files
+generated_reports/
+
+# Uploaded statements
+uploads/
+
+# Database backups
+*.db-journal

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Empty State (Shown if insufficient data: < 2 months) -->
+<div class="container py-5" id="forecast-empty-state" style="display: none;">
+    <div class="empty-state">
+        <i class="bi bi-graph-up-arrow empty-state-icon"></i>
+        <h4 class="fw-bold">Insufficient Data for Forecasting</h4>
+        <p class="text-secondary small max-w-md" id="forecast-empty-message">At least 2 months of statement data are required to generate predictions and trends.</p>
+        <a href="{{ url_for('landing_page') }}" class="btn btn-primary px-4 py-2 mt-2">
+            <i class="bi bi-cloud-arrow-up-fill me-2"></i> Upload Statements
+        </a>
+    </div>
+</div>
+
+<!-- Filled Forecasts Page -->
+<div class="container-fluid py-4" id="forecast-filled-state" style="display: none;">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-extrabold m-0" style="font-family: var(--font-heading);">Financial Forecasts</h2>
+            <p class="text-secondary small m-0">Predict your future finances, visualize cash flow trend curves, and perform what-if scenario simulations</p>
+        </div>
+    </div>
+
+    <!-- Forecast KPIs -->
+    <div class="kpi-grid">
+        <div class="card-premium kpi-card accent-primary">
+            <div class="kpi-header">
+                <span class="kpi-title">Projected Income (Next 3m)</span>
+                <div class="kpi-icon-wrapper success"><i class="bi bi-graph-up"></i></div>
+            </div>
+            <div class="kpi-value text-success" id="forecast-projected-income">₹0.00</div>
+            <div class="kpi-trend text-muted small" id="forecast-avg-monthly-income">Avg: ₹0.00/mo</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Projected Expenses (Next 3m)</span>
+                <div class="kpi-icon-wrapper danger"><i class="bi bi-graph-down"></i></div>
+            </div>
+            <div class="kpi-value text-danger" id="forecast-projected-expense">₹0.00</div>
+            <div class="kpi-trend text-muted small" id="forecast-avg-monthly-expense">Avg: ₹0.00/mo</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Projected Savings (Next 3m)</span>
+                <div class="kpi-icon-wrapper primary"><i class="bi bi-piggy-bank-fill"></i></div>
+            </div>
+            <div class="kpi-value text-primary" id="forecast-projected-savings">₹0.00</div>
+            <div class="kpi-trend text-muted small" id="forecast-avg-monthly-savings">Avg: ₹0.00/mo</div>
+        </div>
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Avg. Savings Rate (Projected)</span>
+                <div class="kpi-icon-wrapper warning"><i class="bi bi-percent"></i></div>
+            </div>
+            <div class="kpi-value" id="forecast-projected-savings-rate">0.0%</div>
+            <div class="kpi-trend up" id="forecast-savings-rate-trend">
+                <i class="bi bi-arrow-up-right me-1"></i> <span>0.0% vs historical</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projections Chart and Table Grid -->
+    <div class="charts-grid">
+        <!-- Forecast Chart -->
+        <div class="card-premium">
+            <div class="chart-title-wrapper">
+                <span class="chart-title"><i class="bi bi-activity text-primary me-2"></i> Income vs Expenses Forecast</span>
+                <select class="form-select form-select-sm w-auto" id="forecastHorizonSelect">
+                    <option value="3">Next 3 Months</option>
+                    <option value="6" selected>Next 6 Months</option>
+                    <option value="9">Next 9 Months</option>
+                    <option value="12">Next 12 Months</option>
+                </select>
+            </div>
+            <div style="height: 300px; position: relative;">
+                <canvas id="forecastTimelineChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Projections Summary Table -->
+        <div class="card-premium">
+            <div class="chart-title-wrapper">
+                <span class="chart-title"><i class="bi bi-calendar-range text-primary me-2"></i> Monthly Forecast Summary</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-premium text-nowrap align-middle">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Projected Income</th>
+                            <th>Projected Expenses</th>
+                            <th>Projected Savings</th>
+                            <th>Savings Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forecast-monthly-rows">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Projections, Large Bills, Cash Flow Charts -->
+    <div class="row mb-4">
+        <!-- Top Category Spend Projections -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-tags-fill text-primary me-2"></i> Top Category Forecast (3 Months)</span>
+                </div>
+                <div class="list-premium" id="forecast-category-list">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Large Upcoming Expenses -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-calendar-check-fill text-primary me-2"></i> Upcoming Large Expenses</span>
+                </div>
+                <div class="list-premium mb-3" id="forecast-upcoming-expenses">
+                    <!-- Populated dynamically -->
+                </div>
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 mt-auto small">
+                    <span class="fw-bold">Total Est. Outflow</span>
+                    <strong class="text-danger" id="forecast-total-upcoming">₹0.00</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cash Flow Bar Projections -->
+        <div class="col-lg-4">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-bar-chart-fill text-primary me-2"></i> Cash Flow Forecast</span>
+                </div>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="forecastCashFlowChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What-If Simulator & AI Recommendations Drawer -->
+    <div class="row">
+        <!-- What-If Simulator Panel -->
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card-premium h-100 accent-primary">
+                <h5 class="fw-bold mb-2"><i class="bi bi-calculator-fill text-primary me-2"></i> What-If Budget Simulator</h5>
+                <p class="text-secondary small mb-4">Simulate how reducing spending in specific categories will affect your savings rate and project future balances.</p>
+                
+                <form id="what-if-form" class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label small fw-bold">Select Category</label>
+                        <select class="form-select" id="whatIfCategory" required>
+                            <option value="">Choose category...</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label small fw-bold">Reduction Percentage</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="whatIfReduction" min="1" max="100" placeholder="e.g. 20" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="bi bi-lightning-fill me-1"></i> Run Simulation
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- What-If Result Notification -->
+                <div class="alert alert-success d-flex align-items-center mt-3 mb-0 py-3 rounded-3" id="what-if-alert" style="display: none !important;">
+                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                    <div class="small" id="what-if-alert-message">
+                        Select a category to run simulation.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommendations Drawer -->
+        <div class="col-lg-7">
+            <div class="card-premium h-100">
+                <div class="chart-title-wrapper">
+                    <span class="chart-title"><i class="bi bi-cpu-fill text-primary me-2"></i> System Recommendations</span>
+                </div>
+                <div id="forecast-recommendations-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

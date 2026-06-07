@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-extrabold m-0" style="font-family: var(--font-heading);">Transactions Audit</h2>
+            <p class="text-secondary small m-0">Browse, search, filter, and customize the classification of all parsed statement rows</p>
+        </div>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="card-premium mb-4">
+        <form id="filters-form" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Search Description / Merchant</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0" id="searchVal" placeholder="Search keyword...">
+                </div>
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Category</label>
+                <select class="form-select form-select-sm" id="categoryVal">
+                    <option value="">All Categories</option>
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Type</label>
+                <select class="form-select form-select-sm" id="typeVal">
+                    <option value="">All Types</option>
+                    <option value="Debit">Debit</option>
+                    <option value="Credit">Credit</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">Start Date</label>
+                <input type="date" class="form-control form-control-sm" id="startDateVal">
+            </div>
+            
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">End Date</label>
+                <input type="date" class="form-control form-control-sm" id="endDateVal">
+            </div>
+            
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-secondary btn-sm w-100 py-2" id="clearFiltersBtn">
+                    Reset
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card-premium">
+        <div class="table-responsive">
+            <table class="table table-premium text-nowrap align-middle">
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;" id="th-date">Date <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                        <th style="cursor: pointer;" id="th-amount">Amount <i class="bi bi-arrow-down-up small ms-1"></i></th>
+                        <th>Running Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-rows">
+                    <!-- Populated dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State Inside Table -->
+        <div class="text-center py-5" id="table-empty-state" style="display: none;">
+            <i class="bi bi-slash-circle text-muted fs-1 mb-2"></i>
+            <h6 class="fw-bold text-secondary">No Transactions Found</h6>
+            <p class="small text-muted mb-0">Try adjusting your search queries or filter constraints.</p>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div class="d-flex align-items-center justify-content-between mt-4 border-top pt-3">
+            <div class="small text-muted" id="pagination-info">
+                Showing 0 to 0 of 0 transactions
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm m-0" id="pagination-controls">
+                    <!-- Loaded dynamically -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Category Edit Popup Modal -->
+<div class="modal fade" id="categoryEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-tag-fill text-primary me-2"></i> Classify Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">Original Narration</label>
+                    <div class="p-3 bg-light rounded-3 small font-monospace text-wrap" id="modal-orig-narration">
+                        SWIGGY RETAIL SERVICE
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label class="form-label fw-bold">Select Category</label>
+                    <select class="form-select" id="modalCategorySelect">
+                        <!-- Categories filled in via JS -->
+                    </select>
+                </div>
+                
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="modalRememberCheckbox">
+                    <label class="form-check-label small" for="modalRememberCheckbox">
+                        Remember this merchant/payee for future transactions (Creates a global classification rule)
+                    </label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="modalRememberAmountCheckbox">
+                    <label class="form-check-label small" for="modalRememberAmountCheckbox">
+                        Remember this specific amount for future transactions (Auto-categorize transactions matching this exact amount)
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-3 py-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary px-4 py-2" id="saveCategoryBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

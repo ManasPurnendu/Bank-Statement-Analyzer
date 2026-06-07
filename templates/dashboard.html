@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Empty State (Shown if no data exists) -->
+<div class="container py-5" id="dashboard-empty-state" style="display: none;">
+    <div class="empty-state">
+        <i class="bi bi-file-earmark-bar-graph-fill empty-state-icon"></i>
+        <h4 class="fw-bold">No Statements Loaded</h4>
+        <p class="text-secondary small max-w-md">Upload bank statements in PDF, XLS, or XLSX formats first to populate this analytical dashboard.</p>
+        <a href="{{ url_for('landing_page') }}" class="btn btn-primary px-4 py-2 mt-2">
+            <i class="bi bi-cloud-arrow-up-fill me-2"></i> Upload Statement
+        </a>
+    </div>
+</div>
+
+<!-- Main Dashboard Container -->
+<div class="container-fluid py-4" id="dashboard-filled-state" style="display: none;">
+    <!-- Welcome Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-extrabold m-0" style="font-family: var(--font-heading);" id="welcome-title">Welcome, Manas 👏</h2>
+            <p class="text-secondary small m-0" id="statement-range-subtitle">Financial overview for Jan - May 2025</p>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-light border dropdown-toggle d-flex align-items-center gap-2" type="button" id="dateFilterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-calendar3"></i>
+                <span id="date-filter-label">01 Jan 2025 - 31 May 2025</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="dateFilterBtn" id="dashboard-date-dropdown">
+                <li><button class="dropdown-item" type="button" data-range="all">All Time</button></li>
+                <li><button class="dropdown-item" type="button" data-range="this-year">This Year</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-year">Last Year</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-6-months">Last 6 Months</button></li>
+                <li><button class="dropdown-item" type="button" data-range="last-3-months">Last 3 Months</button></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- KPI Cards Grid -->
+    <div class="kpi-grid">
+        <!-- Card 1: Balance -->
+        <div class="card-premium kpi-card accent-primary">
+            <div class="kpi-header">
+                <span class="kpi-title">Current Balance</span>
+                <div class="kpi-icon-wrapper primary"><i class="bi bi-wallet2"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-balance">₹0.00</div>
+            <div class="kpi-trend text-muted small" id="kpi-balance-asof">as of today</div>
+        </div>
+        <!-- Card 2: Income -->
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Total Income</span>
+                <div class="kpi-icon-wrapper success"><i class="bi bi-arrow-down-left-circle"></i></div>
+            </div>
+            <div class="kpi-value text-success" id="kpi-income">₹0.00</div>
+            <div class="kpi-trend up" id="kpi-income-trend">
+                <i class="bi bi-arrow-up-right me-1"></i> <span>0.0% MoM</span>
+            </div>
+        </div>
+        <!-- Card 3: Expenses -->
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Total Expenses</span>
+                <div class="kpi-icon-wrapper danger"><i class="bi bi-arrow-up-right-circle"></i></div>
+            </div>
+            <div class="kpi-value text-danger" id="kpi-expense">₹0.00</div>
+            <div class="kpi-trend down" id="kpi-expense-trend">
+                <i class="bi bi-arrow-down-left me-1"></i> <span>0.0% MoM</span>
+            </div>
+        </div>
+        <!-- Card 4: Net Savings -->
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Net Savings</span>
+                <div class="kpi-icon-wrapper primary"><i class="bi bi-piggy-bank"></i></div>
+            </div>
+            <div class="kpi-value text-primary" id="kpi-savings">₹0.00</div>
+            <div class="kpi-trend up" id="kpi-savings-trend">
+                <i class="bi bi-arrow-up-right me-1"></i> <span>0.0% MoM</span>
+            </div>
+        </div>
+        <!-- Card 5: Savings Rate -->
+        <div class="card-premium kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-title">Savings Rate</span>
+                <div class="kpi-icon-wrapper warning"><i class="bi bi-percent"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-savings-rate">0.0%</div>
+            <div class="kpi-trend up" id="kpi-savings-rate-trend">
+                <i class="bi bi-arrow-up-right me-1"></i> <span>0.0% vs target</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-grid">
+        <!-- Income vs Expense Chart -->
+        <div class="card-premium">
+            <div class="chart-title-wrapper">
+                <span class="chart-title"><i class="bi bi-activity text-primary me-2"></i> Income vs Expenses</span>
+                <select class="form-select form-select-sm w-auto" id="incomeVsExpenseTimeline">
+                    <option value="this-year">This Year</option>
+                    <option value="last-6-months">Last 6 Months</option>
+                </select>
+            </div>
+            <div style="height: 320px; position: relative;">
+                <canvas id="incomeExpenseChart"></canvas>
+            </div>
+        </div>
+        <!-- Category Breakdown Donut -->
+        <div class="card-premium">
+            <div class="chart-title-wrapper">
+                <span class="chart-title"><i class="bi bi-pie-chart text-primary me-2"></i> Expenses by Category</span>
+                <select class="form-select form-select-sm w-auto" id="categoryTimeline">
+                    <option value="this-year">This Year</option>
+                    <option value="last-3-months">Last 3 Months</option>
+                </select>
+            </div>
+            <div style="height: 320px; position: relative; display: flex; align-items: center; justify-content: center;">
+                <canvas id="categoryDonutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Breakdown Details Row -->
+    <div class="row mb-4">
+        <!-- Top Categories -->
+        <div class="col-lg-3 mb-4">
+            <div class="card-premium h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold m-0"><i class="bi bi-tags-fill text-primary me-2"></i> Top Categories</h6>
+                    <a href="{{ url_for('analytics_page') }}" class="small text-decoration-none">View All</a>
+                </div>
+                <div class="list-premium" id="dashboard-top-categories">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Merchants -->
+        <div class="col-lg-3 mb-4">
+            <div class="card-premium h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold m-0"><i class="bi bi-shop text-primary me-2"></i> Top Merchants</h6>
+                    <a href="{{ url_for('analytics_page') }}" class="small text-decoration-none">View All</a>
+                </div>
+                <div class="list-premium" id="dashboard-top-merchants">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-lg-3 mb-4">
+            <div class="card-premium h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold m-0"><i class="bi bi-clock-history text-primary me-2"></i> Recent Transactions</h6>
+                    <a href="{{ url_for('transactions_page') }}" class="small text-decoration-none">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle" style="font-size: 11px; margin-bottom: 0;">
+                        <thead>
+                            <tr class="text-muted" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em;">
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-recent-transactions">
+                            <!-- Loaded dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights drawer preview -->
+        <div class="col-lg-3 mb-4">
+            <div class="card-premium h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold m-0"><i class="bi bi-cpu-fill text-primary me-2"></i> Insights Preview</h6>
+                    <a href="{{ url_for('analytics_page') }}" class="small text-decoration-none">View All</a>
+                </div>
+                <div id="dashboard-insights-preview">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Overview table with sparklines -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card-premium">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold m-0"><i class="bi bi-calendar-range-fill text-primary me-2"></i> Monthly Overview</h6>
+                    <a href="{{ url_for('reports_page') }}" class="small text-decoration-none">View Full Monthly Report →</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-premium text-nowrap align-middle">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Income</th>
+                                <th>Total Expenses</th>
+                                <th>Net Savings</th>
+                                <th>Savings Rate</th>
+                                <th>Activity Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-monthly-rows">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
