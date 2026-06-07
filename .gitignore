@@ -22,3 +22,5 @@ uploads/
 
 # Database backups
 *.db-journal
+# Project documentation and internship files
+Docs/
