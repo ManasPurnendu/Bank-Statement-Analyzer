@@ -7,8 +7,11 @@ dashboard_bp = Blueprint('dashboard', __name__)
 @dashboard_bp.route('/dashboard', methods=['GET'])
 def get_dashboard_data():
     try:
-        range_type = request.args.get('range', 'all')
-        start_date, end_date = get_date_range_for_type(range_type)
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        if not start_date or not end_date:
+            range_type = request.args.get('range', 'all')
+            start_date, end_date = get_date_range_for_type(range_type)
         
         analytics = calculate_analytics(start_date, end_date)
         insights = generate_insights(analytics)

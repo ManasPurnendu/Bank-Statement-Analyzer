@@ -14,6 +14,15 @@ def get_date_range_for_type(range_type):
     if range_type == 'this-month':
         start_date = max_end.replace(day=1)
         end_date = max_end
+    elif range_type == 'last-month':
+        first_of_this_month = max_end.replace(day=1)
+        last_month_end = first_of_this_month - timedelta(days=1)
+        start_date = last_month_end.replace(day=1)
+        end_date = last_month_end
+    elif range_type == 'this-quarter':
+        q_start_month = ((max_end.month - 1) // 3) * 3 + 1
+        start_date = datetime(max_end.year, q_start_month, 1)
+        end_date = max_end
     elif range_type == 'last-3-months':
         start_date = (max_end - pd.DateOffset(months=2)).replace(day=1).to_pydatetime()
         end_date = max_end
@@ -27,7 +36,10 @@ def get_date_range_for_type(range_type):
         start_date = datetime(max_end.year - 1, 1, 1)
         end_date = datetime(max_end.year - 1, 12, 31)
     else: # 'all' or default
-        return None, None
+        # Return all statements range for All Time filter to enable explicit date ranges
+        all_starts = [pd.to_datetime(s['start_date']) for s in statements]
+        start_date = min(all_starts).to_pydatetime()
+        end_date = max_end
         
     return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
 
@@ -39,7 +51,16 @@ def calculate_analytics(start_date=None, end_date=None):
     statements = get_all_statements()
     
     if not txs:
+        account_holder = "Manas Purnendu"
+        if statements:
+            for s in statements:
+                if s.get("account_holder"):
+                    account_holder = s["account_holder"]
+                    break
         return {
+            "start_date": start_date or "",
+            "end_date": end_date or "",
+            "account_holder": account_holder,
             "kpis": {
                 "income": 0.0,
                 "expense": 0.0,
@@ -84,7 +105,17 @@ def calculate_analytics(start_date=None, end_date=None):
     # Calculate months span
     min_date = df['transaction_date'].min()
     max_date = df['transaction_date'].max()
-    month_span = (max_date.year - min_date.year) * 12 + (max_date.month - min_date.month) + 1
+    
+    active_start = start_date if start_date else min_date.strftime('%Y-%m-%d')
+    active_end = end_date if end_date else max_date.strftime('%Y-%m-%d')
+    
+    start_dt = pd.to_datetime(active_start)
+    end_dt = pd.to_datetime(active_end)
+    if start_dt > end_dt:
+        start_dt, end_dt = end_dt, start_dt
+    all_months = pd.period_range(start=start_dt, end=end_dt, freq='M').astype(str).tolist()
+    
+    month_span = len(all_months)
     average_monthly_spend = total_expense / max(1, month_span)
     
     # Busiest Day of week
@@ -106,19 +137,20 @@ def calculate_analytics(start_date=None, end_date=None):
     monthly_inc = df[df['transaction_type'] == 'Credit'].groupby('month_period')['amount'].sum()
     monthly_exp = df[df['transaction_type'] == 'Debit'].groupby('month_period')['amount'].sum()
     
-    all_months = sorted(list(set(df['month_period'])))
     monthly_trends = []
     for m in all_months:
         inc = float(monthly_inc.get(m, 0.0))
         exp = float(monthly_exp.get(m, 0.0))
         sav = inc - exp
         sav_rate = (sav / inc * 100) if inc > 0 else 0.0
+        tx_count = int((df['month_period'] == m).sum())
         monthly_trends.append({
             "month": m, # "2025-01"
             "income": inc,
             "expense": exp,
             "savings": sav,
-            "savings_rate": sav_rate
+            "savings_rate": sav_rate,
+            "transaction_count": tx_count
         })
         
     # 4. Merchant Analysis
@@ -156,7 +188,7 @@ def calculate_analytics(start_date=None, end_date=None):
     # Subscriptions are recurring debits. Look for debits from the same merchant (or payee) with similar amounts at regular intervals.
     subscriptions = []
     # Group by merchant name
-    sub_candidates = df[df['transaction_type'] == 'Debit']
+    sub_candidates = df[df['transaction_type'] == 'Debit'].copy()
     
     # We can group by merchant_name or payee_name
     sub_candidates['entity'] = sub_candidates['merchant_name'].fillna(sub_candidates['payee_name'])
@@ -263,12 +295,23 @@ def calculate_analytics(start_date=None, end_date=None):
         # Build list of periods
         coverage_periods = pd.period_range(start=min_start, end=max_end, freq='M').astype(str).tolist()
         
-        # Mark active months from statement_month in database statements
-        active_months = set([s['statement_month'] for s in statements if s['statement_month']])
+        # Check active months based on transaction presence or statement coverage
+        all_months_with_txs = set(df['month_period']) if 'month_period' in df.columns else set()
         
         # Create a full list from Jan 2025 to May 2025 or whatever is the range, plus next two months as dashes
         for m in coverage_periods:
-            coverage_dict[m] = m in active_months
+            is_covered = m in all_months_with_txs
+            if not is_covered:
+                for s in statements:
+                    try:
+                        s_start_month = pd.to_datetime(s['start_date']).strftime('%Y-%m')
+                        s_end_month = pd.to_datetime(s['end_date']).strftime('%Y-%m')
+                        if s_start_month <= m <= s_end_month:
+                            is_covered = True
+                            break
+                    except Exception:
+                        continue
+            coverage_dict[m] = is_covered
             
         # Add next two months as placeholders (dashes) as seen in screenshots
         last_coverage_date = datetime.strptime(coverage_periods[-1] + "-01", "%Y-%m-%d")
@@ -300,7 +343,18 @@ def calculate_analytics(start_date=None, end_date=None):
             "status": status_str
         })
         
+
+    account_holder = "Manas Purnendu"
+    if statements:
+        for s in statements:
+            if s.get("account_holder"):
+                account_holder = s["account_holder"]
+                break
+                
     return {
+        "start_date": active_start,
+        "end_date": active_end,
+        "account_holder": account_holder,
         "kpis": {
             "income": float(total_income),
             "expense": float(total_expense),

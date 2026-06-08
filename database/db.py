@@ -87,6 +87,8 @@ def init_db():
         "Transfer",
         "Education",
         "Bills",
+        "Peer-to-Peer",
+        "Cash & ATM",
         "Uncategorized"
     ]
     
@@ -189,7 +191,12 @@ def init_db():
         ("INSURANCE", cat_map["Bills"]),
         ("LOAN", cat_map["Bills"]),
         ("EMI", cat_map["Bills"]),
-        ("CREDIT CARD BILL", cat_map["Bills"])
+        ("CREDIT CARD BILL", cat_map["Bills"]),
+        
+        ("ATM WDL", cat_map["Cash & ATM"]),
+        ("ATM CASH", cat_map["Cash & ATM"]),
+        ("CASH WDL", cat_map["Cash & ATM"]),
+        ("CASH WITHDRAWAL", cat_map["Cash & ATM"])
     ]
     
     for kw, cid in system_rules:
@@ -200,6 +207,13 @@ def init_db():
             
     conn.commit()
     conn.close()
+    
+    # Auto-classify P2P payees on existing data
+    try:
+        from database.models import auto_classify_p2p_payees
+        auto_classify_p2p_payees()
+    except Exception as e:
+        print("Error running P2P auto-classification:", str(e))
 
 if __name__ == "__main__":
     init_db()

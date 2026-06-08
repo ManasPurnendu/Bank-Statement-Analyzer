@@ -160,6 +160,12 @@ function initLandingPage() {
     
     let pendingFiles = [];
     let duplicateInfo = null;
+    let currentPassword = null;
+
+    // Modal Close/Cancel Handlers
+    document.getElementById("closePasswordBtn").addEventListener("click", resetUploadView);
+    document.getElementById("cancelPasswordBtn").addEventListener("click", resetUploadView);
+    document.getElementById("closeDuplicateBtn").addEventListener("click", resetUploadView);
 
     // Browse files
     const navUploadBtn = document.getElementById("navUploadBtn");
@@ -230,7 +236,12 @@ function initLandingPage() {
         const file = pendingFiles[0];
         const formData = new FormData();
         formData.append("files", file);
-        if (password) formData.append("password", password);
+        if (password) {
+            currentPassword = password;
+            formData.append("password", password);
+        } else if (currentPassword) {
+            formData.append("password", currentPassword);
+        }
         if (action) formData.append("action", action);
         
         startProcessingAnimation();
@@ -274,6 +285,7 @@ function initLandingPage() {
             if (data.success) {
                 // Shift file from array and parse next
                 pendingFiles.shift();
+                // Retain currentPassword for subsequent files in this batch upload
                 uploadNextFile();
             } else {
                 alert("Upload failed: " + data.message);
@@ -305,6 +317,7 @@ function initLandingPage() {
         duplicateModal.hide();
         // Skip current and continue with next file
         pendingFiles.shift();
+        // Retain currentPassword for subsequent files in this batch upload
         uploadNextFile();
     });
 
@@ -323,6 +336,7 @@ function initLandingPage() {
         fileInput.value = "";
         pdfPasswordInput.value = "";
         pendingFiles = [];
+        currentPassword = null;
     }
 
     function updateProcessingStep(stepId, state) {
@@ -364,13 +378,18 @@ function initLandingPage() {
 
 /* --- DASHBOARD VIEW MANAGER --- */
 /* --- DASHBOARD VIEW MANAGER --- */
-function initDashboardPage(range = 'this-year') {
+function initDashboardPage(range = 'all') {
     fetch(`/api/dashboard?range=${range}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.analytics && data.analytics.raw_count > 0) {
                 document.getElementById("dashboard-empty-state").style.display = "none";
                 document.getElementById("dashboard-filled-state").style.display = "block";
+                
+                if (data.analytics.start_date && data.analytics.end_date) {
+                    document.getElementById("date-filter-label").innerText = 
+                        `${formatDateString(data.analytics.start_date)} - ${formatDateString(data.analytics.end_date)}`;
+                }
                 
                 renderDashboardMetrics(data.analytics, data.insights, range);
             } else {
@@ -579,7 +598,7 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
                     recentTxContainer.innerHTML += `
                         <tr style="font-size: 11px;">
                             <td class="text-nowrap" style="font-size: 10px; color: var(--text-muted);">${formatDateString(t.transaction_date)}</td>
-                            <td class="fw-semibold text-truncate" style="max-width: 110px;" title="${t.description}">${t.merchant_name || t.payee_name || t.description}</td>
+                            <td class="fw-semibold text-truncate" style="max-width: 110px;" title="${t.description}">${t.description.replace(/\n/g, ' ')}</td>
                             <td><span class="badge-category ${catClass}" style="padding: 2px 8px; font-size: 9px;">${t.category_name}</span></td>
                             <td><span class="fw-semibold text-capitalize ${t.transaction_type === 'Credit' ? 'text-success' : 'text-danger'}">${t.transaction_type}</span></td>
                             <td class="${amtClass} text-nowrap text-end">${prefix} ${formatCurrency(t.amount)}</td>
@@ -726,12 +745,11 @@ function loadTransactions() {
                         <tr>
                             <td>${formatDateString(t.transaction_date)}</td>
                             <td class="text-truncate fw-semibold" style="max-width: 260px;" title="${t.description}">
-                                ${t.merchant_name || t.payee_name || t.description}
+                                ${t.description.replace(/\n/g, ' ')}
                             </td>
                             <td>${catBadge}</td>
                             <td>${t.transaction_type}</td>
                             <td class="${amtClass} font-bold">${prefix} ${formatCurrency(t.amount)}</td>
-                            <td class="text-muted">${formatCurrency(t.balance)}</td>
                             <td>
                                 <button type="button" class="btn btn-outline-primary btn-xs px-2 py-1 classify-btn" data-id="${t.transaction_id}" data-category-id="${t.category_id}">
                                     <i class="bi bi-tag-fill me-1"></i> Classify
@@ -853,11 +871,15 @@ if (saveCategoryBtnEl) saveCategoryBtnEl.addEventListener("click", () => {
 
 /* --- ANALYTICS DETAILED CHARTS & HEATMAPS --- */
 /* --- ANALYTICS DETAILED CHARTS & HEATMAPS --- */
-function initAnalyticsPage(range = 'this-year') {
+function initAnalyticsPage(range = 'all') {
     fetch(`/api/analytics?range=${range}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.analytics && data.analytics.raw_count > 0) {
+                if (data.analytics.start_date && data.analytics.end_date) {
+                    document.getElementById("analytics-date-label").innerText = 
+                        `${formatDateString(data.analytics.start_date)} - ${formatDateString(data.analytics.end_date)}`;
+                }
                 renderAnalyticsView(data.analytics, range);
             }
         });
@@ -1008,7 +1030,7 @@ function renderAnalyticsView(analytics, range = 'this-year') {
     const trends = analytics.monthly_trends || [];
     const months = trends.map(t => formatMonthLabel(t.month));
     const spendingList = trends.map(t => t.expense);
-    const txCounts = trends.map(() => Math.round(15 + Math.random()*25));
+    const txCounts = trends.map(t => t.transaction_count || 0);
     const ctxTrends = document.getElementById('spendingTrendsChart').getContext('2d');
     if (window.analyticsTrendsChart) {
         window.analyticsTrendsChart.destroy();
@@ -1519,7 +1541,7 @@ function initReportsPage() {
     }
 }
 
-window.triggerReportBuild = function(type, range = 'Jan to May 2025', sections = null) {
+window.triggerReportBuild = function(type, range = 'all', sections = null) {
     showToast(`Generating ${type} Report PDF...`);
     
     fetch('/api/report/generate', {
@@ -1694,6 +1716,8 @@ function getCategoryClass(catName) {
         "Transfer": "cat-transfer",
         "Education": "cat-education",
         "Bills": "cat-bills",
+        "Peer-to-Peer": "cat-peer-to-peer",
+        "Cash & ATM": "cat-cash-atm",
         "Uncategorized": "cat-uncategorized"
     };
     return classes[catName] || "cat-uncategorized";
@@ -1712,6 +1736,8 @@ function getCategoryColorHex(catName) {
         "Transfer": "#64748b",
         "Education": "#f97316",
         "Bills": "#374151",
+        "Peer-to-Peer": "#6366f1",
+        "Cash & ATM": "#14b8a6",
         "Uncategorized": "#9ca3af"
     };
     return colors[catName] || "#6b7280";

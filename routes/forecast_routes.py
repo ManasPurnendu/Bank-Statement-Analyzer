@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.forecast import generate_forecast
+from services.analytics import get_date_range_for_type
 
 forecast_bp = Blueprint('forecast', __name__)
 
@@ -12,7 +13,13 @@ def get_forecast():
         except ValueError:
             horizon = 3
             
-        data = generate_forecast(horizon=horizon)
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        if not start_date or not end_date:
+            range_type = request.args.get('range', 'all')
+            start_date, end_date = get_date_range_for_type(range_type)
+            
+        data = generate_forecast(horizon=horizon, start_date=start_date, end_date=end_date)
         return jsonify(data)
     except Exception as e:
         return jsonify({
@@ -37,7 +44,13 @@ def simulate_scenario():
         except ValueError:
             return jsonify({"success": False, "message": "Reduction must be a numeric value."}), 400
             
-        data = generate_forecast(category, reduction, horizon=horizon)
+        start_date = req_data.get('start_date') or request.args.get('start_date')
+        end_date = req_data.get('end_date') or request.args.get('end_date')
+        if not start_date or not end_date:
+            range_type = req_data.get('range') or request.args.get('range', 'all')
+            start_date, end_date = get_date_range_for_type(range_type)
+            
+        data = generate_forecast(category, reduction, horizon=horizon, start_date=start_date, end_date=end_date)
         return jsonify(data)
     except Exception as e:
         return jsonify({

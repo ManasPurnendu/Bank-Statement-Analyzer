@@ -6,8 +6,11 @@ analytics_bp = Blueprint('analytics', __name__)
 @analytics_bp.route('/analytics', methods=['GET'])
 def get_analytics_data():
     try:
-        range_type = request.args.get('range', 'all')
-        start_date, end_date = get_date_range_for_type(range_type)
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        if not start_date or not end_date:
+            range_type = request.args.get('range', 'all')
+            start_date, end_date = get_date_range_for_type(range_type)
         
         analytics = calculate_analytics(start_date, end_date)
         return jsonify({

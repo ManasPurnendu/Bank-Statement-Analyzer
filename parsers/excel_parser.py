@@ -54,9 +54,9 @@ def parse_excel_statement(file_path, original_filename, password=None):
     metadata = {
         "file_name": original_filename,
         "file_type": "Excel",
-        "account_holder": "Manas Purnendu", # Default fallback
-        "account_number": "XXXX-XXXX-1234", # Default fallback
-        "bank_name": "Standard Bank",       # Default fallback
+        "account_holder": "Unknown",
+        "account_number": "Unknown",
+        "bank_name": "Unknown",
         "statement_month": None,
         "start_date": None,
         "end_date": None,
@@ -67,39 +67,73 @@ def parse_excel_statement(file_path, original_filename, password=None):
     # Simple regex searches in the sheet text for metadata
     text_dump = ""
     for r in range(min(15, rows_count)):
-        row_str = " ".join([str(val) for val in df.iloc[r] if pd.notna(val)])
+        row_str = " | ".join([str(val) for val in df.iloc[r] if pd.notna(val)])
         text_dump += row_str + "\n"
         
-        # Look for account holder (using lookbehind to ensure 'Name' isn't preceded by 'Bank')
-        holder_match = re.search(r'(?:Account Holder|Customer Name|(?<!Bank\s)(?<!Bank)\bName)[:\s]+([A-Za-z\s]{3,30})', row_str, re.IGNORECASE)
-        if holder_match:
-            metadata["account_holder"] = holder_match.group(1).strip()
-            
-        # Look for account number
-        acc_match = re.search(r'(?:Account Number|Account No|A/c No|A/c)[:\s]+([0-9A-Za-z\-]{6,20})', row_str, re.IGNORECASE)
-        if acc_match:
-            metadata["account_number"] = acc_match.group(1).strip()
-            
-        # Look for bank name
-        bank_match = re.search(r'(?:Bank Name|Bank)[:\s]+([A-Za-z\s]{3,20})', row_str, re.IGNORECASE)
+    # Bank Name detection
+    if "state bank of india" in text_dump.lower():
+        metadata["bank_name"] = "State Bank of India"
+    elif "standard bank" in text_dump.lower():
+        metadata["bank_name"] = "Standard Bank"
+    elif "hdfc" in text_dump.lower():
+        metadata["bank_name"] = "HDFC Bank"
+    elif "icici" in text_dump.lower():
+        metadata["bank_name"] = "ICICI Bank"
+    elif "axis" in text_dump.lower():
+        metadata["bank_name"] = "Axis Bank"
+    else:
+        bank_match = re.search(r'Bank Name\s*[:\|\-\s]+\s*([A-Za-z ]{3,20})', text_dump, re.IGNORECASE)
         if bank_match:
             metadata["bank_name"] = bank_match.group(1).strip()
+        else:
+            bank_match2 = re.search(r'([A-Za-z ]+ Bank)', text_dump, re.IGNORECASE)
+            if bank_match2:
+                metadata["bank_name"] = bank_match2.group(1).strip()
+            else:
+                bank_match3 = re.search(r'Bank\s*[:\|\-\s]+\s*([A-Za-z ]{3,20})', text_dump, re.IGNORECASE)
+                if bank_match3:
+                    metadata["bank_name"] = bank_match3.group(1).strip()
+
+    # Account Holder detection
+    holder_match = re.search(r'(?:Mr\.|Mrs\.|Ms\.)\s*([A-Za-z ]{3,30})', text_dump)
+    if holder_match:
+        metadata["account_holder"] = re.sub(r'\s+', ' ', holder_match.group(1).strip())
+    else:
+        holder_match2 = re.search(r'(?:Account Holder|Customer Name)\s*[:\|\-\s]+\s*([A-Za-z ]{3,30})', text_dump, re.IGNORECASE)
+        if holder_match2:
+            metadata["account_holder"] = re.sub(r'\s+', ' ', holder_match2.group(1).strip())
+        else:
+            lines = [l.strip() for l in text_dump.split('\n') if l.strip()]
+            for line in lines[:15]:
+                clean_line = line.replace(' | ', ' ').strip()
+                if re.match(r'^[A-Za-z\s\.]+$', clean_line) and len(clean_line) > 5 and not any(k in clean_line.upper() for k in ["ACCOUNT", "STATEMENT", "SUMMARY", "BRANCH", "MOBILE", "EMAIL", "IFSC", "NOMINEE", "WELCOME", "BANK", "DATE", "DESCRIPTION", "DEBIT", "CREDIT", "BALANCE", "PARTICULARS", "AMOUNT", "TRANSACTION"]):
+                    metadata["account_holder"] = clean_line
+                    break
+
+    # Account Number detection
+    ac_match = re.search(r'(?:Account Number|Account No\.?|A/C No\.?|A/C Number)\s*[:\|\-\s]+\s*([0-9A-Za-z\-]+)', text_dump, re.IGNORECASE)
+    if ac_match:
+        metadata["account_number"] = ac_match.group(1).strip()
+    else:
+        ac_match2 = re.search(r'(?:Account Number|Account No|A/c No|A/c)[:\s]+([0-9A-Za-z\-]{6,20})', text_dump, re.IGNORECASE)
+        if ac_match2:
+            metadata["account_number"] = ac_match2.group(1).strip()
+
+    # Look for opening balance
+    op_match = re.search(r'(?:Opening Balance|Start Balance)\s*[:\|\-\s]+\s*([0-9,\-\.]+)', text_dump, re.IGNORECASE)
+    if op_match:
+        try:
+            metadata["opening_balance"] = float(op_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
             
-        # Look for opening balance
-        op_match = re.search(r'(?:Opening Balance|Start Balance)[:\s]+([0-9,]+\.?[0-9]*)', row_str, re.IGNORECASE)
-        if op_match:
-            try:
-                metadata["opening_balance"] = float(op_match.group(1).replace(",", ""))
-            except ValueError:
-                pass
-                
-        # Look for closing balance
-        cl_match = re.search(r'(?:Closing Balance|End Balance|Balance)[:\s]+([0-9,]+\.?[0-9]*)', row_str, re.IGNORECASE)
-        if cl_match:
-            try:
-                metadata["closing_balance"] = float(cl_match.group(1).replace(",", ""))
-            except ValueError:
-                pass
+    # Look for closing balance
+    cl_match = re.search(r'(?:Closing Balance|End Balance|Balance)\s*[:\|\-\s]+\s*([0-9,\-\.]+)', text_dump, re.IGNORECASE)
+    if cl_match:
+        try:
+            metadata["closing_balance"] = float(cl_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
 
     # 3. Find the Transaction Table Header Row
     header_idx = -1
@@ -267,8 +301,8 @@ def parse_excel_statement(file_path, original_filename, password=None):
             "is_subscription": 1 if is_subscription else 0
         })
 
-    # Sort transactions chronologically
-    transactions.sort(key=lambda x: (x["transaction_date"], x.get("balance", 0)))
+    # Sort transactions stably by normalized date only (preserves spreadsheet order)
+    transactions.sort(key=lambda x: x["transaction_date"])
     
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the Excel file.")

@@ -59,19 +59,19 @@ class NumberedCanvas(canvas.Canvas):
             
         self.restoreState()
 
-def generate_pdf_report(dest_path, report_type="Summary", date_range="All Time", selected_sections=None):
+def generate_pdf_report(dest_path, report_type="Summary", date_range="All Time", selected_sections=None, start_date=None, end_date=None):
     """
     Builds a styled ReportLab PDF report.
     report_type: "Summary", "Detailed", "Analytics", "Custom"
     """
-    analytics = calculate_analytics()
+    analytics = calculate_analytics(start_date, end_date)
     kpis = analytics["kpis"]
     category_spending = analytics["category_spending"]
     top_merchants = analytics["top_merchants"]
     top_contacts = analytics["top_contacts"]
     subscriptions = analytics["subscriptions"]
     
-    forecast = generate_forecast()
+    forecast = generate_forecast(start_date=start_date, end_date=end_date)
     insights = generate_insights(analytics)
     
     # Document Setup (0.75 in margins: 54 points)
@@ -193,7 +193,7 @@ def generate_pdf_report(dest_path, report_type="Summary", date_range="All Time",
     # Cover Metadata Block
     meta_data = [
         [Paragraph("<b>Period:</b>", body_style), Paragraph(date_range, body_style)],
-        [Paragraph("<b>Account Holder:</b>", body_style), Paragraph(analytics["data_coverage"][0]["name"] if analytics["data_coverage"] else "Manas Purnendu", body_style)],
+        [Paragraph("<b>Account Holder:</b>", body_style), Paragraph(analytics.get("account_holder", "Manas Purnendu"), body_style)],
         [Paragraph("<b>Generated On:</b>", body_style), Paragraph(datetime.now().strftime("%d %b %Y, %I:%M %p"), body_style)],
         [Paragraph("<b>Status:</b>", body_style), Paragraph("Final Draft", body_style)]
     ]

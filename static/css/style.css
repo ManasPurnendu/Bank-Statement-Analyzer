@@ -607,7 +607,10 @@ h1, h2, h3, h4, h5, h6 {
 .cat-transfer { background-color: rgba(100, 116, 139, 0.15); color: #475569; }
 .cat-education { background-color: rgba(249, 115, 22, 0.15); color: #ea580c; }
 .cat-bills { background-color: rgba(107, 114, 128, 0.15); color: #374151; }
+.cat-peer-to-peer { background-color: rgba(99, 102, 241, 0.15); color: #4f46e5; }
+.cat-cash-atm { background-color: rgba(20, 184, 166, 0.15); color: #0d9488; }
 .cat-uncategorized { background-color: rgba(156, 163, 175, 0.15); color: #4b5563; }
+
 
 /* Amount colors */
 .amount-credit {

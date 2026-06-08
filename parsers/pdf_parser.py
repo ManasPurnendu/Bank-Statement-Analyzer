@@ -83,8 +83,57 @@ def parse_pdf_statement(file_path, original_filename, password=None):
     try:
         with pdfplumber.open(parse_target) as pdf:
             # 1. Inspect first pages for metadata (simpler extraction)
-            first_page_text = pdf.pages[0].extract_text() or ""
-            text_lines = first_page_text.split('\n')
+            try:
+                full_text = ""
+                for page in pdf.pages[:3]:
+                    full_text += (page.extract_text() or "") + "\n"
+                
+                # Bank Name detection
+                if "state bank of india" in full_text.lower():
+                    metadata["bank_name"] = "State Bank of India"
+                elif "hdfc" in full_text.lower():
+                    metadata["bank_name"] = "HDFC Bank"
+                elif "icici" in full_text.lower():
+                    metadata["bank_name"] = "ICICI Bank"
+                elif "axis" in full_text.lower():
+                    metadata["bank_name"] = "Axis Bank"
+                elif "standard bank" in full_text.lower():
+                    metadata["bank_name"] = "Standard Bank"
+                else:
+                    bank_match = re.search(r'([A-Za-z ]+ Bank)', full_text, re.IGNORECASE)
+                    if bank_match:
+                        metadata["bank_name"] = bank_match.group(1).strip()
+                
+                # Account Holder detection
+                holder_match = re.search(r'(?:Mr\.|Mrs\.|Ms\.)\s*([A-Za-z ]{3,30})', full_text)
+                if holder_match:
+                    metadata["account_holder"] = re.sub(r'\s+', ' ', holder_match.group(1).strip())
+                else:
+                    lines = [l.strip() for l in full_text.split('\n') if l.strip()]
+                    for line in lines[:15]:
+                        if re.match(r'^[A-Z\s\.]+$', line) and len(line) > 5 and not any(k in line.upper() for k in ["ACCOUNT", "STATEMENT", "SUMMARY", "BRANCH", "MOBILE", "EMAIL", "IFSC", "NOMINEE", "WELCOME", "DATE", "DESCRIPTION", "DEBIT", "CREDIT", "BALANCE", "PARTICULARS", "AMOUNT", "TRANSACTION"]):
+                            metadata["account_holder"] = line
+                            break
+                
+                # Account Number detection
+                ac_match = re.search(r'(?:Account Number|Account No\.?|A/C No\.?|A/C Number)\s*:\s*(\d+)', full_text, re.IGNORECASE)
+                if ac_match:
+                    metadata["account_number"] = ac_match.group(1).strip()
+                
+                # Statement Period / Dates detection
+                date_range_match = re.search(r'(?:Statement From|Period|Statement Period)?\s*:\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})\s*(?:to|To|-\s*)\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})', full_text, re.IGNORECASE)
+                if date_range_match:
+                    start_str = date_range_match.group(1)
+                    end_str = date_range_match.group(2)
+                    for fmt in ('%d-%m-%Y', '%d/%m/%Y'):
+                        try:
+                            metadata["start_date"] = datetime.strptime(start_str, fmt).strftime('%Y-%m-%d')
+                            metadata["end_date"] = datetime.strptime(end_str, fmt).strftime('%Y-%m-%d')
+                            break
+                        except ValueError:
+                            continue
+            except Exception as me:
+                print(f"Error extracting metadata from first pages: {str(me)}")
 
             # 2. Extract transaction table rows
             # Try strategy A: extract_tables
@@ -168,6 +217,17 @@ def parse_pdf_statement(file_path, original_filename, password=None):
                 data_rows = raw_table_rows
                 
             # If columns were not guessed or mapped, let's establish defaults based on first row length
+            # If columns were not guessed or mapped, let's establish defaults based on first row of length 7
+            if data_rows and debit_col_idx == -1 and credit_col_idx == -1:
+                for row in data_rows:
+                    if len(row) == 7:
+                        date_col_idx = 0
+                        desc_col_idx = 2
+                        debit_col_idx = 4
+                        credit_col_idx = 5
+                        balance_col_idx = 6
+                        break
+
             for row in data_rows:
                 # Skip header repetitions
                 row_lower = [str(val).lower() for val in row]
@@ -301,35 +361,75 @@ def parse_pdf_statement(file_path, original_filename, password=None):
                     "payment_method": payment_method,
                     "is_subscription": 1 if is_subscription else 0
                 })
+            # Try to extract closing details from the last page
+            try:
+                last_page_text = pdf.pages[-1].extract_text() or ""
+                summary_period_match = re.search(r'Statement Summary\s*:\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})\s*(?:To|to|-\s*)\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})', last_page_text, re.IGNORECASE)
+                if summary_period_match:
+                    start_str = summary_period_match.group(1)
+                    end_str = summary_period_match.group(2)
+                    for fmt in ('%d-%m-%Y', '%d/%m/%Y'):
+                        try:
+                            metadata["start_date"] = datetime.strptime(start_str, fmt).strftime('%Y-%m-%d')
+                            metadata["end_date"] = datetime.strptime(end_str, fmt).strftime('%Y-%m-%d')
+                            break
+                        except ValueError:
+                            continue
+                
+                lines = [l.strip() for l in last_page_text.split('\n') if l.strip()]
+                for idx, line in enumerate(lines):
+                    if "Brought Forward" in line and "Closing Balance" in line:
+                        if idx + 1 < len(lines):
+                            val_line = lines[idx+1]
+                            tokens = val_line.split()
+                            if len(tokens) >= 6:
+                                ob_str = tokens[0].upper().replace("CR", "").replace("DR", "").replace(",", "")
+                                cb_str = tokens[5].upper().replace("CR", "").replace("DR", "").replace(",", "")
+                                try:
+                                    metadata["opening_balance"] = float(ob_str)
+                                    metadata["closing_balance"] = float(cb_str)
+                                except ValueError:
+                                    pass
+            except Exception as le:
+                print(f"Error extracting metadata from last page: {str(le)}")
                 
     finally:
         # Cleanup temporary decrypted file if created
         if temp_decrypted_path and os.path.exists(temp_decrypted_path):
             os.remove(temp_decrypted_path)
 
-    # Sort transactions
-    transactions.sort(key=lambda x: (x["transaction_date"], x.get("balance", 0)))
+    # Sort transactions stably by normalized date only (preserves page order)
+    transactions.sort(key=lambda x: x["transaction_date"])
     
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the PDF file.")
     print(f"Parsed transactions: {len(transactions)}")
         
     dates = [t["transaction_date"] for t in transactions]
-    metadata["start_date"] = min(dates)
-    metadata["end_date"] = max(dates)
+    if not metadata.get("start_date") and dates:
+        metadata["start_date"] = min(dates)
+    if not metadata.get("end_date") and dates:
+        metadata["end_date"] = max(dates)
     metadata["transaction_count"] = len(transactions)
     
-    start_dt = datetime.strptime(metadata["start_date"], "%Y-%m-%d")
-    metadata["statement_month"] = start_dt.strftime("%Y-%m")
+    if metadata.get("start_date"):
+        try:
+            start_dt = datetime.strptime(metadata["start_date"], "%Y-%m-%d")
+            metadata["statement_month"] = start_dt.strftime("%Y-%m")
+        except Exception:
+            pass
+    elif dates:
+        start_dt = datetime.strptime(min(dates), "%Y-%m-%d")
+        metadata["statement_month"] = start_dt.strftime("%Y-%m")
     
-    if not metadata["opening_balance"] and len(transactions) > 0:
+    if not metadata.get("opening_balance") and len(transactions) > 0:
         first_txn = transactions[0]
         if first_txn["transaction_type"] == 'Credit':
             metadata["opening_balance"] = first_txn["balance"] - first_txn["amount"]
         else:
             metadata["opening_balance"] = first_txn["balance"] + first_txn["amount"]
             
-    if not metadata["closing_balance"] and len(transactions) > 0:
+    if not metadata.get("closing_balance") and len(transactions) > 0:
         metadata["closing_balance"] = transactions[-1]["balance"]
         
     return {

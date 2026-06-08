@@ -291,5 +291,22 @@ class TestBankStatementAnalyzer(unittest.TestCase):
         
         conn.close()
 
+    def test_cash_atm_categorization(self):
+        """Test that ATM/Cash transactions are auto-categorized under 'Cash & ATM'."""
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT category_id FROM categories WHERE category_name = 'Cash & ATM'")
+        cash_atm_row = cursor.fetchone()
+        self.assertIsNotNone(cash_atm_row)
+        cash_atm_id = cash_atm_row['category_id']
+        conn.close()
+
+        # Test the categorization logic directly
+        self.assertEqual(categorize_transaction("ATM WDL CASH 12345", "Debit"), cash_atm_id)
+        self.assertEqual(categorize_transaction("ATM CASH WITHDRAWAL", "Debit"), cash_atm_id)
+        self.assertEqual(categorize_transaction("CASH WDL FROM BRANCH", "Debit"), cash_atm_id)
+        self.assertEqual(categorize_transaction("CASH WITHDRAWAL FROM ATM", "Debit"), cash_atm_id)
+
 if __name__ == "__main__":
     unittest.main()
+

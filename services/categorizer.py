@@ -94,6 +94,15 @@ def detect_merchant_and_payee(description, transaction_type):
         if keyword in desc:
             return display_name, None
             
+    # Extract clean name from UPI pattern: UPI/CR/txn_id/NAME/BANK/upi_id/...
+    upi_match = re.search(r'UPI/(?:CR|DR)/[0-9]+/([^/]+)', description, re.IGNORECASE)
+    if upi_match:
+        name = upi_match.group(1).replace('\n', ' ').strip()
+        name_clean = re.sub(r'\b(?:UPI|P2P|BANK|MOBILE|A/C|XX+|ACCOUNT|IN|ON|FOR|AT)\b', '', name, flags=re.IGNORECASE).strip()
+        name_clean = re.sub(r'\s+', ' ', name_clean).strip()
+        if len(name_clean) >= 3 and not re.match(r'^[0-9]+$', name_clean):
+            return None, name_clean.title()
+            
     # If it's a debit and looks like payment to a person (UPI P2P, transfer, send)
     if transaction_type == 'Debit':
         # E.g., "TRANSFER TO ANUJ", "UPI-ANUJ-...", "PAID TO RAMESH"

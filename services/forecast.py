@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3):
+def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, start_date=None, end_date=None):
     """
     Generates 1, 3, 6, and 9-month projections using moving-average and trend analysis.
     Supports What-If scenario modifications and dynamic horizons.
     """
-    analytics = calculate_analytics()
+    analytics = calculate_analytics(start_date, end_date)
     monthly_trends = analytics["monthly_trends"]
     kpis = analytics["kpis"]
     category_spending = analytics["category_spending"]
@@ -117,15 +117,7 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3):
                 "amount": sub["amount"]
             })
             
-    # Add generic large bills if historical utilities/bills exceed standard amounts
-    placeholders = [
-        {"description": "Annual Insurance Premium", "expected_month": (last_month_dt + timedelta(days=30)).strftime("%b %Y"), "raw_date": last_month_dt + timedelta(days=30), "amount": 18000.0},
-        {"description": "Property Tax (Quarterly)", "expected_month": (last_month_dt + timedelta(days=60)).strftime("%b %Y"), "raw_date": last_month_dt + timedelta(days=60), "amount": 12500.0},
-        {"description": "Car Service", "expected_month": (last_month_dt + timedelta(days=90)).strftime("%b %Y"), "raw_date": last_month_dt + timedelta(days=90), "amount": 8000.0},
-        {"description": "School Fees (Term 1)", "expected_month": (last_month_dt + timedelta(days=90)).strftime("%b %Y"), "raw_date": last_month_dt + timedelta(days=90), "amount": 25000.0}
-    ]
-    for p in placeholders:
-        upcoming_expenses.append(p)
+
         
     upcoming_expenses.sort(key=lambda x: x["raw_date"])
     

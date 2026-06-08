@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime
 from services.report_generator import generate_pdf_report
-from services.analytics import calculate_analytics
+from services.analytics import calculate_analytics, get_date_range_for_type
 
 report_bp = Blueprint('report', __name__)
 
@@ -39,9 +39,22 @@ def generate_report():
     try:
         data = request.json or {}
         report_type = data.get('report_type', 'Summary') # 'Summary', 'Detailed', 'Analytics', 'Custom'
-        date_range = data.get('date_range', 'Jan to May 2025')
+        date_range = data.get('date_range', 'all')
         sections = data.get('sections', None)
         
+        # Resolve dates
+        start_date, end_date = get_date_range_for_type(date_range)
+        
+        # Build period string and file suffix
+        if start_date and end_date:
+            s_dt = datetime.strptime(start_date, "%Y-%m-%d")
+            e_dt = datetime.strptime(end_date, "%Y-%m-%d")
+            period_str = f"{s_dt.strftime('%d %b %Y')} - {e_dt.strftime('%d %b %Y')}"
+            range_suffix = f"{start_date}_to_{end_date}"
+        else:
+            period_str = "All Time"
+            range_suffix = "All_Time"
+            
         # Build file name
         timestamp = int(time.time())
         name_prefix = "Financial_Summary"
@@ -52,7 +65,7 @@ def generate_report():
         elif report_type == "Custom":
             name_prefix = "Custom_Report"
             
-        filename = f"{name_prefix}_-_Jan_to_May_2025_{timestamp}.pdf"
+        filename = f"{name_prefix}_-_{range_suffix}_{timestamp}.pdf"
         
         report_dir = current_app.config['REPORT_FOLDER']
         if not os.path.exists(report_dir):
@@ -61,7 +74,7 @@ def generate_report():
         dest_path = os.path.join(report_dir, filename)
         
         # Call generator
-        generate_pdf_report(dest_path, report_type, date_range, sections)
+        generate_pdf_report(dest_path, report_type, period_str, sections, start_date, end_date)
         
         return jsonify({
             "success": True,
@@ -90,11 +103,29 @@ def list_reports():
                     file_size_mb = stat.st_size / (1024 * 1024)
                     generated_time = datetime.fromtimestamp(stat.st_mtime).strftime("%d %b %Y, %I:%M %p")
                     
+                    # Parse start_date and end_date from filename
+                    display_range = "All Time"
+                    try:
+                        if "_-_" in filename:
+                            range_part = filename.split("_-_")[1]
+                            range_part = range_part.rsplit("_", 1)[0]
+                            if "_to_" in range_part:
+                                s_str, e_str = range_part.split("_to_")
+                                s_dt = datetime.strptime(s_str, "%Y-%m-%d")
+                                e_dt = datetime.strptime(e_str, "%Y-%m-%d")
+                                display_range = f"{s_dt.strftime('%d %b %Y')} - {e_dt.strftime('%d %b %Y')}"
+                            elif range_part == "All_Time":
+                                display_range = "All Time"
+                            else:
+                                display_range = range_part.replace("_", " ")
+                    except Exception:
+                        pass
+                        
                     reports_list.append({
                         "name": friendly_name,
                         "filename": filename,
                         "type": rpt_type,
-                        "date_range": "01 Jan 2025 - 31 May 2025",
+                        "date_range": display_range,
                         "generated_on": generated_time,
                         "file_size": f"{file_size_mb:.2f} MB"
                     })
