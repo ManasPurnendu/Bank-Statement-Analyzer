@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- GLOBAL SETUP ---
     initTheme();
     setupActiveNav();
+    setupMobileSidebar();
     
     // Determine current page route
     const path = window.location.pathname;
@@ -30,19 +31,70 @@ document.addEventListener("DOMContentLoaded", function () {
 /* --- THEME / DARK MODE MANAGER --- */
 function initTheme() {
     const toggle = document.getElementById("darkModeToggle");
+    const toggleMobile = document.getElementById("darkModeToggleMobile");
     const currentTheme = localStorage.getItem("theme") || "light";
     
     document.documentElement.setAttribute("data-theme", currentTheme);
+    document.body.setAttribute("data-theme", currentTheme);
+
+    // Set both toggles to current state
+    if (toggle) toggle.checked = currentTheme === "dark";
+    if (toggleMobile) toggleMobile.checked = currentTheme === "dark";
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        document.body.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        // Sync both toggles
+        if (toggle) toggle.checked = theme === "dark";
+        if (toggleMobile) toggleMobile.checked = theme === "dark";
+        // Refresh current page charts if present
+        window.location.reload();
+    }
+
     if (toggle) {
-        toggle.checked = currentTheme === "dark";
         toggle.addEventListener("change", function () {
-            const theme = this.checked ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", theme);
-            localStorage.setItem("theme", theme);
-            // Refresh current page charts if present
-            window.location.reload();
+            applyTheme(this.checked ? "dark" : "light");
         });
     }
+    if (toggleMobile) {
+        toggleMobile.addEventListener("change", function () {
+            applyTheme(this.checked ? "dark" : "light");
+        });
+    }
+}
+
+/* --- MOBILE SIDEBAR TOGGLE --- */
+function setupMobileSidebar() {
+    const sidebar = document.getElementById("appSidebar");
+    const backdrop = document.getElementById("sidebarBackdrop");
+    const toggleBtn = document.getElementById("sidebarToggleBtn");
+    const closeBtn = document.getElementById("sidebarCloseBtn");
+
+    if (!sidebar || !toggleBtn) return; // Not on a sidebar page
+
+    function openSidebar() {
+        sidebar.classList.add("show");
+        if (backdrop) backdrop.classList.add("show");
+        document.body.style.overflow = "hidden"; // Prevent background scroll
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove("show");
+        if (backdrop) backdrop.classList.remove("show");
+        document.body.style.overflow = "";
+    }
+
+    toggleBtn.addEventListener("click", openSidebar);
+    if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
+    if (backdrop) backdrop.addEventListener("click", closeSidebar);
+
+    // Close sidebar when a nav link is tapped on mobile
+    sidebar.querySelectorAll(".nav-item").forEach(link => {
+        link.addEventListener("click", () => {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
 }
 
 function setupActiveNav() {
