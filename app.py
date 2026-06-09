@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 import os
+import secrets
 from database.db import init_db
 from routes.upload_routes import upload_bp
 from routes.dashboard_routes import dashboard_bp
@@ -9,7 +10,17 @@ from routes.forecast_routes import forecast_bp
 from routes.report_routes import report_bp
 
 app = Flask(__name__)
-app.secret_key = 'bank_statement_analyzer_secret_key'
+
+# --- Security: Flask Secret Key ---
+# NEVER hardcode secret keys in source code. A leaked key allows attackers to
+# forge session cookies and hijack user sessions.
+#
+# In production, set the SECRET_KEY environment variable to a strong random value:
+#   export SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+#
+# For local development, a random fallback is generated automatically. Note that
+# sessions will not persist across server restarts when using the fallback.
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # Configuration Directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

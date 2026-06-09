@@ -115,13 +115,21 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Database Setup & Seeding
+### 4. Security Configuration
+Copy the environment template and generate a secure secret key:
+```bash
+cp .env.example .env
+python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))" > .env
+```
+> **Note:** If `SECRET_KEY` is not set, a random key is generated at startup. This is fine for local development, but sessions will not persist across server restarts. Always set a fixed key in production.
+
+### 5. Database Setup & Seeding
 Initialize the SQLite schema and seed standard category lookup data:
 ```bash
 python3 database/db.py
 ```
 
-### 5. Start the Application
+### 6. Start the Application
 Run the Flask server locally:
 ```bash
 python3 app.py
