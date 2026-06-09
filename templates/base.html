@@ -112,6 +112,24 @@
         <main class="main-content">
             {% block content %}{% endblock %}
         </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger"><i class="bi bi-trash-fill me-2"></i> Delete Statement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDeleteConfirmBtn"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="text-secondary small mb-0" id="deleteConfirmDetails">Are you sure you want to delete the statement "<strong id="deleteConfirmFileName"></strong>"? This will delete all its associated transactions and update all charts.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal" id="cancelDeleteConfirmBtn">Cancel</button>
+                    <button type="button" class="btn btn-danger px-4 py-2" id="submitDeleteConfirmBtn">Delete Statement</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper JS -->

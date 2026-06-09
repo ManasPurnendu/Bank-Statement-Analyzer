@@ -150,7 +150,7 @@ function fetchSidebarData() {
                                                 <div class="sidebar-list-item-sub text-muted text-truncate" style="font-size: 10px;">${s.bank_name} • ${formatMonthLabel(s.statement_month)}</div>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-link text-danger p-0 ms-2 delete-statement-btn" onclick="window.deleteStatement(${s.statement_id}, '${safeFileName}')" style="text-decoration: none; font-size: 14px; flex-shrink: 0;" title="Delete this statement">
+                                        <button type="button" class="btn btn-link text-danger p-0 ms-2 delete-statement-btn" data-id="${s.statement_id}" data-filename="${safeFileName}" style="text-decoration: none; font-size: 14px; flex-shrink: 0;" title="Delete this statement">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
                                     </div>`;
@@ -968,8 +968,52 @@ function initAnalyticsPage(range = 'all') {
     }
 }
 
+function formatMonthWithAmount(monthStr, amount) {
+    if (!monthStr || monthStr === "No data available") return "No data available";
+    const parts = monthStr.split('-');
+    const year = parts[0];
+    const month = parts[1];
+    const months = {
+        "01": "January", "02": "February", "03": "March", "04": "April", "05": "May", "06": "June",
+        "07": "July", "08": "August", "09": "September", "10": "October", "11": "November", "12": "December"
+    };
+    const monthName = months[month] || monthStr;
+    const formattedAmount = Math.round(amount).toLocaleString('en-IN');
+    return `${monthName} ${year} (₹${formattedAmount})`;
+}
+
 function updateSpendingOverviewChart(analytics) {
     const trends = analytics.monthly_trends || [];
+    
+    // Calculate highest and lowest spending month dynamically
+    let highestMonthStr = "No data available";
+    let lowestMonthStr = "No data available";
+    
+    const totalTransactions = trends.reduce((acc, t) => acc + (t.transaction_count || 0), 0);
+    const hasTransactions = totalTransactions > 0;
+    
+    if (trends.length > 0 && hasTransactions) {
+        let highest = trends[0];
+        let lowest = trends[0];
+        
+        for (let i = 1; i < trends.length; i++) {
+            if (trends[i].expense > highest.expense) {
+                highest = trends[i];
+            }
+            if (trends[i].expense < lowest.expense) {
+                lowest = trends[i];
+            }
+        }
+        
+        highestMonthStr = formatMonthWithAmount(highest.month, highest.expense);
+        lowestMonthStr = formatMonthWithAmount(lowest.month, lowest.expense);
+    }
+    
+    const highestEl = document.getElementById("overview-highest-month");
+    const lowestEl = document.getElementById("overview-lowest-month");
+    if (highestEl) highestEl.innerText = highestMonthStr;
+    if (lowestEl) lowestEl.innerText = lowestMonthStr;
+
     const months = trends.map(t => formatMonthLabel(t.month));
     const spendingList = trends.map(t => t.expense);
     
@@ -1836,25 +1880,87 @@ function debounce(func, wait) {
     };
 }
 
+let deleteModalEl = null;
+let deleteModal = null;
+let activeDeleteStatementId = null;
+
 window.deleteStatement = function(statementId, fileName) {
-    if (confirm(`Are you sure you want to delete the statement "${fileName}"? This will delete all its associated transactions and update all charts.`)) {
-        fetch(`/api/statement/${statementId}`, {
-            method: 'DELETE'
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                showToast("Statement deleted successfully");
-                fetchSidebarData();
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
-            } else {
-                alert("Failed to delete statement: " + data.message);
-            }
-        })
-        .catch(err => {
-            alert("An error occurred: " + err.message);
-        });
+    activeDeleteStatementId = statementId;
+    
+    // Set the file name in the modal body
+    const fileNameSpan = document.getElementById("deleteConfirmFileName");
+    if (fileNameSpan) {
+        fileNameSpan.textContent = fileName;
+    }
+    
+    // Initialize modal if not done already
+    if (!deleteModalEl) {
+        deleteModalEl = document.getElementById('deleteConfirmModal');
+        if (deleteModalEl) {
+            deleteModal = new bootstrap.Modal(deleteModalEl);
+        }
+    }
+    
+    if (deleteModal) {
+        deleteModal.show();
     }
 };
+
+// Bind the modal delete button click listener once
+document.addEventListener("DOMContentLoaded", function () {
+    const submitBtn = document.getElementById("submitDeleteConfirmBtn");
+    if (submitBtn) {
+        submitBtn.addEventListener("click", function () {
+            if (!activeDeleteStatementId) return;
+            
+            // Disable button to prevent double-clicks
+            submitBtn.disabled = true;
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Deleting...`;
+            
+            fetch(`/api/statement/${activeDeleteStatementId}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+                if (data.success) {
+                    showToast("Statement deleted successfully");
+                    fetchSidebarData();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    alert("Failed to delete statement: " + data.message);
+                }
+            })
+            .catch(err => {
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+                alert("An error occurred: " + err.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                activeDeleteStatementId = null;
+            });
+        });
+    }
+});
+
+// Delegated click listener to prevent event propagation conflicts and native form/link triggers
+document.addEventListener("click", function(e) {
+    const deleteBtn = e.target.closest(".delete-statement-btn");
+    if (deleteBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const statementId = deleteBtn.getAttribute("data-id");
+        const fileName = deleteBtn.getAttribute("data-filename");
+        if (statementId && fileName) {
+            window.deleteStatement(statementId, fileName);
+        }
+    }
+});

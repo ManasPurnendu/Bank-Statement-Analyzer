@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, jsonify
 import os
 import secrets
 from database.db import init_db
@@ -29,6 +29,11 @@ REPORT_FOLDER = os.path.join(BASE_DIR, 'generated_reports')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['REPORT_FOLDER'] = REPORT_FOLDER
+
+# --- Security: File Upload Size Limit (S-03) ---
+# Prevent Denial of Service (DoS) attacks via memory or disk exhaustion.
+# 16 MB is a sensible limit for bank statements (PDFs or Excel spreadsheets).
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # Ensure folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -72,6 +77,14 @@ def forecast_page():
 @app.route('/report')
 def reports_page():
     return render_template('reports.html')
+
+# --- Error Handlers ---
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({
+        "success": False,
+        "message": "Maximum supported upload size is 16 MB."
+    }), 413
 
 if __name__ == '__main__':
     # Run the server on port 5001 in debug mode
