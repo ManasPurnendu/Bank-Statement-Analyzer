@@ -140,23 +140,56 @@ function fetchSidebarData() {
                         
                         if (stmtData.success && stmtData.statements && stmtData.statements.length > 0) {
                             stmtData.statements.forEach(s => {
-                                const safeFileName = s.file_name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                                stmtContainer.innerHTML += `
-                                    <div class="sidebar-list-item d-flex justify-content-between align-items-center mb-1">
-                                        <div class="sidebar-list-item-content flex-grow-1 overflow-hidden d-flex align-items-center gap-2">
-                                            <i class="bi bi-file-earmark-spreadsheet-fill text-success" style="font-size: 16px; flex-shrink: 0;"></i>
-                                            <div style="min-width: 0;">
-                                                <div class="sidebar-list-item-title text-truncate fw-bold" title="${s.file_name}" style="font-size: 13px;">${s.file_name}</div>
-                                                <div class="sidebar-list-item-sub text-muted text-truncate" style="font-size: 10px;">${s.bank_name} • ${formatMonthLabel(s.statement_month)}</div>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-link text-danger p-0 ms-2 delete-statement-btn" data-id="${s.statement_id}" data-filename="${safeFileName}" style="text-decoration: none; font-size: 14px; flex-shrink: 0;" title="Delete this statement">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    </div>`;
+                                const item = document.createElement("div");
+                                item.className = "sidebar-list-item d-flex justify-content-between align-items-center mb-1";
+
+                                const content = document.createElement("div");
+                                content.className = "sidebar-list-item-content flex-grow-1 overflow-hidden d-flex align-items-center gap-2";
+
+                                const icon = document.createElement("i");
+                                icon.className = "bi bi-file-earmark-spreadsheet-fill text-success";
+                                icon.style.cssText = "font-size: 16px; flex-shrink: 0;";
+
+                                const textDiv = document.createElement("div");
+                                textDiv.style.minWidth = "0";
+
+                                const titleDiv = document.createElement("div");
+                                titleDiv.className = "sidebar-list-item-title text-truncate fw-bold";
+                                titleDiv.style.fontSize = "13px";
+                                titleDiv.textContent = s.file_name;
+                                titleDiv.title = s.file_name;
+
+                                const subDiv = document.createElement("div");
+                                subDiv.className = "sidebar-list-item-sub text-muted text-truncate";
+                                subDiv.style.fontSize = "10px";
+                                subDiv.textContent = `${s.bank_name} • ${formatMonthLabel(s.statement_month)}`;
+
+                                textDiv.appendChild(titleDiv);
+                                textDiv.appendChild(subDiv);
+                                content.appendChild(icon);
+                                content.appendChild(textDiv);
+
+                                const deleteBtn = document.createElement("button");
+                                deleteBtn.type = "button";
+                                deleteBtn.className = "btn btn-link text-danger p-0 ms-2 delete-statement-btn";
+                                deleteBtn.setAttribute("data-id", s.statement_id);
+                                deleteBtn.setAttribute("data-filename", s.file_name);
+                                deleteBtn.style.cssText = "text-decoration: none; font-size: 14px; flex-shrink: 0;";
+                                deleteBtn.title = "Delete this statement";
+
+                                const trashIcon = document.createElement("i");
+                                trashIcon.className = "bi bi-trash-fill";
+                                deleteBtn.appendChild(trashIcon);
+
+                                item.appendChild(content);
+                                item.appendChild(deleteBtn);
+                                stmtContainer.appendChild(item);
                             });
                         } else {
-                            stmtContainer.innerHTML = `<div class="text-muted small p-2">No statements loaded</div>`;
+                            const noStmt = document.createElement("div");
+                            noStmt.className = "text-muted small p-2";
+                            noStmt.textContent = "No statements loaded";
+                            stmtContainer.appendChild(noStmt);
                         }
                     });
                 
@@ -166,25 +199,30 @@ function fetchSidebarData() {
                 coverageContainer.innerHTML = "";
                 
                 coverage.forEach(item => {
+                    const itemDiv = document.createElement("div");
+                    itemDiv.className = "sidebar-coverage-item";
+
+                    const nameSpan = document.createElement("span");
+                    nameSpan.textContent = item.name;
+
+                    const dotSpan = document.createElement("span");
                     if (item.status === 'placeholder') {
-                        coverageContainer.innerHTML += `
-                            <div class="sidebar-coverage-item">
-                                <span class="text-muted">${item.name}</span>
-                                <span class="missing-dash">-</span>
-                            </div>`;
+                        nameSpan.className = "text-muted";
+                        dotSpan.className = "missing-dash";
+                        dotSpan.textContent = "-";
                     } else if (item.status === 'active') {
-                        coverageContainer.innerHTML += `
-                            <div class="sidebar-coverage-item">
-                                <span>${item.name}</span>
-                                <span class="active-dot"><i class="bi bi-check-circle-fill"></i></span>
-                            </div>`;
+                        dotSpan.className = "active-dot";
+                        const checkIcon = document.createElement("i");
+                        checkIcon.className = "bi bi-check-circle-fill";
+                        dotSpan.appendChild(checkIcon);
                     } else {
-                        coverageContainer.innerHTML += `
-                            <div class="sidebar-coverage-item">
-                                <span class="text-muted">${item.name}</span>
-                                <span class="missing-dash">-</span>
-                            </div>`;
+                        nameSpan.className = "text-muted";
+                        dotSpan.className = "missing-dash";
+                        dotSpan.textContent = "-";
                     }
+                    itemDiv.appendChild(nameSpan);
+                    itemDiv.appendChild(dotSpan);
+                    coverageContainer.appendChild(itemDiv);
                 });
             } else {
                 document.getElementById("sidebar-dynamic-sections").style.display = "none";
@@ -601,16 +639,37 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
     catSpending.slice(0, 5).forEach(c => {
         const pct = (c.amount / maxCatSpend) * 100;
         const color = getCategoryColorHex(c.category_name);
-        topCatContainer.innerHTML += `
-            <div class="list-premium-item py-2 d-flex flex-column align-items-stretch gap-1">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold small text-truncate" style="max-width: 140px;">${c.category_name}</span>
-                    <span class="small font-bold">${formatCurrency(c.amount)}</span>
-                </div>
-                <div class="list-progress-bar">
-                    <div class="list-progress-fill" style="width: ${pct}%; background-color: ${color}"></div>
-                </div>
-            </div>`;
+
+        const item = document.createElement("div");
+        item.className = "list-premium-item py-2 d-flex flex-column align-items-stretch gap-1";
+
+        const flexDiv = document.createElement("div");
+        flexDiv.className = "d-flex justify-content-between align-items-center";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "fw-semibold small text-truncate";
+        nameSpan.style.maxWidth = "140px";
+        nameSpan.textContent = c.category_name;
+
+        const amountSpan = document.createElement("span");
+        amountSpan.className = "small font-bold";
+        amountSpan.textContent = formatCurrency(c.amount);
+
+        flexDiv.appendChild(nameSpan);
+        flexDiv.appendChild(amountSpan);
+
+        const progBar = document.createElement("div");
+        progBar.className = "list-progress-bar";
+
+        const progFill = document.createElement("div");
+        progFill.className = "list-progress-fill";
+        progFill.style.width = `${pct}%`;
+        progFill.style.backgroundColor = color;
+
+        progBar.appendChild(progFill);
+        item.appendChild(flexDiv);
+        item.appendChild(progBar);
+        topCatContainer.appendChild(item);
     });
 
     // 4. Lists - Top Merchants
@@ -622,16 +681,36 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
     
     analytics.top_merchants.slice(0, 5).forEach(m => {
         const pct = (m.total_spend / maxMerchantSpend) * 100;
-        topMerchantContainer.innerHTML += `
-            <div class="list-premium-item py-2 d-flex flex-column align-items-stretch gap-1">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold small text-truncate" style="max-width: 140px;">${m.merchant_name}</span>
-                    <span class="small font-bold">${formatCurrency(m.total_spend)}</span>
-                </div>
-                <div class="list-progress-bar">
-                    <div class="list-progress-fill" style="width: ${pct}%"></div>
-                </div>
-            </div>`;
+
+        const item = document.createElement("div");
+        item.className = "list-premium-item py-2 d-flex flex-column align-items-stretch gap-1";
+
+        const flexDiv = document.createElement("div");
+        flexDiv.className = "d-flex justify-content-between align-items-center";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "fw-semibold small text-truncate";
+        nameSpan.style.maxWidth = "140px";
+        nameSpan.textContent = m.merchant_name;
+
+        const amountSpan = document.createElement("span");
+        amountSpan.className = "small font-bold";
+        amountSpan.textContent = formatCurrency(m.total_spend);
+
+        flexDiv.appendChild(nameSpan);
+        flexDiv.appendChild(amountSpan);
+
+        const progBar = document.createElement("div");
+        progBar.className = "list-progress-bar";
+
+        const progFill = document.createElement("div");
+        progFill.className = "list-progress-fill";
+        progFill.style.width = `${pct}%`;
+
+        progBar.appendChild(progFill);
+        item.appendChild(flexDiv);
+        item.appendChild(progBar);
+        topMerchantContainer.appendChild(item);
     });
 
     // 5. Lists - Recent Transactions
@@ -647,14 +726,45 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
                     const amtClass = t.transaction_type === 'Credit' ? 'amount-credit' : 'amount-debit';
                     const prefix = t.transaction_type === 'Credit' ? '+' : '-';
                     const catClass = getCategoryClass(t.category_name);
-                    recentTxContainer.innerHTML += `
-                        <tr style="font-size: 11px;">
-                            <td class="text-nowrap" style="font-size: 10px; color: var(--text-muted);">${formatDateString(t.transaction_date)}</td>
-                            <td class="fw-semibold text-truncate" style="max-width: 110px;" title="${t.description}">${t.description.replace(/\n/g, ' ')}</td>
-                            <td><span class="badge-category ${catClass}" style="padding: 2px 8px; font-size: 9px;">${t.category_name}</span></td>
-                            <td><span class="fw-semibold text-capitalize ${t.transaction_type === 'Credit' ? 'text-success' : 'text-danger'}">${t.transaction_type}</span></td>
-                            <td class="${amtClass} text-nowrap text-end">${prefix} ${formatCurrency(t.amount)}</td>
-                        </tr>`;
+
+                    const tr = document.createElement("tr");
+                    tr.style.fontSize = "11px";
+
+                    const dateTd = document.createElement("td");
+                    dateTd.className = "text-nowrap";
+                    dateTd.style.fontSize = "10px";
+                    dateTd.style.color = "var(--text-muted)";
+                    dateTd.textContent = formatDateString(t.transaction_date);
+
+                    const descTd = document.createElement("td");
+                    descTd.className = "fw-semibold text-truncate";
+                    descTd.style.maxWidth = "110px";
+                    descTd.title = t.description;
+                    descTd.textContent = t.description.replace(/\n/g, ' ');
+
+                    const catTd = document.createElement("td");
+                    const catBadge = document.createElement("span");
+                    catBadge.className = `badge-category ${catClass}`;
+                    catBadge.style.cssText = "padding: 2px 8px; font-size: 9px;";
+                    catBadge.textContent = t.category_name;
+                    catTd.appendChild(catBadge);
+
+                    const typeTd = document.createElement("td");
+                    const typeSpan = document.createElement("span");
+                    typeSpan.className = `fw-semibold text-capitalize ${t.transaction_type === 'Credit' ? 'text-success' : 'text-danger'}`;
+                    typeSpan.textContent = t.transaction_type;
+                    typeTd.appendChild(typeSpan);
+
+                    const amountTd = document.createElement("td");
+                    amountTd.className = `${amtClass} text-nowrap text-end`;
+                    amountTd.textContent = `${prefix} ${formatCurrency(t.amount)}`;
+
+                    tr.appendChild(dateTd);
+                    tr.appendChild(descTd);
+                    tr.appendChild(catTd);
+                    tr.appendChild(typeTd);
+                    tr.appendChild(amountTd);
+                    recentTxContainer.appendChild(tr);
                 });
             }
         });
@@ -663,11 +773,23 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
     const insightsContainer = document.getElementById("dashboard-insights-preview");
     insightsContainer.innerHTML = "";
     insights.slice(0, 3).forEach(i => {
-        insightsContainer.innerHTML += `
-            <div class="insight-card p-2 px-3 mb-2">
-                <div class="insight-card-icon ${i.status}"><i class="bi ${i.icon}"></i></div>
-                <div class="insight-card-text small" style="line-height: 1.3;">${i.text}</div>
-            </div>`;
+        const card = document.createElement("div");
+        card.className = "insight-card p-2 px-3 mb-2";
+
+        const iconDiv = document.createElement("div");
+        iconDiv.className = `insight-card-icon ${i.status}`;
+        const icon = document.createElement("i");
+        icon.className = `bi ${i.icon}`;
+        iconDiv.appendChild(icon);
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "insight-card-text small";
+        textDiv.style.lineHeight = "1.3";
+        textDiv.textContent = i.text;
+
+        card.appendChild(iconDiv);
+        card.appendChild(textDiv);
+        insightsContainer.appendChild(card);
     });
 
     // 7. Monthly Overview Table with Sparklines
@@ -688,20 +810,43 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
             sparklineBars += `<rect x="${moIdx * 12}" y="${20 - h}" width="8" height="${h}" fill="${fill}" rx="2"></rect>`;
         });
         
-        const sparklineSVG = `
+        const tr = document.createElement("tr");
+
+        const monthTd = document.createElement("td");
+        monthTd.className = "fw-bold";
+        monthTd.textContent = formatMonthLabel(t.month);
+
+        const incomeTd = document.createElement("td");
+        incomeTd.className = "amount-credit";
+        incomeTd.textContent = `+ ${formatCurrency(t.income)}`;
+
+        const expenseTd = document.createElement("td");
+        expenseTd.className = "amount-debit";
+        expenseTd.textContent = `- ${formatCurrency(t.expense)}`;
+
+        const savingsTd = document.createElement("td");
+        savingsTd.className = `${t.savings >= 0 ? 'text-success' : 'text-danger'} font-semibold`;
+        savingsTd.textContent = formatCurrency(t.savings);
+
+        const rateTd = document.createElement("td");
+        const rateSpan = document.createElement("span");
+        rateSpan.className = "badge bg-light text-dark border px-2 py-1";
+        rateSpan.textContent = `${t.savings_rate.toFixed(1)}%`;
+        rateTd.appendChild(rateSpan);
+
+        const sparkTd = document.createElement("td");
+        sparkTd.innerHTML = `
             <svg width="80" height="24" viewBox="0 0 80 24" class="overflow-visible">
                 ${sparklineBars}
             </svg>`;
-            
-        monthlyTableBody.innerHTML += `
-            <tr>
-                <td class="fw-bold">${formatMonthLabel(t.month)}</td>
-                <td class="amount-credit">+ ${formatCurrency(t.income)}</td>
-                <td class="amount-debit">- ${formatCurrency(t.expense)}</td>
-                <td class="${t.savings >= 0 ? 'text-success' : 'text-danger'} font-semibold">${formatCurrency(t.savings)}</td>
-                <td><span class="badge bg-light text-dark border px-2 py-1">${t.savings_rate.toFixed(1)}%</span></td>
-                <td>${sparklineSVG}</td>
-            </tr>`;
+
+        tr.appendChild(monthTd);
+        tr.appendChild(incomeTd);
+        tr.appendChild(expenseTd);
+        tr.appendChild(savingsTd);
+        tr.appendChild(rateTd);
+        tr.appendChild(sparkTd);
+        monthlyTableBody.appendChild(tr);
     });
 }
 
@@ -720,8 +865,15 @@ function initTransactionsPage() {
         .then(data => {
             if (data.success && data.categories) {
                 data.categories.forEach(c => {
-                    catSelect.innerHTML += `<option value="${c.category_id}">${c.category_name}</option>`;
-                    modalSelect.innerHTML += `<option value="${c.category_id}">${c.category_name}</option>`;
+                    const opt1 = document.createElement("option");
+                    opt1.value = c.category_id;
+                    opt1.textContent = c.category_name;
+                    catSelect.appendChild(opt1);
+
+                    const opt2 = document.createElement("option");
+                    opt2.value = c.category_id;
+                    opt2.textContent = c.category_name;
+                    modalSelect.appendChild(opt2);
                 });
             }
         });
@@ -791,23 +943,52 @@ function loadTransactions() {
                 data.transactions.forEach(t => {
                     const amtClass = t.transaction_type === 'Credit' ? 'amount-credit' : 'amount-debit';
                     const prefix = t.transaction_type === 'Credit' ? '+' : '-';
-                    const catBadge = `<span class="badge-category ${getCategoryClass(t.category_name)}">${t.category_name}</span>`;
+
+                    const tr = document.createElement("tr");
+
+                    const dateTd = document.createElement("td");
+                    dateTd.textContent = formatDateString(t.transaction_date);
+
+                    const descTd = document.createElement("td");
+                    descTd.className = "text-truncate fw-semibold";
+                    descTd.style.maxWidth = "260px";
+                    descTd.title = t.description;
+                    descTd.textContent = t.description.replace(/\n/g, ' ');
+
+                    const catTd = document.createElement("td");
+                    const catBadge = document.createElement("span");
+                    catBadge.className = `badge-category ${getCategoryClass(t.category_name)}`;
+                    catBadge.textContent = t.category_name;
+                    catTd.appendChild(catBadge);
+
+                    const typeTd = document.createElement("td");
+                    typeTd.textContent = t.transaction_type;
+
+                    const amountTd = document.createElement("td");
+                    amountTd.className = `${amtClass} font-bold`;
+                    amountTd.textContent = `${prefix} ${formatCurrency(t.amount)}`;
+
+                    const actionTd = document.createElement("td");
+                    const actionBtn = document.createElement("button");
+                    actionBtn.type = "button";
+                    actionBtn.className = "btn btn-outline-primary btn-xs px-2 py-1 classify-btn";
+                    actionBtn.setAttribute("data-id", t.transaction_id);
+                    actionBtn.setAttribute("data-category-id", t.category_id);
                     
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${formatDateString(t.transaction_date)}</td>
-                            <td class="text-truncate fw-semibold" style="max-width: 260px;" title="${t.description}">
-                                ${t.description.replace(/\n/g, ' ')}
-                            </td>
-                            <td>${catBadge}</td>
-                            <td>${t.transaction_type}</td>
-                            <td class="${amtClass} font-bold">${prefix} ${formatCurrency(t.amount)}</td>
-                            <td>
-                                <button type="button" class="btn btn-outline-primary btn-xs px-2 py-1 classify-btn" data-id="${t.transaction_id}" data-category-id="${t.category_id}">
-                                    <i class="bi bi-tag-fill me-1"></i> Classify
-                                </button>
-                            </td>
-                        </tr>`;
+                    const tagIcon = document.createElement("i");
+                    tagIcon.className = "bi bi-tag-fill me-1";
+                    
+                    actionBtn.appendChild(tagIcon);
+                    actionBtn.appendChild(document.createTextNode(" Classify"));
+                    actionTd.appendChild(actionBtn);
+
+                    tr.appendChild(dateTd);
+                    tr.appendChild(descTd);
+                    tr.appendChild(catTd);
+                    tr.appendChild(typeTd);
+                    tr.appendChild(amountTd);
+                    tr.appendChild(actionTd);
+                    tbody.appendChild(tr);
                 });
                 
                 renderPagination(data.pagination);
@@ -1109,17 +1290,38 @@ function renderAnalyticsView(analytics, range = 'this-year') {
     const mContainer = document.getElementById("analytics-merchants-list");
     mContainer.innerHTML = "";
     analytics.top_merchants.slice(0, 5).forEach((m, idx) => {
-        mContainer.innerHTML += `
-            <div class="list-premium-item py-2 px-3">
-                <div class="list-premium-item-left">
-                    <span class="list-premium-item-rank">${idx+1}</span>
-                    <div>
-                        <div class="list-premium-item-name">${m.merchant_name}</div>
-                        <div class="list-premium-item-sub small text-muted">${m.transaction_count} transactions</div>
-                    </div>
-                </div>
-                <div class="list-premium-item-right text-danger">${formatCurrency(m.total_spend)}</div>
-            </div>`;
+        const item = document.createElement("div");
+        item.className = "list-premium-item py-2 px-3";
+
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "list-premium-item-left";
+
+        const rankSpan = document.createElement("span");
+        rankSpan.className = "list-premium-item-rank";
+        rankSpan.textContent = idx + 1;
+
+        const infoDiv = document.createElement("div");
+        
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "list-premium-item-name";
+        nameDiv.textContent = m.merchant_name;
+
+        const subDiv = document.createElement("div");
+        subDiv.className = "list-premium-item-sub small text-muted";
+        subDiv.textContent = `${m.transaction_count} transactions`;
+
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(subDiv);
+        leftDiv.appendChild(rankSpan);
+        leftDiv.appendChild(infoDiv);
+
+        const rightDiv = document.createElement("div");
+        rightDiv.className = "list-premium-item-right text-danger";
+        rightDiv.textContent = formatCurrency(m.total_spend);
+
+        item.appendChild(leftDiv);
+        item.appendChild(rightDiv);
+        mContainer.appendChild(item);
     });
 
     // 4. Combined Spending Trends (Bar + Line combo)
@@ -1262,14 +1464,34 @@ function renderAnalyticsView(analytics, range = 'this-year') {
     if (analytics.subscriptions && analytics.subscriptions.length > 0) {
         document.getElementById("subscriptions-empty-state").style.display = "none";
         analytics.subscriptions.forEach(s => {
-            subContainer.innerHTML += `
-                <tr>
-                    <td class="fw-bold">${s.merchant_name}</td>
-                    <td><span class="badge-category cat-entertainment">${s.category_name}</span></td>
-                    <td class="font-semibold text-danger">- ${formatCurrency(s.amount)}</td>
-                    <td>${s.frequency}</td>
-                    <td>${formatDateString(s.next_billing)}</td>
-                </tr>`;
+            const tr = document.createElement("tr");
+
+            const nameTd = document.createElement("td");
+            nameTd.className = "fw-bold";
+            nameTd.textContent = s.merchant_name;
+
+            const catTd = document.createElement("td");
+            const catBadge = document.createElement("span");
+            catBadge.className = `badge-category ${getCategoryClass(s.category_name)}`;
+            catBadge.textContent = s.category_name;
+            catTd.appendChild(catBadge);
+
+            const amountTd = document.createElement("td");
+            amountTd.className = "font-semibold text-danger";
+            amountTd.textContent = `- ${formatCurrency(s.amount)}`;
+
+            const freqTd = document.createElement("td");
+            freqTd.textContent = s.frequency;
+
+            const dateTd = document.createElement("td");
+            dateTd.textContent = formatDateString(s.next_billing);
+
+            tr.appendChild(nameTd);
+            tr.appendChild(catTd);
+            tr.appendChild(amountTd);
+            tr.appendChild(freqTd);
+            tr.appendChild(dateTd);
+            subContainer.appendChild(tr);
         });
     } else {
         document.getElementById("subscriptions-empty-state").style.display = "block";
@@ -1285,16 +1507,33 @@ function renderAnalyticsView(analytics, range = 'this-year') {
         .then(iData => {
             if (iData.success && iData.insights) {
                 iData.insights.forEach(i => {
-                    insightsContainer.innerHTML += `
-                        <div class="insight-card p-3 mb-3 shadow-sm">
-                            <div class="insight-card-icon ${i.status}"><i class="bi ${i.icon}"></i></div>
-                            <div class="insight-card-text">
-                                <span class="badge bg-${i.status}-subtle text-${i.status} border border-${i.status}-subtle rounded-pill px-2 py-1 mb-1 font-bold small text-uppercase" style="font-size: 9px;">
-                                    ${i.type}
-                                </span>
-                                <div class="font-semibold" style="line-height: 1.4;">${i.text}</div>
-                            </div>
-                        </div>`;
+                    const card = document.createElement("div");
+                    card.className = "insight-card p-3 mb-3 shadow-sm";
+
+                    const iconDiv = document.createElement("div");
+                    iconDiv.className = `insight-card-icon ${i.status}`;
+                    const icon = document.createElement("i");
+                    icon.className = `bi ${i.icon}`;
+                    iconDiv.appendChild(icon);
+
+                    const textDiv = document.createElement("div");
+                    textDiv.className = "insight-card-text";
+
+                    const badge = document.createElement("span");
+                    badge.className = `badge bg-${i.status}-subtle text-${i.status} border border-${i.status}-subtle rounded-pill px-2 py-1 mb-1 font-bold small text-uppercase`;
+                    badge.style.fontSize = "9px";
+                    badge.textContent = i.type;
+
+                    const descDiv = document.createElement("div");
+                    descDiv.className = "font-semibold";
+                    descDiv.style.lineHeight = "1.4";
+                    descDiv.textContent = i.text;
+
+                    textDiv.appendChild(badge);
+                    textDiv.appendChild(descDiv);
+                    card.appendChild(iconDiv);
+                    card.appendChild(textDiv);
+                    insightsContainer.appendChild(card);
                 });
             }
         });
@@ -1342,8 +1581,35 @@ function initForecastPage() {
                 // Show result alert
                 const alertEl = document.getElementById("what-if-alert");
                 alertEl.style.setProperty("display", "flex", "important");
-                document.getElementById("what-if-alert-message").innerHTML = `
-                    <strong>Simulation Result:</strong> By reducing <strong>${cat}</strong> spend by <strong>${reduction}%</strong>, you will save an additional <strong>${formatCurrency(simData.what_if.adjusted_saving)}</strong> per month. Projections updated!`;
+                
+                const alertMsg = document.getElementById("what-if-alert-message");
+                alertMsg.innerHTML = ""; // Clear
+                
+                const titleStrong = document.createElement("strong");
+                titleStrong.textContent = "Simulation Result: ";
+                
+                const text1 = document.createTextNode("By reducing ");
+                const catStrong = document.createElement("strong");
+                catStrong.textContent = cat;
+                
+                const text2 = document.createTextNode(" spend by ");
+                const redStrong = document.createElement("strong");
+                redStrong.textContent = `${reduction}%`;
+                
+                const text3 = document.createTextNode(", you will save an additional ");
+                const saveStrong = document.createElement("strong");
+                saveStrong.textContent = formatCurrency(simData.what_if.adjusted_saving);
+                
+                const text4 = document.createTextNode(" per month. Projections updated!");
+                
+                alertMsg.appendChild(titleStrong);
+                alertMsg.appendChild(text1);
+                alertMsg.appendChild(catStrong);
+                alertMsg.appendChild(text2);
+                alertMsg.appendChild(redStrong);
+                alertMsg.appendChild(text3);
+                alertMsg.appendChild(saveStrong);
+                alertMsg.appendChild(text4);
             }
         });
     });
@@ -1487,38 +1753,89 @@ function renderForecastView(data, horizon = 6) {
         const changeClass = c.change >= 0 ? 'text-danger' : 'text-success';
         const changePrefix = c.change >= 0 ? '▲' : '▼';
         
-        catList.innerHTML += `
-            <div class="list-premium-item py-2 d-flex flex-column align-items-stretch gap-1">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="badge-category ${getCategoryClass(c.category_name)} py-1 px-2 me-2" style="font-size: 10px;">${c.category_name}</span>
-                        <span class="small font-semibold text-muted">${c.percentage.toFixed(0)}% of total</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="small font-bold">${formatCurrency(c.projected_spend)}</span>
-                        <span class="small font-bold ${changeClass}" style="font-size: 11px;">${changePrefix} ${Math.abs(c.change).toFixed(1)}%</span>
-                    </div>
-                </div>
-                <div class="list-progress-bar">
-                    <div class="list-progress-fill" style="width: ${pct}%"></div>
-                </div>
-            </div>`;
+        const item = document.createElement("div");
+        item.className = "list-premium-item py-2 d-flex flex-column align-items-stretch gap-1";
+
+        const topDiv = document.createElement("div");
+        topDiv.className = "d-flex justify-content-between align-items-center";
+
+        const leftDiv = document.createElement("div");
+        
+        const catBadge = document.createElement("span");
+        catBadge.className = `badge-category ${getCategoryClass(c.category_name)} py-1 px-2 me-2`;
+        catBadge.style.fontSize = "10px";
+        catBadge.textContent = c.category_name;
+
+        const pctSpan = document.createElement("span");
+        pctSpan.className = "small font-semibold text-muted";
+        pctSpan.textContent = `${c.percentage.toFixed(0)}% of total`;
+
+        leftDiv.appendChild(catBadge);
+        leftDiv.appendChild(pctSpan);
+
+        const rightDiv = document.createElement("div");
+        rightDiv.className = "d-flex align-items-center gap-2";
+
+        const spendSpan = document.createElement("span");
+        spendSpan.className = "small font-bold";
+        spendSpan.textContent = formatCurrency(c.projected_spend);
+
+        const changeSpan = document.createElement("span");
+        changeSpan.className = `small font-bold ${changeClass}`;
+        changeSpan.style.fontSize = "11px";
+        changeSpan.textContent = `${changePrefix} ${Math.abs(c.change).toFixed(1)}%`;
+
+        rightDiv.appendChild(spendSpan);
+        rightDiv.appendChild(changeSpan);
+
+        topDiv.appendChild(leftDiv);
+        topDiv.appendChild(rightDiv);
+
+        const progBar = document.createElement("div");
+        progBar.className = "list-progress-bar";
+
+        const progFill = document.createElement("div");
+        progFill.className = "list-progress-fill";
+        progFill.style.width = `${pct}%`;
+
+        progBar.appendChild(progFill);
+        item.appendChild(topDiv);
+        item.appendChild(progBar);
+        catList.appendChild(item);
     });
 
     // 4. Lists - Upcoming Large Bills
     const billsList = document.getElementById("forecast-upcoming-expenses");
     billsList.innerHTML = "";
     data.upcoming_expenses.forEach(b => {
-        billsList.innerHTML += `
-            <div class="list-premium-item py-2 px-3">
-                <div class="list-premium-item-left">
-                    <div>
-                        <div class="list-premium-item-name small">${b.description}</div>
-                        <div class="text-muted" style="font-size: 10px;">Expected: ${b.expected_month}</div>
-                    </div>
-                </div>
-                <div class="list-premium-item-right text-danger small font-bold">${formatCurrency(b.amount)}</div>
-            </div>`;
+        const item = document.createElement("div");
+        item.className = "list-premium-item py-2 px-3";
+
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "list-premium-item-left";
+
+        const wrapperDiv = document.createElement("div");
+        
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "list-premium-item-name small";
+        nameDiv.textContent = b.description;
+
+        const monthDiv = document.createElement("div");
+        monthDiv.className = "text-muted";
+        monthDiv.style.fontSize = "10px";
+        monthDiv.textContent = `Expected: ${b.expected_month}`;
+
+        wrapperDiv.appendChild(nameDiv);
+        wrapperDiv.appendChild(monthDiv);
+        leftDiv.appendChild(wrapperDiv);
+
+        const rightDiv = document.createElement("div");
+        rightDiv.className = "list-premium-item-right text-danger small font-bold";
+        rightDiv.textContent = formatCurrency(b.amount);
+
+        item.appendChild(leftDiv);
+        item.appendChild(rightDiv);
+        billsList.appendChild(item);
     });
     
     document.getElementById("forecast-total-upcoming").innerText = formatCurrency(data.total_upcoming_expenses);
@@ -1570,13 +1887,27 @@ function renderForecastView(data, horizon = 6) {
     const recContainer = document.getElementById("forecast-recommendations-list");
     recContainer.innerHTML = "";
     data.recommendations.forEach(r => {
-        recContainer.innerHTML += `
-            <div class="insight-card p-3 mb-3 shadow-sm border-start border-4 border-primary">
-                <div class="insight-card-icon info"><i class="bi ${r.icon}"></i></div>
-                <div class="insight-card-text">
-                    <div class="font-semibold" style="line-height: 1.4; color: var(--text-primary);">${r.text}</div>
-                </div>
-            </div>`;
+        const card = document.createElement("div");
+        card.className = "insight-card p-3 mb-3 shadow-sm border-start border-4 border-primary";
+
+        const iconDiv = document.createElement("div");
+        iconDiv.className = "insight-card-icon info";
+        const icon = document.createElement("i");
+        icon.className = `bi ${r.icon}`;
+        iconDiv.appendChild(icon);
+
+        const textDiv = document.createElement("div");
+        textDiv.className = "insight-card-text";
+        
+        const descDiv = document.createElement("div");
+        descDiv.className = "font-semibold";
+        descDiv.style.cssText = "line-height: 1.4; color: var(--text-primary);";
+        descDiv.textContent = r.text;
+
+        textDiv.appendChild(descDiv);
+        card.appendChild(iconDiv);
+        card.appendChild(textDiv);
+        recContainer.appendChild(card);
     });
 }
 
@@ -1587,7 +1918,10 @@ function populateWhatIfDropdown(data) {
     
     data.category_forecasts.forEach(c => {
         if (c.category_name !== 'Uncategorized' && c.category_name !== 'Salary' && c.category_name !== 'Transfer') {
-            select.innerHTML += `<option value="${c.category_name}">${c.category_name}</option>`;
+            const opt = document.createElement("option");
+            opt.value = c.category_name;
+            opt.textContent = c.category_name;
+            select.appendChild(opt);
         }
     });
 }
@@ -1672,27 +2006,76 @@ function loadReportsList() {
                 
                 data.reports.forEach(r => {
                     const badgeClass = r.type === 'Summary' ? 'bg-primary' : (r.type === 'Detailed' ? 'bg-success' : (r.type === 'Analytics' ? 'bg-warning text-dark' : 'bg-danger'));
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="fw-bold"><i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i> ${r.name}</td>
-                            <td><span class="badge ${badgeClass} px-2 py-1">${r.type}</span></td>
-                            <td class="text-muted small">${r.date_range}</td>
-                            <td class="text-muted small">${r.generated_on}</td>
-                            <td><span class="badge bg-light text-dark border">${r.file_size}</span></td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary btn-xs px-2 py-1 view-report-btn" data-filename="${r.filename}">
-                                        <i class="bi bi-eye"></i> View
-                                    </button>
-                                    <a class="btn btn-outline-success btn-xs px-2 py-1" href="/api/report/download/${r.filename}">
-                                        <i class="bi bi-download"></i> Download
-                                    </a>
-                                    <button class="btn btn-outline-danger btn-xs px-2 py-1 delete-report-btn" data-filename="${r.filename}">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
+                    const tr = document.createElement("tr");
+
+                    const nameTd = document.createElement("td");
+                    nameTd.className = "fw-bold";
+                    
+                    const pdfIcon = document.createElement("i");
+                    pdfIcon.className = "bi bi-file-earmark-pdf-fill text-danger me-2";
+                    nameTd.appendChild(pdfIcon);
+                    nameTd.appendChild(document.createTextNode(` ${r.name}`));
+
+                    const typeTd = document.createElement("td");
+                    const typeBadge = document.createElement("span");
+                    typeBadge.className = `badge ${badgeClass} px-2 py-1`;
+                    typeBadge.textContent = r.type;
+                    typeTd.appendChild(typeBadge);
+
+                    const rangeTd = document.createElement("td");
+                    rangeTd.className = "text-muted small";
+                    rangeTd.textContent = r.date_range;
+
+                    const dateTd = document.createElement("td");
+                    dateTd.className = "text-muted small";
+                    dateTd.textContent = r.generated_on;
+
+                    const sizeTd = document.createElement("td");
+                    const sizeBadge = document.createElement("span");
+                    sizeBadge.className = "badge bg-light text-dark border";
+                    sizeBadge.textContent = r.file_size;
+                    sizeTd.appendChild(sizeBadge);
+
+                    const actionsTd = document.createElement("td");
+                    const actionsDiv = document.createElement("div");
+                    actionsDiv.className = "d-flex gap-2";
+
+                    const viewBtn = document.createElement("button");
+                    viewBtn.className = "btn btn-outline-primary btn-xs px-2 py-1 view-report-btn";
+                    viewBtn.setAttribute("data-filename", r.filename);
+                    const viewIcon = document.createElement("i");
+                    viewIcon.className = "bi bi-eye";
+                    viewBtn.appendChild(viewIcon);
+                    viewBtn.appendChild(document.createTextNode(" View"));
+
+                    const downloadLink = document.createElement("a");
+                    downloadLink.className = "btn btn-outline-success btn-xs px-2 py-1";
+                    downloadLink.href = `/api/report/download/${encodeURIComponent(r.filename)}`;
+                    const downloadIcon = document.createElement("i");
+                    downloadIcon.className = "bi bi-download";
+                    downloadLink.appendChild(downloadIcon);
+                    downloadLink.appendChild(document.createTextNode(" Download"));
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.className = "btn btn-outline-danger btn-xs px-2 py-1 delete-report-btn";
+                    deleteBtn.setAttribute("data-filename", r.filename);
+                    const deleteIcon = document.createElement("i");
+                    deleteIcon.className = "bi bi-trash";
+                    deleteBtn.appendChild(deleteIcon);
+                    deleteBtn.appendChild(document.createTextNode(" Delete"));
+
+                    actionsDiv.appendChild(viewBtn);
+                    actionsDiv.appendChild(downloadLink);
+                    actionsDiv.appendChild(deleteBtn);
+                    actionsTd.appendChild(actionsDiv);
+
+                    tr.appendChild(nameTd);
+                    tr.appendChild(typeTd);
+                    tr.appendChild(rangeTd);
+                    tr.appendChild(dateTd);
+                    tr.appendChild(sizeTd);
+                    tr.appendChild(actionsTd);
+                    tbody.appendChild(tr);
                 });
                 
                 // Show insights for the first report automatically if available
@@ -1707,7 +2090,14 @@ function loadReportsList() {
 
 window.viewReportPDF = function(filename) {
     const pane = document.getElementById("report-preview-pane");
-    pane.innerHTML = `<iframe src="/api/report/view/${filename}" width="100%" height="400px" style="border: none; border-radius: 8px;"></iframe>`;
+    pane.innerHTML = "";
+    const iframe = document.createElement("iframe");
+    iframe.src = `/api/report/view/${encodeURIComponent(filename)}`;
+    iframe.width = "100%";
+    iframe.height = "400px";
+    iframe.style.border = "none";
+    iframe.style.borderRadius = "8px";
+    pane.appendChild(iframe);
 };
 
 window.deleteReportPDF = function(filename) {
@@ -1740,13 +2130,29 @@ function loadReportInsights() {
             
             if (data.success && data.insights) {
                 data.insights.slice(0, 5).forEach(i => {
-                    container.innerHTML += `
-                        <div class="insight-card p-2 px-3 mb-2 shadow-sm border-start border-3 border-${i.status}">
-                            <div class="insight-card-icon ${i.status}"><i class="bi ${i.icon}"></i></div>
-                            <div class="insight-card-text small" style="line-height: 1.3;">
-                                <strong>[${i.type.toUpperCase()}]</strong> ${i.text}
-                            </div>
-                        </div>`;
+                    const card = document.createElement("div");
+                    card.className = `insight-card p-2 px-3 mb-2 shadow-sm border-start border-3 border-${i.status}`;
+
+                    const iconDiv = document.createElement("div");
+                    iconDiv.className = `insight-card-icon ${i.status}`;
+                    const icon = document.createElement("i");
+                    icon.className = `bi ${i.icon}`;
+                    iconDiv.appendChild(icon);
+
+                    const textDiv = document.createElement("div");
+                    textDiv.className = "insight-card-text small";
+                    textDiv.style.lineHeight = "1.3";
+
+                    const statusStrong = document.createElement("strong");
+                    statusStrong.textContent = `[${i.type.toUpperCase()}] `;
+
+                    const descText = document.createTextNode(i.text);
+
+                    textDiv.appendChild(statusStrong);
+                    textDiv.appendChild(descText);
+                    card.appendChild(iconDiv);
+                    card.appendChild(textDiv);
+                    container.appendChild(card);
                 });
             }
         });
@@ -1853,7 +2259,15 @@ function showToast(message) {
     const el = document.createElement("div");
     el.className = "p-3 bg-dark text-white rounded-3 shadow-lg small d-flex align-items-center gap-2";
     el.style.cssText = "min-width: 250px; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-out; background-color: var(--text-primary) !important; color: var(--bg-surface) !important;";
-    el.innerHTML = `<i class="bi bi-info-circle-fill text-primary"></i> <span>${message}</span>`;
+    
+    const icon = document.createElement("i");
+    icon.className = "bi bi-info-circle-fill text-primary";
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = message;
+
+    el.appendChild(icon);
+    el.appendChild(textSpan);
     
     toastContainer.appendChild(el);
     
