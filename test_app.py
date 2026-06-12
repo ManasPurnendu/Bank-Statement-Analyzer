@@ -307,6 +307,470 @@ class TestBankStatementAnalyzer(unittest.TestCase):
         self.assertEqual(categorize_transaction("CASH WDL FROM BRANCH", "Debit"), cash_atm_id)
         self.assertEqual(categorize_transaction("CASH WITHDRAWAL FROM ATM", "Debit"), cash_atm_id)
 
+    def test_negative_balance_excel_parsing(self):
+        """Test that negative balances are parsed correctly from Excel metadata without sign stripping."""
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Statement"
+        ws.cell(row=1, column=1).value = "Opening Balance: | -54321.10"
+        ws.cell(row=2, column=1).value = "Closing Balance: | -12345.50"
+        ws.cell(row=3, column=1).value = "Account Number: | 9988776655"
+        
+        headers = ["Date", "Description", "Debit", "Credit", "Balance"]
+        for col, h in enumerate(headers, 1):
+            ws.cell(row=4, column=col).value = h
+            
+        row_data = ["2025-01-01", "UPI-SWIGGY-FOOD", 100, None, -54421.10]
+        for col, val in enumerate(row_data, 1):
+            ws.cell(row=5, column=col).value = val
+            
+        test_file = 'test_neg_balance.xlsx'
+        wb.save(test_file)
+        try:
+            from parsers.excel_parser import parse_excel_statement
+            parsed = parse_excel_statement(test_file, test_file)
+            metadata = parsed["metadata"]
+            self.assertEqual(metadata["opening_balance"], -54321.10)
+            self.assertEqual(metadata["closing_balance"], -12345.50)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
+    def test_reverse_chronological_excel_parsing(self):
+        """Test that reverse-chronological statements are correctly chronologized ascending."""
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Statement"
+        ws.cell(row=1, column=1).value = "Account Number: | 11223344"
+        
+        headers = ["Date", "Description", "Debit", "Credit", "Balance"]
+        for col, h in enumerate(headers, 1):
+            ws.cell(row=2, column=col).value = h
+            
+        # Reverse chronological (newest first)
+        rows_data = [
+            ["2025-01-02", "Tx C (Newest on Jan 2)", 10, None, 10030],
+            ["2025-01-01", "Tx B (Newer on Jan 1)", 50, None, 10050],
+            ["2025-01-01", "Tx A (Older on Jan 1)", None, 100, 10100]
+        ]
+        
+        for r_idx, r_data in enumerate(rows_data, 3):
+            for c_idx, val in enumerate(r_data, 1):
+                ws.cell(row=r_idx, column=c_idx).value = val
+                
+        test_file = 'test_rev_chrono.xlsx'
+        wb.save(test_file)
+        try:
+            from parsers.excel_parser import parse_excel_statement
+            parsed = parse_excel_statement(test_file, test_file)
+            transactions = parsed["transactions"]
+            metadata = parsed["metadata"]
+            
+            # Check transaction count
+            self.assertEqual(len(transactions), 3)
+            # Verify they are now ordered: Tx A -> Tx B -> Tx C
+            self.assertEqual(transactions[0]["description"], "Tx A (Older on Jan 1)")
+            self.assertEqual(transactions[1]["description"], "Tx B (Newer on Jan 1)")
+            self.assertEqual(transactions[2]["description"], "Tx C (Newest on Jan 2)")
+            
+            # Verify deduced opening balance (before Tx A, which was Credit 100 from starting balance 10000)
+            # Tx A balance was 10100, so opening balance should be 10000
+            self.assertEqual(metadata["opening_balance"], 10000.0)
+            # Verify deduced closing balance (latest txn Tx C balance which is 10030)
+            self.assertEqual(metadata["closing_balance"], 10030.0)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
+    def test_forecasting_accuracy_linear_increase(self):
+        """Test forecasting accuracy under a linear increase trend, verifying MAPE < 10%."""
+        import services.forecast
+        from services.forecast import generate_forecast
+        
+        # Save original calculate_analytics reference
+        orig_calc = services.forecast.calculate_analytics
+        
+        historical_trends = [
+            {"month": "2025-01", "income": 30000.0, "expense": 10000.0, "savings": 20000.0, "savings_rate": 66.6, "transaction_count": 10},
+            {"month": "2025-02", "income": 30000.0, "expense": 12000.0, "savings": 18000.0, "savings_rate": 60.0, "transaction_count": 10},
+            {"month": "2025-03", "income": 30000.0, "expense": 14000.0, "savings": 16000.0, "savings_rate": 53.3, "transaction_count": 10},
+            {"month": "2025-04", "income": 30000.0, "expense": 16000.0, "savings": 14000.0, "savings_rate": 46.6, "transaction_count": 10},
+            {"month": "2025-05", "income": 30000.0, "expense": 18000.0, "savings": 12000.0, "savings_rate": 40.0, "transaction_count": 10},
+        ]
+        
+        services.forecast.calculate_analytics = lambda *args, **kwargs: {
+            "start_date": "2025-01-01",
+            "end_date": "2025-05-01",
+            "account_holder": "Test User",
+            "kpis": {"balance": 50000.0},
+            "category_spending": [],
+            "monthly_trends": historical_trends,
+            "subscriptions": []
+        }
+        
+        try:
+            res = generate_forecast(horizon=1)
+            self.assertTrue(res["success"])
+            pred_jun_expense = res["forecast_details"][0]["projected_expense"]
+            actual_jun_expense = 20000.0
+            mape = (abs(pred_jun_expense - actual_jun_expense) / actual_jun_expense) * 100
+            
+            # The MAPE must be under 10% (our blended model gets ~7.60%)
+            self.assertTrue(mape < 10.0, f"Expected MAPE < 10%, got {mape:.2f}%")
+        finally:
+            services.forecast.calculate_analytics = orig_calc
+
+    def test_forecasting_accuracy_trends_and_damping(self):
+        """Test forecasting stability and trend damping for upward and downward profiles."""
+        import services.forecast
+        from services.forecast import generate_forecast
+        
+        orig_calc = services.forecast.calculate_analytics
+        
+        # Test Downward Trend: should decrease sequentially without sudden starting spikes
+        downward_trends = [
+            {"month": "2025-01", "income": 50000.0, "expense": 30000.0, "savings": 20000.0, "savings_rate": 40.0, "transaction_count": 10},
+            {"month": "2025-02", "income": 50000.0, "expense": 25000.0, "savings": 25000.0, "savings_rate": 50.0, "transaction_count": 10},
+            {"month": "2025-03", "income": 50000.0, "expense": 20000.0, "savings": 30000.0, "savings_rate": 60.0, "transaction_count": 10},
+            {"month": "2025-04", "income": 50000.0, "expense": 15000.0, "savings": 35000.0, "savings_rate": 70.0, "transaction_count": 10},
+            {"month": "2025-05", "income": 50000.0, "expense": 10000.0, "savings": 40000.0, "savings_rate": 80.0, "transaction_count": 10},
+        ]
+        
+        services.forecast.calculate_analytics = lambda *args, **kwargs: {
+            "start_date": "2025-01-01",
+            "end_date": "2025-05-01",
+            "account_holder": "Test User",
+            "kpis": {"balance": 10000.0},
+            "category_spending": [],
+            "monthly_trends": downward_trends,
+            "subscriptions": []
+        }
+        
+        try:
+            res = generate_forecast(horizon=3)
+            self.assertTrue(res["success"])
+            details = res["forecast_details"]
+            
+            # Verify predicted values decrease sequentially
+            self.assertTrue(details[0]["projected_expense"] > details[1]["projected_expense"])
+            self.assertTrue(details[1]["projected_expense"] > details[2]["projected_expense"])
+            
+            # Verify no starting spike (Month 1 expense must be close to May's 10,000, e.g. < 15,000)
+            self.assertTrue(details[0]["projected_expense"] < 15000.0)
+        finally:
+            services.forecast.calculate_analytics = orig_calc
+
+    def test_duplicate_integrity(self):
+        """Test file hash statement rejection and overlapping statement transaction-level deduplication."""
+        # 1. Test duplicate statement check by hash
+        account_number = "123456789"
+        start_date = "2025-06-01"
+        end_date = "2025-06-30"
+        transaction_count = 5
+        file_hash = "abc123xyz456"
+        
+        # Add a test statement with file_hash
+        stmt_id = add_statement(
+            "statement_a.xlsx", "Excel", "Test User",
+            account_number, "Test Bank", "2025-06",
+            start_date, end_date, transaction_count,
+            1000.0, 1500.0, file_hash=file_hash
+        )
+        
+        # Verify check_duplicate_statement finds it by hash
+        dup_by_hash = check_duplicate_statement(
+            "different_acc", "2025-01-01", "2025-01-31", 99, file_hash=file_hash
+        )
+        self.assertEqual(dup_by_hash, stmt_id)
+        
+        # 2. Test transaction-level deduplication on overlapping bulk insert
+        from database.models import compute_transaction_hash
+        
+        # Let's insert transactions with identical fingerprints but one legitimate repeated transaction (same date, desc, amount, different balance)
+        txs = [
+            # Original transaction 1
+            {
+                "statement_id": stmt_id,
+                "transaction_date": "2025-06-05",
+                "description": "UPI-SWIGGY",
+                "amount": 150.0,
+                "transaction_type": "Debit",
+                "balance": 850.0,
+                "category_id": None,
+                "payee_name": "Swiggy",
+                "merchant_name": "Swiggy",
+                "payment_method": "UPI",
+                "is_subscription": 0
+            },
+            # Legitimate repeated transaction on same day (different running balance)
+            {
+                "statement_id": stmt_id,
+                "transaction_date": "2025-06-05",
+                "description": "UPI-SWIGGY",
+                "amount": 150.0,
+                "transaction_type": "Debit",
+                "balance": 700.0,
+                "category_id": None,
+                "payee_name": "Swiggy",
+                "merchant_name": "Swiggy",
+                "payment_method": "UPI",
+                "is_subscription": 0
+            }
+        ]
+        
+        # Calculate hashes
+        for t in txs:
+            t["transaction_hash"] = compute_transaction_hash(
+                account_number,
+                t["transaction_date"],
+                t["description"],
+                t["amount"],
+                t["transaction_type"],
+                t["balance"]
+            )
+            
+        # Add to DB
+        add_transactions_bulk(txs)
+        
+        # Get count of inserted transactions
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM transactions WHERE statement_id = ?", (stmt_id,))
+        first_insert_count = cursor.fetchone()["count"]
+        self.assertEqual(first_insert_count, 2)
+        
+        # 3. Simulate overlapping statement ingestion containing the exact same transactions + one new transaction
+        new_stmt_id = add_statement(
+            "statement_b.xlsx", "Excel", "Test User",
+            account_number, "Test Bank", "2025-06",
+            "2025-06-05", "2025-06-10", 3,
+            700.0, 1200.0, file_hash="def456uvw789"
+        )
+        
+        overlapping_txs = [
+            # Exact duplicate of transaction 1
+            {
+                "statement_id": new_stmt_id,
+                "transaction_date": "2025-06-05",
+                "description": "UPI-SWIGGY",
+                "amount": 150.0,
+                "transaction_type": "Debit",
+                "balance": 850.0,
+                "category_id": None,
+                "payee_name": "Swiggy",
+                "merchant_name": "Swiggy",
+                "payment_method": "UPI",
+                "is_subscription": 0
+            },
+            # Exact duplicate of transaction 2
+            {
+                "statement_id": new_stmt_id,
+                "transaction_date": "2025-06-05",
+                "description": "UPI-SWIGGY",
+                "amount": 150.0,
+                "transaction_type": "Debit",
+                "balance": 700.0,
+                "category_id": None,
+                "payee_name": "Swiggy",
+                "merchant_name": "Swiggy",
+                "payment_method": "UPI",
+                "is_subscription": 0
+            },
+            # A completely new transaction in the overlap statement
+            {
+                "statement_id": new_stmt_id,
+                "transaction_date": "2025-06-08",
+                "description": "SALARY DEP",
+                "amount": 500.0,
+                "transaction_type": "Credit",
+                "balance": 1200.0,
+                "category_id": None,
+                "payee_name": "Salary",
+                "merchant_name": "Salary",
+                "payment_method": "Other",
+                "is_subscription": 0
+            }
+        ]
+        
+        # Calculate hashes
+        for t in overlapping_txs:
+            t["transaction_hash"] = compute_transaction_hash(
+                account_number,
+                t["transaction_date"],
+                t["description"],
+                t["amount"],
+                t["transaction_type"],
+                t["balance"]
+            )
+            
+        # Ingest overlapping
+        add_transactions_bulk(overlapping_txs)
+        
+        # Verify database counts
+        # Overlapping duplicates should have been skipped, but the new salary transaction should be inserted
+        cursor.execute("SELECT COUNT(*) as count FROM transactions WHERE statement_id = ?", (new_stmt_id,))
+        new_stmt_inserted_count = cursor.fetchone()["count"]
+        # Only the new unique salary transaction should be inserted under new_stmt_id, other 2 skipped
+        self.assertEqual(new_stmt_inserted_count, 1)
+        
+        # Total transactions for this account/range should be 3
+        cursor.execute("SELECT COUNT(*) as count FROM transactions WHERE statement_id IN (?, ?)", (stmt_id, new_stmt_id))
+        total_txs = cursor.fetchone()["count"]
+        self.assertEqual(total_txs, 3)
+        
+        # Clean up statements
+        cursor.execute("DELETE FROM statements WHERE statement_id IN (?, ?)", (stmt_id, new_stmt_id))
+        conn.commit()
+        conn.close()
+
+    def test_csv_parser_separate_debit_credit(self):
+        """Test parsing of CSV statements with separate Debit and Credit columns."""
+        csv_content = """Date,Description,Debit,Credit,Balance
+2025-01-01,Swiggy Payment,150.00,,9850.00
+2025-01-02,Salary Credited,,25000.00,34850.00
+"""
+        test_file = 'test_sep_debit_credit.csv'
+        with open(test_file, 'w') as f:
+            f.write(csv_content)
+            
+        try:
+            from parsers.csv_parser import parse_csv_statement
+            parsed = parse_csv_statement(test_file, test_file)
+            metadata = parsed["metadata"]
+            transactions = parsed["transactions"]
+            
+            self.assertEqual(len(transactions), 2)
+            self.assertEqual(transactions[0]["transaction_type"], "Debit")
+            self.assertEqual(transactions[0]["amount"], 150.0)
+            self.assertEqual(transactions[0]["balance"], 9850.0)
+            
+            self.assertEqual(transactions[1]["transaction_type"], "Credit")
+            self.assertEqual(transactions[1]["amount"], 25000.0)
+            self.assertEqual(transactions[1]["balance"], 34850.0)
+            
+            self.assertEqual(metadata["opening_balance"], 10000.0)
+            self.assertEqual(metadata["closing_balance"], 34850.0)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
+    def test_csv_parser_single_amount_type(self):
+        """Test parsing of CSV statements with a single Amount column and Type column."""
+        csv_content = """Date,Description,Amount,Balance,Type
+01/01/2025,Starbucks Coffee,120.00,9880.00,Debit
+02/01/2025,Transfer from Friend,500.00,10380.00,CR
+03/01/2025,Refund,-100.00,10280.00,
+"""
+        test_file = 'test_single_amount_type.csv'
+        with open(test_file, 'w') as f:
+            f.write(csv_content)
+            
+        try:
+            from parsers.csv_parser import parse_csv_statement
+            parsed = parse_csv_statement(test_file, test_file)
+            transactions = parsed["transactions"]
+            
+            self.assertEqual(len(transactions), 3)
+            self.assertEqual(transactions[0]["transaction_type"], "Debit")
+            self.assertEqual(transactions[0]["amount"], 120.0)
+            
+            self.assertEqual(transactions[1]["transaction_type"], "Credit")
+            self.assertEqual(transactions[1]["amount"], 500.0)
+            
+            # Negative sign fallback when type is missing/unknown
+            self.assertEqual(transactions[2]["transaction_type"], "Debit")
+            self.assertEqual(transactions[2]["amount"], 100.0)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
+    def test_json_parser_top_level(self):
+        """Test parsing of JSON statements with a top-level transactions array."""
+        json_content = """{
+            "bank_name": "Axis Bank",
+            "account_holder": "Manas Purnendu",
+            "account_number": "12345678",
+            "opening_balance": 5000.00,
+            "closing_balance": 4850.00,
+            "transactions": [
+                {
+                    "date": "2025-01-01",
+                    "description": "ZOMATO ORDER",
+                    "debit": 150.00,
+                    "credit": 0.00,
+                    "balance": 4850.00
+                }
+            ]
+        }"""
+        test_file = 'test_top_level.json'
+        with open(test_file, 'w') as f:
+            f.write(json_content)
+            
+        try:
+            from parsers.json_parser import parse_json_statement
+            parsed = parse_json_statement(test_file, test_file)
+            metadata = parsed["metadata"]
+            transactions = parsed["transactions"]
+            
+            self.assertEqual(metadata["bank_name"], "Axis Bank")
+            self.assertEqual(metadata["account_holder"], "Manas Purnendu")
+            self.assertEqual(metadata["account_number"], "12345678")
+            self.assertEqual(metadata["opening_balance"], 5000.0)
+            self.assertEqual(metadata["closing_balance"], 4850.0)
+            
+            self.assertEqual(len(transactions), 1)
+            self.assertEqual(transactions[0]["description"], "ZOMATO ORDER")
+            self.assertEqual(transactions[0]["amount"], 150.0)
+            self.assertEqual(transactions[0]["transaction_type"], "Debit")
+            self.assertEqual(transactions[0]["balance"], 4850.0)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
+    def test_json_parser_nested_statement(self):
+        """Test parsing of JSON statements with a nested statement object."""
+        json_content = """{
+            "statement": {
+                "bank": "HDFC Bank",
+                "holder": "Purnendu",
+                "opening_balance": 1000.00,
+                "closing_balance": 2000.00,
+                "data": [
+                    {
+                        "transaction_date": "2025-01-05",
+                        "remarks": "SALARY CREDIT",
+                        "amount": 1000.00,
+                        "type": "Credit",
+                        "balance": 2000.00
+                    }
+                ]
+            }
+        }"""
+        test_file = 'test_nested.json'
+        with open(test_file, 'w') as f:
+            f.write(json_content)
+            
+        try:
+            from parsers.json_parser import parse_json_statement
+            parsed = parse_json_statement(test_file, test_file)
+            metadata = parsed["metadata"]
+            transactions = parsed["transactions"]
+            
+            self.assertEqual(metadata["bank_name"], "HDFC Bank")
+            self.assertEqual(metadata["account_holder"], "Purnendu")
+            self.assertEqual(metadata["opening_balance"], 1000.0)
+            self.assertEqual(metadata["closing_balance"], 2000.0)
+            
+            self.assertEqual(len(transactions), 1)
+            self.assertEqual(transactions[0]["description"], "SALARY CREDIT")
+            self.assertEqual(transactions[0]["amount"], 1000.0)
+            self.assertEqual(transactions[0]["transaction_type"], "Credit")
+            self.assertEqual(transactions[0]["balance"], 2000.0)
+        finally:
+            if os.path.exists(test_file):
+                os.remove(test_file)
+
 if __name__ == "__main__":
     unittest.main()
-

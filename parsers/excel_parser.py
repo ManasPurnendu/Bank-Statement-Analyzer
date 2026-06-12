@@ -5,6 +5,8 @@ import io
 import msoffcrypto
 from datetime import datetime
 from services.categorizer import categorize_transaction, detect_merchant_and_payee, detect_payment_method, detect_subscription, load_category_rules
+from database.models import compute_transaction_hash
+from parsers.utils import normalize_date, normalize_amount, normalize_headers, clean_description, finalize_metadata
 
 def is_excel_encrypted(file_path):
     """
@@ -120,7 +122,8 @@ def parse_excel_statement(file_path, original_filename, password=None):
             metadata["account_number"] = ac_match2.group(1).strip()
 
     # Look for opening balance
-    op_match = re.search(r'(?:Opening Balance|Start Balance)\s*[:\|\-\s]+\s*([0-9,\-\.]+)', text_dump, re.IGNORECASE)
+    separator_pattern = r'[ \t]*(?:-(?!\d)|[:\| \t])+[ \t]*'
+    op_match = re.search(r'(?:Opening Balance|Start Balance)' + separator_pattern + r'(-?[0-9,\.]+)', text_dump, re.IGNORECASE)
     if op_match:
         try:
             metadata["opening_balance"] = float(op_match.group(1).replace(",", ""))
@@ -128,7 +131,7 @@ def parse_excel_statement(file_path, original_filename, password=None):
             pass
             
     # Look for closing balance
-    cl_match = re.search(r'(?:Closing Balance|End Balance|Balance)\s*[:\|\-\s]+\s*([0-9,\-\.]+)', text_dump, re.IGNORECASE)
+    cl_match = re.search(r'(?<!Opening\s)(?<!Start\s)\b(?:Closing Balance|End Balance|Balance)\b' + separator_pattern + r'(-?[0-9,\.]+)', text_dump, re.IGNORECASE)
     if cl_match:
         try:
             metadata["closing_balance"] = float(cl_match.group(1).replace(",", ""))
@@ -204,40 +207,28 @@ def parse_excel_statement(file_path, original_filename, password=None):
             continue
             
         raw_date = str(row[date_col]).strip()
-        description = str(row[desc_col]).strip()
+        description = clean_description(str(row[desc_col]).strip())
         
         if not raw_date or not description:
             continue
-            
-        # Standardize Date
+        
+        # Standardize Date using shared util
         try:
-            # Try multiple parsing patterns
-            parsed_date = None
-            for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%d-%m-%Y', '%d/%m/%Y', '%d/%m/%y', '%d-%b-%Y', '%d-%b-%y', '%b %d, %Y'):
-                try:
-                    parsed_date = datetime.strptime(raw_date.split(" ")[0], fmt).date()
-                    break
-                except ValueError:
-                    continue
-            if not parsed_date:
-                # pandas to_datetime helper
-                parsed_date = pd.to_datetime(raw_date).date()
+            transaction_date = normalize_date(raw_date)
         except Exception:
-            continue # Date formatting error, skip row
-            
-        transaction_date = parsed_date.strftime('%Y-%m-%d')
+            continue  # Date formatting error, skip row
         
         # Calculate Amount and Type
         amount = 0.0
         txn_type = 'Debit'
         
         if debit_col and credit_col:
-            raw_deb = row[debit_col]
-            raw_cred = row[credit_col]
+            raw_deb = row[debit_col] if pd.notna(row[debit_col]) else ''
+            raw_cred = row[credit_col] if pd.notna(row[credit_col]) else ''
             
-            # Clean numeric strings
-            val_deb = float(str(raw_deb).replace(",", "")) if pd.notna(raw_deb) and str(raw_deb).strip() not in ("", "-", "nan", "None") else 0.0
-            val_cred = float(str(raw_cred).replace(",", "")) if pd.notna(raw_cred) and str(raw_cred).strip() not in ("", "-", "nan", "None") else 0.0
+            # Clean numeric strings via shared util
+            val_deb = normalize_amount(raw_deb)
+            val_cred = normalize_amount(raw_cred)
             
             if val_deb > 0:
                 amount = val_deb
@@ -277,10 +268,7 @@ def parse_excel_statement(file_path, original_filename, password=None):
         # Parse Balance
         balance = 0.0
         if balance_col and pd.notna(row[balance_col]):
-            try:
-                balance = float(str(row[balance_col]).replace(",", ""))
-            except ValueError:
-                pass
+            balance = normalize_amount(row[balance_col])
 
         # Compute Categorization and names
         category_id = categorize_transaction(description, txn_type, rules, amount=amount)
@@ -300,6 +288,14 @@ def parse_excel_statement(file_path, original_filename, password=None):
             "payment_method": payment_method,
             "is_subscription": 1 if is_subscription else 0
         })
+
+    # Check if dates are primarily in descending order to detect reverse-chronological statements
+    dates = [t["transaction_date"] for t in transactions if t.get("transaction_date")]
+    if len(dates) >= 2:
+        desc_count = sum(1 for i in range(len(dates) - 1) if dates[i] > dates[i+1])
+        asc_count = sum(1 for i in range(len(dates) - 1) if dates[i] < dates[i+1])
+        if desc_count > asc_count:
+            transactions.reverse()
 
     # Sort transactions stably by normalized date only (preserves spreadsheet order)
     transactions.sort(key=lambda x: x["transaction_date"])
@@ -328,6 +324,18 @@ def parse_excel_statement(file_path, original_filename, password=None):
     if not metadata["closing_balance"] and len(transactions) > 0:
         metadata["closing_balance"] = transactions[-1]["balance"]
         
+    # Calculate transaction fingerprint hashes
+    account_number = metadata.get("account_number") or "Unknown"
+    for t in transactions:
+        t["transaction_hash"] = compute_transaction_hash(
+            account_number,
+            t["transaction_date"],
+            t["description"],
+            t["amount"],
+            t["transaction_type"],
+            t["balance"]
+        )
+
     return {
         "metadata": metadata,
         "transactions": transactions

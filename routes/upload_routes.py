@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify, current_app
 import os
+import hashlib
 from werkzeug.utils import secure_filename
-from parsers.excel_parser import parse_excel_statement
-from parsers.pdf_parser import parse_pdf_statement
+from parsers.unified_parser import parse_statement
 from database.models import check_duplicate_statement, add_statement, add_transactions_bulk, delete_statement, get_all_statements
 
 upload_bp = Blueprint('upload', __name__)
 
-ALLOWED_EXTENSIONS = {'pdf', 'xls', 'xlsx'}
+ALLOWED_EXTENSIONS = {'pdf', 'xls', 'xlsx', 'csv', 'json'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -22,16 +22,21 @@ def upload_file():
                 from generate_sample_data import create_sample_excel
                 create_sample_excel()
             
-            parsed_data = parse_excel_statement(demo_file, demo_file)
+            parsed_data = parse_statement(demo_file, demo_file)
             metadata = parsed_data["metadata"]
             transactions = parsed_data["transactions"]
             
+            # Calculate file hash for demo file
+            with open(demo_file, 'rb') as f:
+                demo_hash = hashlib.sha256(f.read()).hexdigest()
+
             # Delete if duplicate exists (to ensure a clean reload)
             dup_id = check_duplicate_statement(
                 metadata["account_number"], 
                 metadata["start_date"], 
                 metadata["end_date"], 
-                metadata["transaction_count"]
+                metadata["transaction_count"],
+                file_hash=demo_hash
             )
             if dup_id:
                 delete_statement(dup_id)
@@ -40,7 +45,8 @@ def upload_file():
                 metadata["file_name"], metadata["file_type"], metadata["account_holder"],
                 metadata["account_number"], metadata["bank_name"], metadata["statement_month"],
                 metadata["start_date"], metadata["end_date"], metadata["transaction_count"],
-                metadata["opening_balance"], metadata["closing_balance"]
+                metadata["opening_balance"], metadata["closing_balance"],
+                file_hash=demo_hash
             )
             
             for t in transactions:
@@ -83,49 +89,35 @@ def upload_file():
         if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
             
+        # Calculate file hash
+        file.seek(0)
+        file_bytes = file.read()
+        file_hash = hashlib.sha256(file_bytes).hexdigest()
+        file.seek(0) # Reset stream pointer
+
         temp_path = os.path.join(upload_dir, filename)
         file.save(temp_path)
-        
+        stmt_id = None
         try:
-            # Parse statement based on type
-            ext = filename.rsplit('.', 1)[1].lower()
-            if ext == 'pdf':
-                try:
-                    parsed_data = parse_pdf_statement(temp_path, filename, password)
-                except ValueError as ve:
-                    if str(ve) == "PasswordRequired":
-                        return jsonify({
-                            "success": False, 
-                            "error": "PasswordRequired", 
-                            "message": "The PDF statement is password-protected. Please enter the password."
-                        }), 401
-                    elif str(ve) == "IncorrectPassword":
-                        return jsonify({
-                            "success": False, 
-                            "error": "IncorrectPassword", 
-                            "message": "Incorrect password. The password does not match the uploaded statement."
-                        }), 401
-                    else:
-                        raise ve
-            else:
-                # Excel Statement
-                try:
-                    parsed_data = parse_excel_statement(temp_path, filename, password)
-                except ValueError as ve:
-                    if str(ve) == "PasswordRequired":
-                        return jsonify({
-                            "success": False, 
-                            "error": "PasswordRequired", 
-                            "message": "The Excel statement is password-protected. Please enter the password."
-                        }), 401
-                    elif str(ve) == "IncorrectPassword":
-                        return jsonify({
-                            "success": False, 
-                            "error": "IncorrectPassword", 
-                            "message": "Incorrect password. The password does not match the uploaded statement."
-                        }), 401
-                    else:
-                        raise ve
+            # Parse statement through the unified parser
+            try:
+                parsed_data = parse_statement(temp_path, filename, password=password)
+            except ValueError as ve:
+                err = str(ve)
+                if err == "PasswordRequired":
+                    return jsonify({
+                        "success": False,
+                        "error": "PasswordRequired",
+                        "message": "This file is password-protected. Please enter the password."
+                    }), 401
+                elif err == "IncorrectPassword":
+                    return jsonify({
+                        "success": False,
+                        "error": "IncorrectPassword",
+                        "message": "Incorrect password. The password does not match the uploaded file."
+                    }), 401
+                else:
+                    raise ve
                 
             metadata = parsed_data["metadata"]
             transactions = parsed_data["transactions"]
@@ -135,7 +127,8 @@ def upload_file():
                 metadata["account_number"], 
                 metadata["start_date"], 
                 metadata["end_date"], 
-                metadata["transaction_count"]
+                metadata["transaction_count"],
+                file_hash=file_hash
             )
             
             if dup_id:
@@ -167,7 +160,8 @@ def upload_file():
                 metadata["file_name"], metadata["file_type"], metadata["account_holder"],
                 metadata["account_number"], metadata["bank_name"], metadata["statement_month"],
                 metadata["start_date"], metadata["end_date"], metadata["transaction_count"],
-                metadata["opening_balance"], metadata["closing_balance"]
+                metadata["opening_balance"], metadata["closing_balance"],
+                file_hash=file_hash
             )
             
             # Link transactions to statement ID and insert bulk
@@ -180,6 +174,11 @@ def upload_file():
             uploaded_statements.append(stmt_id)
             
         except Exception as e:
+            if stmt_id is not None:
+                try:
+                    delete_statement(stmt_id)
+                except Exception:
+                    pass
             # Cleanup and return error
             return jsonify({
                 "success": False, 

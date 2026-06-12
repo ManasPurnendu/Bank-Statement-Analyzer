@@ -125,79 +125,79 @@ function setupActiveNav() {
 
 /* --- SIDEBAR META INGESTION --- */
 function fetchSidebarData() {
-    fetch('/api/dashboard')
-        .then(res => res.json())
-        .then(data => {
+    Promise.all([
+        fetch('/api/statements').then(res => res.json()).catch(() => ({ success: false, statements: [] })),
+        fetch('/api/dashboard').then(res => res.json()).catch(() => ({ success: false }))
+    ])
+    .then(([stmtData, data]) => {
+        const hasStatements = stmtData.success && stmtData.statements && stmtData.statements.length > 0;
+        if (hasStatements) {
+            document.getElementById("sidebar-dynamic-sections").style.display = "block";
+            
+            // 1. Populate loaded statements list from database
+            const stmtContainer = document.getElementById("sidebar-statements-list");
+            stmtContainer.innerHTML = "";
+            
+            stmtData.statements.forEach(s => {
+                const item = document.createElement("div");
+                item.className = "sidebar-list-item d-flex justify-content-between align-items-center mb-1";
+
+                const content = document.createElement("div");
+                content.className = "sidebar-list-item-content flex-grow-1 overflow-hidden d-flex align-items-center gap-2";
+
+                const icon = document.createElement("i");
+                icon.className = "bi bi-file-earmark-spreadsheet-fill text-success";
+                icon.style.cssText = "font-size: 16px; flex-shrink: 0;";
+
+                const textDiv = document.createElement("div");
+                textDiv.style.minWidth = "0";
+
+                const titleDiv = document.createElement("div");
+                titleDiv.className = "sidebar-list-item-title text-truncate fw-bold";
+                titleDiv.style.fontSize = "13px";
+                titleDiv.textContent = s.file_name;
+                titleDiv.title = s.file_name;
+
+                const subDiv = document.createElement("div");
+                subDiv.className = "sidebar-list-item-sub text-muted text-truncate";
+                subDiv.style.fontSize = "10px";
+                subDiv.textContent = `${s.bank_name || 'Unknown'} • ${formatMonthLabel(s.statement_month)}`;
+
+                textDiv.appendChild(titleDiv);
+                textDiv.appendChild(subDiv);
+                content.appendChild(icon);
+                content.appendChild(textDiv);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.type = "button";
+                deleteBtn.className = "btn btn-link text-danger p-0 ms-2 delete-statement-btn";
+                deleteBtn.setAttribute("data-id", s.statement_id);
+                deleteBtn.setAttribute("data-filename", s.file_name);
+                deleteBtn.style.cssText = "text-decoration: none; font-size: 14px; flex-shrink: 0;";
+                deleteBtn.title = "Delete this statement";
+
+                const trashIcon = document.createElement("i");
+                trashIcon.className = "bi bi-trash-fill";
+                deleteBtn.appendChild(trashIcon);
+
+                item.appendChild(content);
+                item.appendChild(deleteBtn);
+                stmtContainer.appendChild(item);
+            });
+
+            // 2. Populate data coverage list from analytics trends
+            const coverageContainer = document.getElementById("sidebar-coverage-list");
+            coverageContainer.innerHTML = "";
+            
+            const coverageHeader = document.querySelector("#sidebar-dynamic-sections .sidebar-section-title:nth-of-type(2)");
+            const coverageDivider = document.querySelector("#sidebar-dynamic-sections hr:nth-of-type(2)");
+
             if (data.success && data.analytics && data.analytics.raw_count > 0) {
-                document.getElementById("sidebar-dynamic-sections").style.display = "block";
-                
-                // 1. Populate loaded statements list from database
-                fetch('/api/statements')
-                    .then(res => res.json())
-                    .then(stmtData => {
-                        const stmtContainer = document.getElementById("sidebar-statements-list");
-                        stmtContainer.innerHTML = "";
-                        
-                        if (stmtData.success && stmtData.statements && stmtData.statements.length > 0) {
-                            stmtData.statements.forEach(s => {
-                                const item = document.createElement("div");
-                                item.className = "sidebar-list-item d-flex justify-content-between align-items-center mb-1";
+                if (coverageHeader) coverageHeader.style.display = "block";
+                if (coverageDivider) coverageDivider.style.display = "block";
+                coverageContainer.style.display = "block";
 
-                                const content = document.createElement("div");
-                                content.className = "sidebar-list-item-content flex-grow-1 overflow-hidden d-flex align-items-center gap-2";
-
-                                const icon = document.createElement("i");
-                                icon.className = "bi bi-file-earmark-spreadsheet-fill text-success";
-                                icon.style.cssText = "font-size: 16px; flex-shrink: 0;";
-
-                                const textDiv = document.createElement("div");
-                                textDiv.style.minWidth = "0";
-
-                                const titleDiv = document.createElement("div");
-                                titleDiv.className = "sidebar-list-item-title text-truncate fw-bold";
-                                titleDiv.style.fontSize = "13px";
-                                titleDiv.textContent = s.file_name;
-                                titleDiv.title = s.file_name;
-
-                                const subDiv = document.createElement("div");
-                                subDiv.className = "sidebar-list-item-sub text-muted text-truncate";
-                                subDiv.style.fontSize = "10px";
-                                subDiv.textContent = `${s.bank_name} • ${formatMonthLabel(s.statement_month)}`;
-
-                                textDiv.appendChild(titleDiv);
-                                textDiv.appendChild(subDiv);
-                                content.appendChild(icon);
-                                content.appendChild(textDiv);
-
-                                const deleteBtn = document.createElement("button");
-                                deleteBtn.type = "button";
-                                deleteBtn.className = "btn btn-link text-danger p-0 ms-2 delete-statement-btn";
-                                deleteBtn.setAttribute("data-id", s.statement_id);
-                                deleteBtn.setAttribute("data-filename", s.file_name);
-                                deleteBtn.style.cssText = "text-decoration: none; font-size: 14px; flex-shrink: 0;";
-                                deleteBtn.title = "Delete this statement";
-
-                                const trashIcon = document.createElement("i");
-                                trashIcon.className = "bi bi-trash-fill";
-                                deleteBtn.appendChild(trashIcon);
-
-                                item.appendChild(content);
-                                item.appendChild(deleteBtn);
-                                stmtContainer.appendChild(item);
-                            });
-                        } else {
-                            const noStmt = document.createElement("div");
-                            noStmt.className = "text-muted small p-2";
-                            noStmt.textContent = "No statements loaded";
-                            stmtContainer.appendChild(noStmt);
-                        }
-                    });
-                
-                // 2. Populate data coverage list from analytics trends
                 const coverage = data.analytics.data_coverage || [];
-                const coverageContainer = document.getElementById("sidebar-coverage-list");
-                coverageContainer.innerHTML = "";
-                
                 coverage.forEach(item => {
                     const itemDiv = document.createElement("div");
                     itemDiv.className = "sidebar-coverage-item";
@@ -225,12 +225,17 @@ function fetchSidebarData() {
                     coverageContainer.appendChild(itemDiv);
                 });
             } else {
-                document.getElementById("sidebar-dynamic-sections").style.display = "none";
+                if (coverageHeader) coverageHeader.style.display = "none";
+                if (coverageDivider) coverageDivider.style.display = "none";
+                coverageContainer.style.display = "none";
             }
-        })
-        .catch(err => {
-            console.error("Error fetching sidebar data:", err);
-        });
+        } else {
+            document.getElementById("sidebar-dynamic-sections").style.display = "none";
+        }
+    })
+    .catch(err => {
+        console.error("Error fetching sidebar data:", err);
+    });
 }
 
 /* --- LANDING & UPLOAD COMPONENT --- */
@@ -1682,7 +1687,18 @@ function renderForecastView(data, horizon = 6) {
                     tension: 0.3,
                     fill: false,
                     segment: {
-                        borderDash: ctx => ctx.p0DataIndex >= chartData.historical_count - 1 ? [6, 6] : []
+                        borderDash: ctx => {
+                            const p0 = ctx.p0DataIndex;
+                            const p1 = ctx.p1DataIndex;
+                            if (chartData.status) {
+                                const s0 = chartData.status[p0];
+                                const s1 = chartData.status[p1];
+                                if (s0 === 'actual' && s1 === 'actual') {
+                                    return [];
+                                }
+                            }
+                            return [6, 6];
+                        }
                     }
                 },
                 {
@@ -1693,7 +1709,18 @@ function renderForecastView(data, horizon = 6) {
                     tension: 0.3,
                     fill: false,
                     segment: {
-                        borderDash: ctx => ctx.p0DataIndex >= chartData.historical_count - 1 ? [6, 6] : []
+                        borderDash: ctx => {
+                            const p0 = ctx.p0DataIndex;
+                            const p1 = ctx.p1DataIndex;
+                            if (chartData.status) {
+                                const s0 = chartData.status[p0];
+                                const s1 = chartData.status[p1];
+                                if (s0 === 'actual' && s1 === 'actual') {
+                                    return [];
+                                }
+                            }
+                            return [6, 6];
+                        }
                     }
                 }
             ]
@@ -1702,7 +1729,28 @@ function renderForecastView(data, horizon = 6) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            const status = chartData.status ? chartData.status[index] : 'actual';
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += formatCurrency(context.parsed.y);
+                            }
+                            if (status === 'interpolated') {
+                                label += ' (Missing month data - possible inaccurate forecast)';
+                            } else if (status === 'projected') {
+                                label += ' (Projected)';
+                            }
+                            return label;
+                        }
+                    }
+                }
             },
             scales: {
                 y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { callback: v => '₹' + formatCompactNumber(v) } },

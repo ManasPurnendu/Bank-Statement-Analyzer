@@ -29,7 +29,8 @@ def init_db():
             upload_date DATETIME DEFAULT CURRENT_TIMESTAMP,
             transaction_count INTEGER DEFAULT 0,
             opening_balance REAL,
-            closing_balance REAL
+            closing_balance REAL,
+            file_hash TEXT
         )
     ''')
     
@@ -56,6 +57,7 @@ def init_db():
             merchant_name TEXT,
             payment_method TEXT, -- 'UPI', 'Card', 'ATM', 'NEFT', 'IMPS', 'RTGS', 'Cheque', 'Other'
             is_subscription BOOLEAN DEFAULT 0,
+            transaction_hash TEXT UNIQUE,
             FOREIGN KEY (statement_id) REFERENCES statements(statement_id) ON DELETE CASCADE,
             FOREIGN KEY (category_id) REFERENCES categories(category_id)
         )
@@ -72,6 +74,22 @@ def init_db():
         )
     ''')
     
+    # Run dynamic alter migrations for existing databases
+    try:
+        cursor.execute("ALTER TABLE statements ADD COLUMN file_hash TEXT")
+    except sqlite3.OperationalError:
+        pass # Already exists
+        
+    try:
+        cursor.execute("ALTER TABLE transactions ADD COLUMN transaction_hash TEXT")
+    except sqlite3.OperationalError:
+        pass # Already exists
+        
+    try:
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_transaction_hash ON transactions(transaction_hash)")
+    except sqlite3.OperationalError:
+        pass
+        
     conn.commit()
     
     # Seed Initial Categories

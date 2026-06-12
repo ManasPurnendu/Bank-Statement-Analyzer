@@ -137,13 +137,36 @@ def calculate_analytics(start_date=None, end_date=None):
     monthly_inc = df[df['transaction_type'] == 'Credit'].groupby('month_period')['amount'].sum()
     monthly_exp = df[df['transaction_type'] == 'Debit'].groupby('month_period')['amount'].sum()
     
+    # Identify covered months across all statements
+    covered_months = set()
+    for s in statements:
+        try:
+            s_start = pd.to_datetime(s['start_date']).to_period('M')
+            s_end = pd.to_datetime(s['end_date']).to_period('M')
+            p_range = pd.period_range(start=s_start, end=s_end, freq='M').astype(str).tolist()
+            covered_months.update(p_range)
+        except Exception:
+            continue
+            
+    # Fallback to include any months that actually have transaction records
+    all_months_with_txs = set(df['month_period']) if 'month_period' in df.columns else set()
+    covered_months.update(all_months_with_txs)
+    
     monthly_trends = []
     for m in all_months:
-        inc = float(monthly_inc.get(m, 0.0))
-        exp = float(monthly_exp.get(m, 0.0))
-        sav = inc - exp
-        sav_rate = (sav / inc * 100) if inc > 0 else 0.0
-        tx_count = int((df['month_period'] == m).sum())
+        if m in covered_months:
+            inc = float(monthly_inc.get(m, 0.0))
+            exp = float(monthly_exp.get(m, 0.0))
+            sav = inc - exp
+            sav_rate = (sav / inc * 100) if inc > 0 else 0.0
+            tx_count = int((df['month_period'] == m).sum())
+        else:
+            inc = None
+            exp = None
+            sav = None
+            sav_rate = None
+            tx_count = None
+            
         monthly_trends.append({
             "month": m, # "2025-01"
             "income": inc,

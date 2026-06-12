@@ -1,20 +1,39 @@
 from database.db import get_db_connection
 import sqlite3
+import hashlib
+import re
+
+def compute_transaction_hash(account_number, date, description, amount, txn_type, balance):
+    # Normalize description: lowercase, strip, collapse multiple spaces
+    norm_desc = re.sub(r'\s+', ' ', str(description).strip().lower())
+    # Normalize amount: float to 2 decimal places
+    try:
+        norm_amount = f"{float(amount):.2f}"
+    except (ValueError, TypeError):
+        norm_amount = "0.00"
+    # Normalize balance: float to 2 decimal places
+    try:
+        norm_balance = f"{float(balance):.2f}"
+    except (ValueError, TypeError):
+        norm_balance = "0.00"
+        
+    hash_str = f"{account_number or 'Unknown'}||{date}||{norm_desc}||{norm_amount}||{txn_type}||{norm_balance}"
+    return hashlib.md5(hash_str.encode('utf-8')).hexdigest()
 
 def add_statement(file_name, file_type, account_holder, account_number, bank_name, 
                   statement_month, start_date, end_date, transaction_count, 
-                  opening_balance, closing_balance):
+                  opening_balance, closing_balance, file_hash=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO statements (
             file_name, file_type, account_holder, account_number, bank_name,
             statement_month, start_date, end_date, transaction_count,
-            opening_balance, closing_balance
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            opening_balance, closing_balance, file_hash
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (file_name, file_type, account_holder, account_number, bank_name,
           statement_month, start_date, end_date, transaction_count,
-          opening_balance, closing_balance))
+          opening_balance, closing_balance, file_hash))
     statement_id = cursor.lastrowid
     conn.commit()
     conn.close()
@@ -44,9 +63,16 @@ def delete_statement(statement_id):
     conn.commit()
     conn.close()
 
-def check_duplicate_statement(account_number, start_date, end_date, transaction_count):
+def check_duplicate_statement(account_number, start_date, end_date, transaction_count, file_hash=None):
     conn = get_db_connection()
     cursor = conn.cursor()
+    if file_hash:
+        cursor.execute('SELECT statement_id FROM statements WHERE file_hash = ?', (file_hash,))
+        row = cursor.fetchone()
+        if row:
+            conn.close()
+            return row['statement_id']
+            
     cursor.execute('''
         SELECT statement_id FROM statements 
         WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ?
@@ -69,19 +95,21 @@ def add_transactions_bulk(transactions_data):
     """
     transactions_data: list of dicts with keys:
     statement_id, transaction_date, description, amount, transaction_type, balance,
-    category_id, payee_name, merchant_name, payment_method, is_subscription
+    category_id, payee_name, merchant_name, payment_method, is_subscription, transaction_hash
     """
     if not transactions_data:
         return
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.executemany('''
-        INSERT INTO transactions (
+        INSERT OR IGNORE INTO transactions (
             statement_id, transaction_date, description, amount, transaction_type,
-            balance, category_id, payee_name, merchant_name, payment_method, is_subscription
+            balance, category_id, payee_name, merchant_name, payment_method, is_subscription,
+            transaction_hash
         ) VALUES (
             :statement_id, :transaction_date, :description, :amount, :transaction_type,
-            :balance, :category_id, :payee_name, :merchant_name, :payment_method, :is_subscription
+            :balance, :category_id, :payee_name, :merchant_name, :payment_method, :is_subscription,
+            :transaction_hash
         )
     ''', transactions_data)
     conn.commit()

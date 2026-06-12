@@ -46,12 +46,12 @@
                 <div class="upload-dropzone" id="dropzone" style="border: none; padding: 20px;">
                     <i class="bi bi-cloud-arrow-up upload-icon mb-2" style="font-size: 40px;"></i>
                     <h5 class="fw-bold m-0" style="font-size: 1.1rem;">Upload Bank Statement</h5>
-                    <p class="text-secondary small mb-2">Drag and drop your PDF statement here, or</p>
-                    <input type="file" id="fileInput" multiple accept=".pdf,.xls,.xlsx" style="display: none;">
+                    <p class="text-secondary small mb-2">Drag and drop your bank statement here, or</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.xls,.xlsx,.csv,.json" style="display: none;">
                     <button type="button" class="btn btn-primary px-4 py-2 mb-2" id="browseBtn">
                         Choose File
                     </button>
-                    <p class="text-muted small m-0" style="font-size: 0.75rem;">Supports PDF & Excel formats • Max file size 16MB</p>
+                    <p class="text-muted small m-0" style="font-size: 0.75rem;">Supports PDF, Excel, CSV & JSON formats • Max file size 16MB</p>
                 </div>
             </div>
 
@@ -388,7 +388,7 @@
                         </h2>
                         <div id="faq-c4" class="accordion-collapse collapse" aria-labelledby="faq-h4" data-bs-parent="#faqAccordion">
                             <div class="accordion-body px-0 py-3 text-secondary small">
-                                We support standard bank statement PDF formats and Excel exports (e.g., HDFC, ICICI, SBI, Axis, etc.). The parser automatically identifies transaction columns, deposits, withdrawals, dates, and balances.
+                                We support standard bank statement PDF formats, Excel exports, CSV files, and JSON formats (e.g., HDFC, ICICI, SBI, Axis, etc.). The parser automatically identifies transaction columns, deposits, withdrawals, dates, and balances.
                             </div>
                         </div>
                     </div>

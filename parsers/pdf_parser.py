@@ -1,70 +1,487 @@
+"""
+pdf_parser.py  –  Robust PDF bank statement parser.
+
+Strategy:
+  1. Try pdfplumber table extraction (structured).
+  2. If that yields <3 rows, fall back to line-by-line regex parsing.
+  3. Multiple column layouts are auto-detected:
+       * 7-col SBI:  Date | Date | Description | - | Debit | - | Credit | Balance
+       * 6-col:      Date | Description | Ref | Debit | Credit | Balance
+       * 5-col:      Date | Description | Debit | Credit | Balance
+       * 4-col:      Date | Description | Amount | Balance
+       * 3-col+type: Date | Description | Amount (signed or with CR/DR)
+
+Balances are extracted from:
+  - Header section text ("Statement Summary", "Clear Balance", numeric CR/DR values)
+  - Last-page summary line ("Brought Forward … Closing Balance")
+  - Fallback: first/last transaction row balance column
+"""
+
 import pdfplumber
 import PyPDF2
 import os
 import re
 import pandas as pd
 from datetime import datetime
-from services.categorizer import categorize_transaction, detect_merchant_and_payee, detect_payment_method, detect_subscription, load_category_rules
+from services.categorizer import (categorize_transaction, detect_merchant_and_payee,
+                                   detect_payment_method, detect_subscription, load_category_rules)
+from database.models import compute_transaction_hash
+
+
+# ---------------------------------------------------------------------------
+# Encryption helpers
+# ---------------------------------------------------------------------------
 
 def is_pdf_encrypted(file_path):
-    """
-    Checks if a PDF file is encrypted/password-protected.
-    """
     with open(file_path, 'rb') as f:
         reader = PyPDF2.PdfReader(f)
         return reader.is_encrypted
 
+
 def decrypt_pdf(input_path, output_path, password):
-    """
-    Attempts to decrypt a password-protected PDF.
-    Saves a decrypted copy to output_path.
-    Returns True on success, False on failure.
-    """
     try:
         with open(input_path, 'rb') as f:
             reader = PyPDF2.PdfReader(f)
             if reader.is_encrypted:
                 result = reader.decrypt(password)
-                if result == 0: # 0 means incorrect password
+                if result == 0:
                     return False
-            
             writer = PyPDF2.PdfWriter()
             for page in reader.pages:
                 writer.add_page(page)
-                
             with open(output_path, 'wb') as out_f:
                 writer.write(out_f)
-            return True
+        return True
     except Exception:
         return False
 
-def parse_pdf_statement(file_path, original_filename, password=None):
+
+# ---------------------------------------------------------------------------
+# Date helpers
+# ---------------------------------------------------------------------------
+
+_DATE_FORMATS = (
+    '%d/%m/%Y', '%d-%m-%Y', '%Y-%m-%d', '%d/%m/%y', '%d-%m-%y',
+    '%d-%b-%Y', '%d-%b-%y', '%d %b %Y', '%d %b %y',
+    '%b %d, %Y', '%Y/%m/%d',
+)
+
+
+def _parse_date(raw: str):
+    """Return datetime.date or None."""
+    raw = str(raw).strip()
+    # Strip trailing time component
+    raw = raw.split()[0] if raw.split() else raw
+    for fmt in _DATE_FORMATS:
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except ValueError:
+            continue
+    try:
+        return pd.to_datetime(raw, dayfirst=True).date()
+    except Exception:
+        return None
+
+
+def _fmt_date(d) -> str:
+    return d.strftime('%Y-%m-%d')
+
+
+def _is_date_str(s: str) -> bool:
+    return _parse_date(s) is not None
+
+
+# ---------------------------------------------------------------------------
+# Amount helpers
+# ---------------------------------------------------------------------------
+
+def _parse_amount(s: str) -> float:
+    """Parse a money string like '1,23,456.78' or '1234.56CR' → float (always positive)."""
+    s = str(s).strip()
+    # Remove CR/DR suffix for later use by caller
+    s = re.sub(r'(?i)(cr|dr)$', '', s)
+    s = re.sub(r'[^\d\.\-\+]', '', s)
+    if not s or s in ('.', '-', '+'):
+        return 0.0
+    try:
+        return abs(float(s))
+    except ValueError:
+        return 0.0
+
+
+def _cr_or_dr(s: str) -> str:
+    """Return 'CR' if the string ends with CR, 'DR' if it ends with DR, else ''."""
+    s = str(s).strip().upper()
+    if s.endswith('CR'):
+        return 'CR'
+    if s.endswith('DR'):
+        return 'DR'
+    return ''
+
+
+# ---------------------------------------------------------------------------
+# Metadata extraction helpers
+# ---------------------------------------------------------------------------
+
+_BANK_PATTERNS = [
+    ('state bank of india', 'State Bank of India'),
+    ('sbi ', 'State Bank of India'),
+    ('hdfc bank', 'HDFC Bank'),
+    ('hdfc', 'HDFC Bank'),
+    ('icici bank', 'ICICI Bank'),
+    ('icici', 'ICICI Bank'),
+    ('axis bank', 'Axis Bank'),
+    ('kotak', 'Kotak Mahindra Bank'),
+    ('yes bank', 'Yes Bank'),
+    ('standard bank', 'Standard Bank'),
+    ('pnb', 'Punjab National Bank'),
+    ('punjab national', 'Punjab National Bank'),
+    ('canara', 'Canara Bank'),
+    ('union bank', 'Union Bank of India'),
+    ('bank of baroda', 'Bank of Baroda'),
+    ('idbi', 'IDBI Bank'),
+    ('indusind', 'IndusInd Bank'),
+    ('rbl bank', 'RBL Bank'),
+]
+
+
+def _detect_bank(text: str) -> str:
+    tl = text.lower()
+    for keyword, name in _BANK_PATTERNS:
+        if keyword in tl:
+            return name
+    m = re.search(r'([A-Za-z ]+\bBank\b)', text, re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+    return "Unknown"
+
+
+def _extract_metadata_from_text(full_text: str) -> dict:
     """
-    Parses a PDF bank statement.
-    Supports decryption.
-    Returns a dict with statement metadata and a list of normalized transactions.
+    Extract account holder, number, bank, balances, period from free text.
+    Returns a partial metadata dict (only fields that could be found).
+    """
+    meta = {}
+
+    # Bank name
+    meta['bank_name'] = _detect_bank(full_text)
+
+    # Account number  (several possible labels)
+    ac = re.search(
+        r'(?:Account\s*(?:Number|No\.?)|A[/\.]?C\s*(?:No\.?|Number))[\s:\-]+([0-9A-Za-z]{6,20})',
+        full_text, re.IGNORECASE)
+    if ac:
+        meta['account_number'] = ac.group(1).strip()
+
+    # Account holder
+    holder = re.search(r'(?:Mr\.|Mrs\.|Ms\.)\s*([A-Za-z .]{3,40})', full_text)
+    if holder:
+        meta['account_holder'] = re.sub(r'\s+', ' ', holder.group(1).strip())
+    else:
+        # Try "Customer Name:" label
+        h2 = re.search(r'(?:Customer\s*Name|Account\s*Holder)\s*[:\-]\s*([A-Za-z .]{3,40})',
+                       full_text, re.IGNORECASE)
+        if h2:
+            meta['account_holder'] = h2.group(1).strip()
+        else:
+            # Heuristic: prominent ALL-CAPS line in first 15 lines
+            for line in full_text.split('\n')[:15]:
+                line = line.strip()
+                if (re.match(r'^[A-Z][A-Z .]{4,}$', line) and
+                        not any(k in line for k in (
+                            'ACCOUNT', 'STATEMENT', 'BRANCH', 'BANK', 'DATE',
+                            'BALANCE', 'CREDIT', 'DEBIT', 'PARTICULARS',
+                            'AMOUNT', 'NARRATION', 'TRANSACTION', 'IFSC',
+                            'WELCOME', 'SUMMARY', 'MOBILE', 'EMAIL', 'PAN',
+                        ))):
+                    meta['account_holder'] = line
+                    break
+
+    # Statement period  (DD-MM-YYYY to DD-MM-YYYY style)
+    period = re.search(
+        r'(?:Statement\s*(?:From|Period)?|Period)\s*[:\-]?\s*'
+        r'(\d{1,2}[-/\s]\d{1,2}[-/\s]\d{2,4})\s*(?:to|To|\-)\s*'
+        r'(\d{1,2}[-/\s]\d{1,2}[-/\s]\d{2,4})',
+        full_text, re.IGNORECASE)
+    if period:
+        sd = _parse_date(period.group(1).replace(' ', '-'))
+        ed = _parse_date(period.group(2).replace(' ', '-'))
+        if sd:
+            meta['start_date'] = _fmt_date(sd)
+        if ed:
+            meta['end_date'] = _fmt_date(ed)
+
+    # Opening / Closing balances
+    sep = r'[\s:\-|]*'
+    # Named labels
+    ob = re.search(r'(?:Opening\s*Balance|Start\s*Balance|Brought\s*Forward)' + sep +
+                   r'([0-9,]+\.?\d*\s*(?:CR|DR)?)', full_text, re.IGNORECASE)
+    if ob:
+        meta['opening_balance'] = _parse_amount(ob.group(1))
+
+    cb = re.search(r'(?:Closing\s*Balance|End\s*Balance)' + sep +
+                   r'([0-9,]+\.?\d*\s*(?:CR|DR)?)', full_text, re.IGNORECASE)
+    if cb:
+        meta['closing_balance'] = _parse_amount(cb.group(1))
+
+    # SBI-specific "Clear Balance" is the CURRENT account balance (real-time),
+    # NOT the statement period closing balance.  We store it in a separate key
+    # so that the last-page summary line can override with the correct period CB.
+    clr = re.search(r'Clear\s*Balance\s*[:\-]\s*([0-9,]+\.?\d*)', full_text, re.IGNORECASE)
+    if clr:
+        meta['_clear_balance'] = _parse_amount(clr.group(1))
+
+    return meta
+
+
+def _extract_summary_line(last_page_text: str) -> dict:
+    """
+    Parse SBI-style summary line:
+      Brought Forward( ) Dr Count Cr Count Total Debits( ) Total Credits( ) Closing Balance( )
+      24.18CR  1011  494  5,18,144.03  5,32,063.94  13,944.09CR
+    Returns partial metadata.
+    """
+    meta = {}
+    # Find the data line below "Brought Forward"
+    lines = [l.strip() for l in last_page_text.split('\n') if l.strip()]
+    for i, line in enumerate(lines):
+        if 'brought forward' in line.lower() and 'closing balance' in line.lower():
+            if i + 1 < len(lines):
+                tokens = lines[i + 1].split()
+                # Expect: BF Amt, DrCount, CrCount, TotalDr, TotalCr, CB Amt
+                if len(tokens) >= 2:
+                    ob_raw = tokens[0]
+                    cb_raw = tokens[-1]
+                    ob = _parse_amount(ob_raw)
+                    cb = _parse_amount(cb_raw)
+                    if ob:
+                        meta['opening_balance'] = ob
+                    if cb:
+                        meta['closing_balance'] = cb
+            break
+
+    # Also look for "Statement Summary : DD-MM-YYYY To DD-MM-YYYY"
+    period = re.search(
+        r'Statement\s*Summary\s*[:\-]\s*(\d{1,2}[-/]\d{1,2}[-/]\d{4})\s*(?:To|to|-)\s*'
+        r'(\d{1,2}[-/]\d{1,2}[-/]\d{4})',
+        last_page_text, re.IGNORECASE)
+    if period:
+        sd = _parse_date(period.group(1))
+        ed = _parse_date(period.group(2))
+        if sd:
+            meta['start_date'] = _fmt_date(sd)
+        if ed:
+            meta['end_date'] = _fmt_date(ed)
+
+    return meta
+
+
+# ---------------------------------------------------------------------------
+# Column-layout detection
+# ---------------------------------------------------------------------------
+
+def _detect_column_layout(header_row: list) -> dict:
+    """
+    Given a list of header strings, return index mapping:
+      {date, description, debit, credit, amount, balance, type}
+    All values are int indices or None.
+    """
+    mapping = {k: None for k in ('date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
+    synonyms = {
+        'date': ['transaction date', 'txn date', 'value date', 'date', 'tx date', 'posting date'],
+        'description': ['description', 'narration', 'particulars', 'remarks', 'details',
+                        'transaction details', 'narrations'],
+        'debit': ['debit', 'withdrawal', 'withdrawals', 'dr amount', 'dr', 'wdl', 'cheque amount'],
+        'credit': ['credit', 'deposit', 'deposits', 'cr amount', 'cr', 'dep'],
+        'amount': ['amount', 'txn amount', 'transaction amount', 'sum'],
+        'balance': ['balance', 'closing balance', 'running balance', 'ledger balance', 'bal'],
+        'type': ['type', 'indicator', 'dr/cr', 'cr/dr', 'drcr', 'dr cr'],
+    }
+    for idx, col in enumerate(header_row):
+        col_l = str(col).lower().strip()
+        if not col_l or col_l in ('nan', '-', ''):
+            continue
+        for key, syns in synonyms.items():
+            if mapping[key] is not None:
+                continue
+            for syn in syns:
+                if syn == col_l or (len(syn) > 2 and syn in col_l):
+                    # Avoid mapping "description" to amount columns
+                    if key in ('debit', 'credit', 'amount') and 'desc' in col_l:
+                        continue
+                    mapping[key] = idx
+                    break
+    return mapping
+
+
+def _auto_detect_layout(sample_rows: list, n_cols: int) -> dict:
+    """
+    Heuristically assign column layout when no header row found.
+    Works for the most common PDF layouts.
+    """
+    mapping = {k: None for k in ('date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
+    if n_cols == 7:
+        # SBI layout: Date | Date | Description | separator | Debit | separator | Credit | Balance
+        # But pdfplumber extracts 7 values:
+        # idx 0: date1, 1: date2, 2: description, 3: '-', 4: debit, 5: credit(or '-'), 6: balance
+        mapping.update({'date': 0, 'description': 2, 'debit': 4, 'credit': 5, 'balance': 6})
+    elif n_cols == 6:
+        # Date | Description | Ref/Cheque | Debit | Credit | Balance
+        mapping.update({'date': 0, 'description': 1, 'debit': 3, 'credit': 4, 'balance': 5})
+    elif n_cols == 5:
+        # Date | Description | Debit | Credit | Balance
+        mapping.update({'date': 0, 'description': 1, 'debit': 2, 'credit': 3, 'balance': 4})
+    elif n_cols == 4:
+        # Date | Description | Amount | Balance
+        mapping.update({'date': 0, 'description': 1, 'amount': 2, 'balance': 3})
+    elif n_cols == 3:
+        # Date | Description | Amount(signed)
+        mapping.update({'date': 0, 'description': 1, 'amount': 2})
+    else:
+        # Best guess
+        mapping.update({'date': 0, 'description': 1, 'amount': 2, 'balance': n_cols - 1})
+    return mapping
+
+
+# ---------------------------------------------------------------------------
+# Row parser
+# ---------------------------------------------------------------------------
+
+def _parse_row(row: list, mapping: dict) -> dict | None:
+    """
+    Convert a raw table row to a transaction dict.
+    Returns None if the row should be skipped.
+    """
+    if len(row) == 0:
+        return None
+
+    # --- Date ---
+    di = mapping.get('date')
+    if di is None or di >= len(row):
+        return None
+    raw_date = str(row[di]).split('\n')[0].strip()   # take first line only
+    parsed_date = _parse_date(raw_date)
+    if parsed_date is None:
+        return None
+
+    # --- Description ---
+    desc_i = mapping.get('description')
+    if desc_i is None or desc_i >= len(row):
+        return None
+    description = str(row[desc_i]).strip()
+    # For SBI the description has newlines – clean them into spaces
+    description = re.sub(r'[\r\n]+', ' ', description).strip()
+    # Remove the WDL TFR / DEP TFR prefix that SBI puts as first line
+    description = re.sub(r'^(?:WDL\s*TFR|DEP\s*TFR|ATM\s*WDR|NEFT|IMPS|RTGS)\s+', '',
+                         description, flags=re.IGNORECASE).strip()
+    if not description:
+        return None
+
+    # --- Amount & type ---
+    amount = 0.0
+    txn_type = 'Debit'
+
+    deb_i = mapping.get('debit')
+    crd_i = mapping.get('credit')
+    amt_i = mapping.get('amount')
+    typ_i = mapping.get('type')
+
+    if deb_i is not None and crd_i is not None:
+        raw_deb = str(row[deb_i]).strip() if deb_i < len(row) else ''
+        raw_crd = str(row[crd_i]).strip() if crd_i < len(row) else ''
+        val_deb = _parse_amount(raw_deb)
+        val_crd = _parse_amount(raw_crd)
+        if val_deb > 0 and (raw_deb not in ('', '-', 'nan', 'None')):
+            amount = val_deb
+            txn_type = 'Debit'
+        elif val_crd > 0 and (raw_crd not in ('', '-', 'nan', 'None')):
+            amount = val_crd
+            txn_type = 'Credit'
+        else:
+            return None  # zero transaction
+    elif amt_i is not None and amt_i < len(row):
+        raw_amt = str(row[amt_i]).strip()
+        val_amt = _parse_amount(raw_amt)
+        if val_amt == 0:
+            return None
+        if typ_i is not None and typ_i < len(row):
+            raw_type = str(row[typ_i]).upper().strip()
+            txn_type = 'Credit' if any(k in raw_type for k in ('CR', 'CREDIT', '+')) else 'Debit'
+        else:
+            # Sign-based or CR/DR suffix
+            suffix = _cr_or_dr(raw_amt)
+            if suffix == 'CR':
+                txn_type = 'Credit'
+            elif suffix == 'DR':
+                txn_type = 'Debit'
+            else:
+                # negative = debit (common in some exports)
+                try:
+                    raw_signed = re.sub(r'[^\d\.\-]', '', raw_amt)
+                    txn_type = 'Debit' if float(raw_signed) < 0 else 'Credit'
+                except ValueError:
+                    txn_type = 'Credit'
+        amount = val_amt
+    else:
+        # Last resort: find numbers in cols from index 2 onwards
+        numbers = []
+        for v in row[2:]:
+            cleaned = re.sub(r'[^\d\.]', '', str(v).replace(',', ''))
+            try:
+                num = float(cleaned)
+                if num > 0:
+                    numbers.append((num, str(v)))
+            except ValueError:
+                pass
+        if len(numbers) >= 2:
+            amount = numbers[0][0]
+            any_cr = any('cr' in v.lower() for _, v in numbers)
+            txn_type = 'Credit' if any_cr else 'Debit'
+        elif len(numbers) == 1:
+            amount = numbers[0][0]
+        else:
+            return None
+
+    if amount <= 0:
+        return None
+
+    # --- Balance ---
+    bal_i = mapping.get('balance')
+    balance = 0.0
+    if bal_i is not None and bal_i < len(row):
+        balance = _parse_amount(str(row[bal_i]).strip())
+
+    return {
+        'transaction_date': _fmt_date(parsed_date),
+        'description': description,
+        'amount': round(amount, 2),
+        'transaction_type': txn_type,
+        'balance': round(balance, 2),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Main parser
+# ---------------------------------------------------------------------------
+
+def parse_pdf_statement(file_path: str, original_filename: str, password: str = None) -> dict:
+    """
+    Parse a PDF bank statement and return canonical parsed data.
     """
     temp_decrypted_path = None
-    
-    # Check encryption
+
     if is_pdf_encrypted(file_path):
         if not password:
             raise ValueError("PasswordRequired")
-        
-        # Decrypt temporarily
         temp_decrypted_path = file_path + "_decrypted.pdf"
-        success = decrypt_pdf(file_path, temp_decrypted_path, password)
-        if not success:
+        if not decrypt_pdf(file_path, temp_decrypted_path, password):
             if os.path.exists(temp_decrypted_path):
                 os.remove(temp_decrypted_path)
             raise ValueError("IncorrectPassword")
-        
         parse_target = temp_decrypted_path
     else:
         parse_target = file_path
 
-    # Extract data using pdfplumber
-    transactions = []
     metadata = {
         "file_name": original_filename,
         "file_type": "PDF",
@@ -75,364 +492,161 @@ def parse_pdf_statement(file_path, original_filename, password=None):
         "start_date": None,
         "end_date": None,
         "opening_balance": 0.0,
-        "closing_balance": 0.0
+        "closing_balance": 0.0,
     }
-    
     rules = load_category_rules()
-    
+    transactions = []
+
     try:
         with pdfplumber.open(parse_target) as pdf:
-            # 1. Inspect first pages for metadata (simpler extraction)
-            try:
-                full_text = ""
-                for page in pdf.pages[:3]:
-                    full_text += (page.extract_text() or "") + "\n"
-                
-                # Bank Name detection
-                if "state bank of india" in full_text.lower():
-                    metadata["bank_name"] = "State Bank of India"
-                elif "hdfc" in full_text.lower():
-                    metadata["bank_name"] = "HDFC Bank"
-                elif "icici" in full_text.lower():
-                    metadata["bank_name"] = "ICICI Bank"
-                elif "axis" in full_text.lower():
-                    metadata["bank_name"] = "Axis Bank"
-                elif "standard bank" in full_text.lower():
-                    metadata["bank_name"] = "Standard Bank"
-                else:
-                    bank_match = re.search(r'([A-Za-z ]+ Bank)', full_text, re.IGNORECASE)
-                    if bank_match:
-                        metadata["bank_name"] = bank_match.group(1).strip()
-                
-                # Account Holder detection
-                holder_match = re.search(r'(?:Mr\.|Mrs\.|Ms\.)\s*([A-Za-z ]{3,30})', full_text)
-                if holder_match:
-                    metadata["account_holder"] = re.sub(r'\s+', ' ', holder_match.group(1).strip())
-                else:
-                    lines = [l.strip() for l in full_text.split('\n') if l.strip()]
-                    for line in lines[:15]:
-                        if re.match(r'^[A-Z\s\.]+$', line) and len(line) > 5 and not any(k in line.upper() for k in ["ACCOUNT", "STATEMENT", "SUMMARY", "BRANCH", "MOBILE", "EMAIL", "IFSC", "NOMINEE", "WELCOME", "DATE", "DESCRIPTION", "DEBIT", "CREDIT", "BALANCE", "PARTICULARS", "AMOUNT", "TRANSACTION"]):
-                            metadata["account_holder"] = line
-                            break
-                
-                # Account Number detection
-                ac_match = re.search(r'(?:Account Number|Account No\.?|A/C No\.?|A/C Number)\s*:\s*(\d+)', full_text, re.IGNORECASE)
-                if ac_match:
-                    metadata["account_number"] = ac_match.group(1).strip()
-                
-                # Statement Period / Dates detection
-                date_range_match = re.search(r'(?:Statement From|Period|Statement Period)?\s*:\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})\s*(?:to|To|-\s*)\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})', full_text, re.IGNORECASE)
-                if date_range_match:
-                    start_str = date_range_match.group(1)
-                    end_str = date_range_match.group(2)
-                    for fmt in ('%d-%m-%Y', '%d/%m/%Y'):
-                        try:
-                            metadata["start_date"] = datetime.strptime(start_str, fmt).strftime('%Y-%m-%d')
-                            metadata["end_date"] = datetime.strptime(end_str, fmt).strftime('%Y-%m-%d')
-                            break
-                        except ValueError:
-                            continue
-            except Exception as me:
-                print(f"Error extracting metadata from first pages: {str(me)}")
+            total_pages = len(pdf.pages)
 
-            # 2. Extract transaction table rows
-            # Try strategy A: extract_tables
+            # ---- Step 1: Extract metadata from first 3 pages ----
+            try:
+                header_text = ""
+                for page in pdf.pages[:3]:
+                    header_text += (page.extract_text() or "") + "\n"
+                meta_from_text = _extract_metadata_from_text(header_text)
+                metadata.update({k: v for k, v in meta_from_text.items() if v})
+            except Exception as e:
+                print(f"[pdf_parser] header metadata error: {e}")
+
+            # ---- Step 2: Extract metadata from last page (authoritative) ----
+            try:
+                last_text = pdf.pages[-1].extract_text() or ""
+                summary_meta = _extract_summary_line(last_text)
+                # Summary-line data is authoritative (period-specific) – always override
+                for k, v in summary_meta.items():
+                    if v:
+                        metadata[k] = v
+            except Exception as e:
+                print(f"[pdf_parser] last-page metadata error: {e}")
+
+            # Use _clear_balance as last-resort closing balance if still 0
+            if not metadata.get('closing_balance') and metadata.get('_clear_balance'):
+                metadata['closing_balance'] = metadata['_clear_balance']
+            metadata.pop('_clear_balance', None)
+
+            # ---- Step 3: Collect raw table rows from all pages ----
             raw_table_rows = []
             for page in pdf.pages:
                 tables = page.extract_tables()
                 for table in tables:
-                    if table:
-                        print("\nTABLE FOUND")
-                        for r in table[:5]:
-                            print(r)
                     for row in table:
-                        # Clean row values
-                        row_vals = [str(val).strip() if val is not None else "" for val in row]
-                        # Filter out empty rows
-                        if any(val != "" for val in row_vals):
-                            raw_table_rows.append(row_vals)
-            
-            # If Strategy A extracted very few rows, try Strategy B: extract_text and regex split
+                        cleaned = [str(v).strip() if v is not None else '' for v in row]
+                        if any(v for v in cleaned):
+                            raw_table_rows.append(cleaned)
+
+            # ---- Step 4: Fall back to text-based row extraction ----
             if len(raw_table_rows) < 3:
                 raw_table_rows = []
+                date_pat = re.compile(
+                    r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})')
                 for page in pdf.pages:
                     page_text = page.extract_text() or ""
                     for line in page_text.split('\n'):
-                        # Look for lines starting with a date pattern, e.g. 31 May 2025 or 30-05-2025
-                        # A typical transaction line: "30 May 2025 Swiggy 518.00 Debit 45680.50"
-                        # Or: "30-05-2025 Amazon Pay 2450.00 Debit 46198.50"
-                        date_pattern = r'^(\d{1,2}[/\-\s](?:\d{1,2}|[A-Za-z]{3})[/\-\s]\d{2,4})'
-                        match = re.match(date_pattern, line.strip())
-                        if match:
-                            # Split by whitespace, merging descriptions
-                            tokens = line.strip().split()
-                            if len(tokens) >= 4:
+                        line = line.strip()
+                        if date_pat.match(line):
+                            tokens = line.split()
+                            if len(tokens) >= 3:
                                 raw_table_rows.append(tokens)
-            
-            # 3. Parse transaction lists
-            # Find column index for Date, Description, Amount, Type, Balance
+
             if not raw_table_rows:
-                raise ValueError("No transaction rows found in PDF.")
-                
-            # Scan top rows of raw table rows to find header column indexes
+                raise ValueError("No transaction rows could be extracted from the PDF.")
+
+            # ---- Step 5: Detect header row & column layout ----
             header_idx = -1
-            for idx, row in enumerate(raw_table_rows[:10]):
-                row_lower = [str(val).lower() for val in row]
-                has_date = any("date" in val for val in row_lower)
-                has_desc = any("desc" in val or "narr" in val or "part" in val or "detail" in val for val in row_lower)
+            mapping = None
+
+            for i, row in enumerate(raw_table_rows[:15]):
+                row_lower = [str(v).lower() for v in row]
+                has_date = any('date' in v for v in row_lower)
+                has_desc = any(kw in v for kw in
+                               ('desc', 'narr', 'part', 'detail', 'particular') for v in row_lower)
                 if has_date and has_desc:
-                    header_idx = idx
+                    header_idx = i
+                    mapping = _detect_column_layout(row)
                     break
-            
-            date_col_idx = 0
-            desc_col_idx = 2
-            debit_col_idx = -1
-            credit_col_idx = -1
-            amount_col_idx = -1
-            balance_col_idx = -1
-            type_col_idx = -1
-            
+
+            # Determine data rows
             if header_idx != -1:
-                header_row = [str(val).lower() for val in raw_table_rows[header_idx]]
-                for idx, col in enumerate(header_row):
-                    if any(kw in col for kw in ['transaction date', 'value date', 'date', 'tx date']):
-                        date_col_idx = idx
-                    elif any(kw in col for kw in ['description', 'narration', 'particulars', 'remarks', 'details']):
-                        desc_col_idx = idx
-                    elif any(kw in col for kw in ['debit', 'withdrawal', 'dr_amount', 'dr']):
-                        debit_col_idx = idx
-                    elif any(kw in col for kw in ['credit', 'deposit', 'cr_amount', 'cr']):
-                        credit_col_idx = idx
-                    elif any(kw in col for kw in ['amount', 'txn amount', 'sum']):
-                        amount_col_idx = idx
-                    elif any(kw in col for kw in ['balance', 'running balance', 'ledger balance']):
-                        balance_col_idx = idx
-                    elif any(kw in col for kw in ['type', 'indicator', 'dr/cr', 'cr/dr']):
-                        type_col_idx = idx
-                data_rows = raw_table_rows[header_idx+1:]
+                data_rows = raw_table_rows[header_idx + 1:]
             else:
-                # No header row found: guess columns
-                # Let's assume standard format: Date (0), Description (1), Amount (2), Type (3), Balance (4)
-                # Or Date (0), Description (1), Debit (2), Credit (3), Balance (4)
                 data_rows = raw_table_rows
-                
-            # If columns were not guessed or mapped, let's establish defaults based on first row length
-            # If columns were not guessed or mapped, let's establish defaults based on first row of length 7
-            if data_rows and debit_col_idx == -1 and credit_col_idx == -1:
-                for row in data_rows:
-                    if len(row) == 7:
-                        date_col_idx = 0
-                        desc_col_idx = 2
-                        debit_col_idx = 4
-                        credit_col_idx = 5
-                        balance_col_idx = 6
-                        break
+
+            # If no header found or mapping incomplete, auto-detect from sample row width
+            if mapping is None or (mapping.get('date') is None):
+                # Find the most common row length
+                from collections import Counter
+                lengths = [len(r) for r in data_rows if len(r) >= 3]
+                if lengths:
+                    modal_len = Counter(lengths).most_common(1)[0][0]
+                else:
+                    modal_len = 5
+                mapping = _auto_detect_layout(data_rows[:10], modal_len)
+
+            # ---- Step 6: Parse each data row ----
+            skip_keywords = {'date', 'balance', 'narration', 'description',
+                             'particulars', 'debit', 'credit', 'amount', 'withdrawal',
+                             'deposit', 'brought forward', 'page', 'total'}
 
             for row in data_rows:
                 # Skip header repetitions
-                row_lower = [str(val).lower() for val in row]
-                if any("date" in val for val in row_lower) or any("balance" in val for val in row_lower):
+                row_lower_set = {str(v).lower().strip() for v in row}
+                if row_lower_set & skip_keywords:
                     continue
-                    
-                if len(row) <= max(date_col_idx, desc_col_idx):
+
+                txn = _parse_row(row, mapping)
+                if txn is None:
                     continue
-                    
-                raw_date = str(row[date_col_idx]).strip()
-                description = str(row[desc_col_idx]).strip()
-                
-                if not raw_date or not description:
-                    continue
-                    
-                # Date conversion
-                try:
-                    parsed_date = None
-                    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%d-%m-%Y', '%d/%m/%Y', '%d/%m/%y', '%d-%b-%Y', '%d-%b-%y', '%b %d, %Y'):
-                        try:
-                            parsed_date = datetime.strptime(raw_date.split(" ")[0], fmt).date()
-                            break
-                        except ValueError:
-                            continue
-                    if not parsed_date:
-                        parsed_date = pd.to_datetime(raw_date).date()
-                except Exception:
-                    continue # Date parsing failed, skip
-                    
-                transaction_date = parsed_date.strftime('%Y-%m-%d')
-                
-                amount = 0.0
-                txn_type = 'Debit'
-                
-                # Check column widths and extract amount
-                if debit_col_idx != -1 and credit_col_idx != -1 and debit_col_idx < len(row) and credit_col_idx < len(row):
-                    raw_deb = str(row[debit_col_idx]).replace(",", "").strip()
-                    raw_cred = str(row[credit_col_idx]).replace(",", "").strip()
-                    
-                    val_deb = float(raw_deb) if raw_deb not in ("", "-", "nan", "None") else 0.0
-                    val_cred = float(raw_cred) if raw_cred not in ("", "-", "nan", "None") else 0.0
-                    
-                    if val_deb > 0:
-                        amount = val_deb
-                        txn_type = 'Debit'
-                    elif val_cred > 0:
-                        amount = val_cred
-                        txn_type = 'Credit'
-                    else:
-                        continue
-                elif amount_col_idx != -1 and amount_col_idx < len(row):
-                    raw_amt = str(row[amount_col_idx]).replace(",", "").strip()
-                    if raw_amt in ("", "-", "nan"):
-                        continue
-                    try:
-                        val_amt = float(raw_amt)
-                    except ValueError:
-                        continue
-                        
-                    if type_col_idx != -1 and type_col_idx < len(row):
-                        raw_type = str(row[type_col_idx]).upper().strip()
-                        if 'CR' in raw_type or 'CREDIT' in raw_type or 'IN' in raw_type or '+' in raw_type:
-                            txn_type = 'Credit'
-                            amount = abs(val_amt)
-                        else:
-                            txn_type = 'Debit'
-                            amount = abs(val_amt)
-                    else:
-                        if val_amt < 0:
-                            txn_type = 'Debit'
-                            amount = abs(val_amt)
-                        else:
-                            txn_type = 'Credit'
-                            amount = val_amt
-                else:
-                    # Let's try heuristic: search row for numbers
-                    # A typical row has: Date, Description, Numbers (Amount, Balance)
-                    numbers = []
-                    for val in row[2:]:
-                        val_clean = str(val).replace(",", "").replace("-", "").strip()
-                        try:
-                            num = float(val_clean)
-                            numbers.append(num)
-                        except ValueError:
-                            pass
-                    if len(numbers) >= 2:
-                        amount = numbers[0]
-                        # Assume debit unless there's CR keyword
-                        txn_type = 'Credit' if any('CR' in str(v).upper() or 'CREDIT' in str(v).upper() for v in row) else 'Debit'
-                    elif len(numbers) == 1:
-                        amount = numbers[0]
-                        txn_type = 'Credit' if any('CR' in str(v).upper() or 'CREDIT' in str(v).upper() for v in row) else 'Debit'
-                    else:
-                        continue # No amount found
-                        
-                # Balance parse
-                balance = 0.0
-                if balance_col_idx != -1 and balance_col_idx < len(row):
-                    try:
-                        balance = float(str(row[balance_col_idx]).replace(",", ""))
-                    except ValueError:
-                        pass
-                else:
-                    # Guess last number in row is balance
-                    numbers = []
-                    for val in row[2:]:
-                        val_clean = str(val).replace(",", "").replace("-", "").strip()
-                        try:
-                            num = float(val_clean)
-                            numbers.append(num)
-                        except ValueError:
-                            pass
-                    if len(numbers) >= 2:
-                        balance = numbers[-1]
-                
-                # Category & name matching
-                category_id = categorize_transaction(description, txn_type, rules, amount=amount)
-                merchant_name, payee_name = detect_merchant_and_payee(description, txn_type)
-                payment_method = detect_payment_method(description)
-                is_subscription = detect_subscription(merchant_name, amount, txn_type)
-                
-                transactions.append({
-                    "transaction_date": transaction_date,
-                    "description": description,
-                    "amount": amount,
-                    "transaction_type": txn_type,
-                    "balance": balance,
-                    "category_id": category_id,
-                    "payee_name": payee_name,
-                    "merchant_name": merchant_name,
-                    "payment_method": payment_method,
-                    "is_subscription": 1 if is_subscription else 0
-                })
-            # Try to extract closing details from the last page
-            try:
-                last_page_text = pdf.pages[-1].extract_text() or ""
-                summary_period_match = re.search(r'Statement Summary\s*:\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})\s*(?:To|to|-\s*)\s*(\d{2}[-/\s]\d{2}[-/\s]\d{4})', last_page_text, re.IGNORECASE)
-                if summary_period_match:
-                    start_str = summary_period_match.group(1)
-                    end_str = summary_period_match.group(2)
-                    for fmt in ('%d-%m-%Y', '%d/%m/%Y'):
-                        try:
-                            metadata["start_date"] = datetime.strptime(start_str, fmt).strftime('%Y-%m-%d')
-                            metadata["end_date"] = datetime.strptime(end_str, fmt).strftime('%Y-%m-%d')
-                            break
-                        except ValueError:
-                            continue
-                
-                lines = [l.strip() for l in last_page_text.split('\n') if l.strip()]
-                for idx, line in enumerate(lines):
-                    if "Brought Forward" in line and "Closing Balance" in line:
-                        if idx + 1 < len(lines):
-                            val_line = lines[idx+1]
-                            tokens = val_line.split()
-                            if len(tokens) >= 6:
-                                ob_str = tokens[0].upper().replace("CR", "").replace("DR", "").replace(",", "")
-                                cb_str = tokens[5].upper().replace("CR", "").replace("DR", "").replace(",", "")
-                                try:
-                                    metadata["opening_balance"] = float(ob_str)
-                                    metadata["closing_balance"] = float(cb_str)
-                                except ValueError:
-                                    pass
-            except Exception as le:
-                print(f"Error extracting metadata from last page: {str(le)}")
-                
+                transactions.append(txn)
+
     finally:
-        # Cleanup temporary decrypted file if created
         if temp_decrypted_path and os.path.exists(temp_decrypted_path):
             os.remove(temp_decrypted_path)
 
-    # Sort transactions stably by normalized date only (preserves page order)
-    transactions.sort(key=lambda x: x["transaction_date"])
-    
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the PDF file.")
-    print(f"Parsed transactions: {len(transactions)}")
-        
-    dates = [t["transaction_date"] for t in transactions]
-    if not metadata.get("start_date") and dates:
-        metadata["start_date"] = min(dates)
-    if not metadata.get("end_date") and dates:
-        metadata["end_date"] = max(dates)
-    metadata["transaction_count"] = len(transactions)
-    
-    if metadata.get("start_date"):
-        try:
-            start_dt = datetime.strptime(metadata["start_date"], "%Y-%m-%d")
-            metadata["statement_month"] = start_dt.strftime("%Y-%m")
-        except Exception:
-            pass
-    elif dates:
-        start_dt = datetime.strptime(min(dates), "%Y-%m-%d")
-        metadata["statement_month"] = start_dt.strftime("%Y-%m")
-    
-    if not metadata.get("opening_balance") and len(transactions) > 0:
-        first_txn = transactions[0]
-        if first_txn["transaction_type"] == 'Credit':
-            metadata["opening_balance"] = first_txn["balance"] - first_txn["amount"]
-        else:
-            metadata["opening_balance"] = first_txn["balance"] + first_txn["amount"]
-            
-    if not metadata.get("closing_balance") and len(transactions) > 0:
-        metadata["closing_balance"] = transactions[-1]["balance"]
-        
-    return {
-        "metadata": metadata,
-        "transactions": transactions
-    }
+
+    # ---- Step 7: Sort chronologically ----
+    transactions.sort(key=lambda x: x['transaction_date'])
+
+    # ---- Step 8: Finalise metadata ----
+    dates = [t['transaction_date'] for t in transactions]
+    if not metadata.get('start_date'):
+        metadata['start_date'] = min(dates)
+    if not metadata.get('end_date'):
+        metadata['end_date'] = max(dates)
+
+    if metadata.get('start_date'):
+        metadata['statement_month'] = metadata['start_date'][:7]
+
+    metadata['transaction_count'] = len(transactions)
+
+    # Infer balances from first/last transaction if still missing
+    if not metadata.get('opening_balance') and transactions:
+        first = transactions[0]
+        if first.get('balance'):
+            if first['transaction_type'] == 'Credit':
+                metadata['opening_balance'] = round(first['balance'] - first['amount'], 2)
+            else:
+                metadata['opening_balance'] = round(first['balance'] + first['amount'], 2)
+
+    if not metadata.get('closing_balance') and transactions:
+        metadata['closing_balance'] = transactions[-1].get('balance', 0.0)
+
+    # ---- Step 9: Enrich transactions (categorise, hash, etc.) ----
+    account_number = metadata.get('account_number') or 'Unknown'
+    for t in transactions:
+        desc = t['description']
+        ttype = t['transaction_type']
+        amt = t['amount']
+
+        t['category_id'] = categorize_transaction(desc, ttype, rules, amount=amt)
+        t['merchant_name'], t['payee_name'] = detect_merchant_and_payee(desc, ttype)
+        t['payment_method'] = detect_payment_method(desc)
+        t['is_subscription'] = 1 if detect_subscription(t.get('merchant_name'), amt, ttype) else 0
+        t['transaction_hash'] = compute_transaction_hash(
+            account_number, t['transaction_date'], desc, amt, ttype, t['balance'])
+
+    return {'metadata': metadata, 'transactions': transactions}

@@ -24,9 +24,26 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, sta
     # Build historical data frames
     m_df = pd.DataFrame(monthly_trends)
     
-    # Calculate historical averages
+    # Store clean historical status (actual vs interpolated)
+    historical_status = []
+    for m in monthly_trends:
+        if m["income"] is None:
+            historical_status.append("interpolated")
+        else:
+            historical_status.append("actual")
+            
+    # Calculate historical averages on actual months only
     avg_income = m_df["income"].mean()
     avg_expense = m_df["expense"].mean()
+    if pd.isna(avg_income):
+        avg_income = 0.0
+    if pd.isna(avg_expense):
+        avg_expense = 0.0
+        
+    # Interpolate missing values in-place for forecast modeling and plotting
+    m_df["income"] = m_df["income"].astype(float).interpolate(method="linear").ffill().bfill()
+    m_df["expense"] = m_df["expense"].astype(float).interpolate(method="linear").ffill().bfill()
+    m_df["savings"] = m_df["income"] - m_df["expense"]
     
     # Apply category reduction for What-If simulator
     # If reduction_category is set, we adjust historical average expense
@@ -62,8 +79,11 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, sta
     last_month_dt = datetime.strptime(last_month_str + "-01", "%Y-%m-%d")
     
     future_months = []
-    current_inc = avg_income
-    current_exp = avg_expense
+    # Baseline prioritizes the latest month's actual value to prevent step-change shocks
+    latest_inc = m_df.iloc[-1]["income"]
+    latest_exp = m_df.iloc[-1]["expense"]
+    current_inc = (0.7 * latest_inc) + (0.3 * avg_income)
+    current_exp = (0.7 * latest_exp) + (0.3 * (avg_expense + reduction_amount)) - reduction_amount
     current_bal = kpis["balance"]
     
     forecast_details = []
@@ -73,9 +93,12 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, sta
         proj_dt = proj_dt.replace(day=1)
         month_label = proj_dt.strftime("%Y-%m")
         
-        # Apply trend growth
-        current_inc = current_inc * (1 + income_growth)
-        current_exp = current_exp * (1 + expense_growth)
+        # Apply damped trend growth to prevent exponential growth/decay spikes over long horizons
+        damping_factor = 0.8
+        current_growth_inc = income_growth * (damping_factor ** (i - 1))
+        current_growth_exp = expense_growth * (damping_factor ** (i - 1))
+        current_inc = current_inc * (1 + current_growth_inc)
+        current_exp = current_exp * (1 + current_growth_exp)
         
         # Forecast aggregates
         proj_income = float(current_inc)
@@ -223,6 +246,7 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, sta
     chart_expenses = historical_expenses + [f["projected_expense"] for f in active_forecast]
     chart_savings = [historical_incomes[i] - historical_expenses[i] for i in range(len(m_df))] + [f["projected_savings"] for f in active_forecast]
     chart_balances = historical_balances + [f["projected_balance"] for f in active_forecast]
+    chart_status = historical_status + ["projected"] * len(active_forecast)
 
     return {
         "success": True,
@@ -253,6 +277,7 @@ def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, sta
             "expenses": chart_expenses,
             "savings": chart_savings,
             "balances": chart_balances,
+            "status": chart_status,
             "historical_count": len(historical_months)
         }
     }
