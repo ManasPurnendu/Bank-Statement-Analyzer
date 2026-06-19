@@ -17,7 +17,7 @@ from database.models import (
 from services.categorizer import clean_description, detect_payment_method, detect_merchant_and_payee, categorize_transaction
 from services.analytics import calculate_analytics
 from services.forecast import generate_forecast
-from generate_sample_data import create_sample_excel
+from tests.generate_sample_data import create_sample_excel
 
 class TestBankStatementAnalyzer(unittest.TestCase):
     @classmethod
@@ -35,7 +35,7 @@ class TestBankStatementAnalyzer(unittest.TestCase):
         create_sample_excel()
         # 3. Pre-populate database with transactions for other tests
         from parsers.excel_parser import parse_excel_statement
-        demo_file = 'sample_statement_jan_may_2025.xlsx'
+        demo_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'sample_statement_jan_may_2025.xlsx')
         parsed = parse_excel_statement(demo_file, demo_file)
         metadata = parsed["metadata"]
         transactions = parsed["transactions"]
@@ -103,7 +103,7 @@ class TestBankStatementAnalyzer(unittest.TestCase):
 
     def test_end_to_end_ingestion(self):
         """Test importing the sample statement into SQLite and verifying database reads."""
-        demo_file = 'sample_statement_jan_may_2025.xlsx'
+        demo_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'sample_statement_jan_may_2025.xlsx')
         self.assertTrue(os.path.exists(demo_file))
         
         # Let's import the file

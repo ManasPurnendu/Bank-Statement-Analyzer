@@ -162,8 +162,10 @@ def create_sample_excel():
             ws.cell(row=row_num, column=5).value = current_balance
             row_num += 1
 
-    wb.save("sample_statement_jan_may_2025.xlsx")
-    print("Successfully generated sample_statement_jan_may_2025.xlsx")
+    import os
+    target_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'sample_statement_jan_may_2025.xlsx')
+    wb.save(target_path)
+    print(f"Successfully generated {target_path}")
 
 if __name__ == "__main__":
     create_sample_excel()

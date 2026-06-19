@@ -17,9 +17,9 @@ def upload_file():
     # Check if this is a request to seed demo data
     if request.form.get('demo') == 'true':
         try:
-            demo_file = 'sample_statement_jan_may_2025.xlsx'
+            demo_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'sample_statement_jan_may_2025.xlsx')
             if not os.path.exists(demo_file):
-                from generate_sample_data import create_sample_excel
+                from tests.generate_sample_data import create_sample_excel
                 create_sample_excel()
             
             parsed_data = parse_statement(demo_file, demo_file)
