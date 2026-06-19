@@ -5,7 +5,8 @@ import pandas as pd
 
 # Dynamic database override for tests to avoid dirtying live SQLite
 import database.db
-database.db.DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database', 'bank_statement_test.db')
+database.db.DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'bank_statement_test.db')
+
 
 from database.db import init_db, get_db_connection, DB_PATH
 from database.models import (

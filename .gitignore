@@ -1,6 +1,7 @@
 # Python
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Virtual Environment
 venv/
@@ -22,5 +23,6 @@ uploads/
 
 # Database backups
 *.db-journal
+database/bank_statement_test.db
 # Project documentation and internship files
 Docs/
