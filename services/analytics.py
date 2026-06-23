@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-def get_date_range_for_type(range_type):
-    statements = get_all_statements()
+def get_date_range_for_type(range_type, user_id=None):
+    statements = get_all_statements(user_id)
     if not statements:
         return None, None
         
@@ -43,12 +43,12 @@ def get_date_range_for_type(range_type):
         
     return start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')
 
-def calculate_analytics(start_date=None, end_date=None):
+def calculate_analytics(start_date=None, end_date=None, user_id=None):
     """
     Computes all analytical aggregates from stored transaction data.
     """
-    txs = get_all_transactions_for_analytics(start_date, end_date)
-    statements = get_all_statements()
+    txs = get_all_transactions_for_analytics(start_date, end_date, user_id)
+    statements = get_all_statements(user_id)
     
     if not txs:
         account_holder = "Manas Purnendu"

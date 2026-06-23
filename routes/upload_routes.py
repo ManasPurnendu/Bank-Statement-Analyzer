@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
+from utils.decorators import login_required
 import os
 import hashlib
 from werkzeug.utils import secure_filename
@@ -13,7 +14,9 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @upload_bp.route('/upload', methods=['POST'])
+@login_required
 def upload_file():
+    user_id = session.get('user_id')
     # Check if this is a request to seed demo data
     if request.form.get('demo') == 'true':
         try:
@@ -36,21 +39,23 @@ def upload_file():
                 metadata["start_date"], 
                 metadata["end_date"], 
                 metadata["transaction_count"],
-                file_hash=demo_hash
+                file_hash=demo_hash,
+                user_id=user_id
             )
             if dup_id:
-                delete_statement(dup_id)
+                delete_statement(dup_id, user_id=user_id)
                 
             stmt_id = add_statement(
                 metadata["file_name"], metadata["file_type"], metadata["account_holder"],
                 metadata["account_number"], metadata["bank_name"], metadata["statement_month"],
                 metadata["start_date"], metadata["end_date"], metadata["transaction_count"],
                 metadata["opening_balance"], metadata["closing_balance"],
-                file_hash=demo_hash
+                file_hash=demo_hash, user_id=user_id
             )
             
             for t in transactions:
                 t["statement_id"] = stmt_id
+                t["user_id"] = user_id
                 
             add_transactions_bulk(transactions)
             active_statements = len(get_all_statements())
@@ -128,12 +133,13 @@ def upload_file():
                 metadata["start_date"], 
                 metadata["end_date"], 
                 metadata["transaction_count"],
-                file_hash=file_hash
+                file_hash=file_hash,
+                user_id=user_id
             )
             
             if dup_id:
                 if action == 'replace':
-                    delete_statement(dup_id)
+                    delete_statement(dup_id, user_id=user_id)
                 elif action == 'skip':
                     # Clean up file and proceed to next file
                     if os.path.exists(temp_path):
@@ -161,12 +167,13 @@ def upload_file():
                 metadata["account_number"], metadata["bank_name"], metadata["statement_month"],
                 metadata["start_date"], metadata["end_date"], metadata["transaction_count"],
                 metadata["opening_balance"], metadata["closing_balance"],
-                file_hash=file_hash
+                file_hash=file_hash, user_id=user_id
             )
             
             # Link transactions to statement ID and insert bulk
             for t in transactions:
                 t["statement_id"] = stmt_id
+                t["user_id"] = user_id
                 
             add_transactions_bulk(transactions)
             
@@ -176,7 +183,7 @@ def upload_file():
         except Exception as e:
             if stmt_id is not None:
                 try:
-                    delete_statement(stmt_id)
+                    delete_statement(stmt_id, user_id=user_id)
                 except Exception:
                     pass
             # Cleanup and return error
@@ -199,9 +206,11 @@ def upload_file():
     })
 
 @upload_bp.route('/statements', methods=['GET'])
+@login_required
 def list_statements():
     try:
-        statements = get_all_statements()
+        user_id = session.get('user_id')
+        statements = get_all_statements(user_id=user_id)
         return jsonify({
             "success": True,
             "statements": statements
@@ -213,9 +222,11 @@ def list_statements():
         }), 500
 
 @upload_bp.route('/statement/<int:statement_id>', methods=['DELETE'])
+@login_required
 def delete_statement_endpoint(statement_id):
     try:
-        delete_statement(statement_id)
+        user_id = session.get('user_id')
+        delete_statement(statement_id, user_id=user_id)
         return jsonify({
             "success": True,
             "message": "Statement and all associated transactions removed successfully."

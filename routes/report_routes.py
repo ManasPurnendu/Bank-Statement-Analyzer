@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify, current_app, send_from_directory
+from flask import Blueprint, request, jsonify, current_app, send_from_directory, session
+from utils.decorators import login_required
 import os
 import time
 from datetime import datetime
@@ -35,15 +36,17 @@ def get_friendly_info(filename):
     return friendly_name, rpt_type
 
 @report_bp.route('/report/generate', methods=['POST'])
+@login_required
 def generate_report():
     try:
+        user_id = session.get('user_id')
         data = request.json or {}
         report_type = data.get('report_type', 'Summary') # 'Summary', 'Detailed', 'Analytics', 'Custom'
         date_range = data.get('date_range', 'all')
         sections = data.get('sections', None)
         
         # Resolve dates
-        start_date, end_date = get_date_range_for_type(date_range)
+        start_date, end_date = get_date_range_for_type(date_range, user_id=user_id)
         
         # Build period string and file suffix
         if start_date and end_date:
@@ -67,14 +70,14 @@ def generate_report():
             
         filename = f"{name_prefix}_-_{range_suffix}_{timestamp}.pdf"
         
-        report_dir = current_app.config['REPORT_FOLDER']
+        report_dir = os.path.join(current_app.config['REPORT_FOLDER'], str(user_id))
         if not os.path.exists(report_dir):
             os.makedirs(report_dir)
             
         dest_path = os.path.join(report_dir, filename)
         
         # Call generator
-        generate_pdf_report(dest_path, report_type, period_str, sections, start_date, end_date)
+        generate_pdf_report(dest_path, report_type, period_str, sections, start_date, end_date, user_id=user_id)
         
         return jsonify({
             "success": True,
@@ -88,9 +91,11 @@ def generate_report():
         }), 500
 
 @report_bp.route('/reports', methods=['GET'])
+@login_required
 def list_reports():
     try:
-        report_dir = current_app.config['REPORT_FOLDER']
+        user_id = session.get('user_id')
+        report_dir = os.path.join(current_app.config['REPORT_FOLDER'], str(user_id))
         reports_list = []
         
         if os.path.exists(report_dir):
@@ -143,19 +148,25 @@ def list_reports():
         }), 500
 
 @report_bp.route('/report/download/<filename>', methods=['GET'])
+@login_required
 def download_report(filename):
-    report_dir = current_app.config['REPORT_FOLDER']
+    user_id = session.get('user_id')
+    report_dir = os.path.join(current_app.config['REPORT_FOLDER'], str(user_id))
     return send_from_directory(report_dir, filename, as_attachment=True)
 
 @report_bp.route('/report/view/<filename>', methods=['GET'])
+@login_required
 def view_report(filename):
-    report_dir = current_app.config['REPORT_FOLDER']
+    user_id = session.get('user_id')
+    report_dir = os.path.join(current_app.config['REPORT_FOLDER'], str(user_id))
     return send_from_directory(report_dir, filename, as_attachment=False)
 
 @report_bp.route('/report/<filename>', methods=['DELETE'])
+@login_required
 def delete_report(filename):
     try:
-        report_dir = current_app.config['REPORT_FOLDER']
+        user_id = session.get('user_id')
+        report_dir = os.path.join(current_app.config['REPORT_FOLDER'], str(user_id))
         path = os.path.join(report_dir, filename)
         if os.path.exists(path):
             os.remove(path)

@@ -70,30 +70,33 @@ def parse_json_statement(file_path, original_filename):
         "closing_balance": 0.0
     }
 
+    # Normalize metadata keys for robust matching
+    meta_src_normalized = {str(k).lower().replace(' ', '_').replace('-', '_').strip(): v for k, v in meta_src.items()}
+
     # Extract metadata using known keys
-    def extract_field(src, keys, default="Unknown"):
+    def extract_field(src_norm, keys, default="Unknown"):
         for k in keys:
-            if k in src and src[k] is not None:
-                return str(src[k]).strip()
+            if k in src_norm and src_norm[k] is not None:
+                return str(src_norm[k]).strip()
         return default
 
-    metadata["bank_name"] = extract_field(meta_src, ('bank_name', 'bank', 'bankName'), "Unknown")
-    metadata["account_holder"] = extract_field(meta_src, ('account_holder', 'holder', 'accountHolder', 'customer_name', 'name'), "Unknown")
-    metadata["account_number"] = extract_field(meta_src, ('account_number', 'account_no', 'accountNo', 'acc_no', 'account'), "Unknown")
+    metadata["bank_name"] = extract_field(meta_src_normalized, ('bank_name', 'bank', 'bankname'), "Unknown")
+    metadata["account_holder"] = extract_field(meta_src_normalized, ('account_holder', 'holder', 'accountholder', 'customer_name', 'name'), "Unknown")
+    metadata["account_number"] = extract_field(meta_src_normalized, ('account_number', 'account_no', 'accountno', 'acc_no', 'account'), "Unknown")
 
     # Balances
-    for balance_key in ('opening_balance', 'openingBalance', 'start_balance', 'startBalance'):
-        if balance_key in meta_src and meta_src[balance_key] is not None:
+    for balance_key in ('opening_balance', 'openingbalance', 'start_balance', 'startbalance'):
+        if balance_key in meta_src_normalized and meta_src_normalized[balance_key] is not None:
             try:
-                metadata["opening_balance"] = float(str(meta_src[balance_key]).replace(",", ""))
+                metadata["opening_balance"] = float(str(meta_src_normalized[balance_key]).replace(",", ""))
                 break
             except ValueError:
                 pass
 
-    for balance_key in ('closing_balance', 'closingBalance', 'end_balance', 'endBalance', 'balance'):
-        if balance_key in meta_src and meta_src[balance_key] is not None:
+    for balance_key in ('closing_balance', 'closingbalance', 'end_balance', 'endbalance', 'balance'):
+        if balance_key in meta_src_normalized and meta_src_normalized[balance_key] is not None:
             try:
-                metadata["closing_balance"] = float(str(meta_src[balance_key]).replace(",", ""))
+                metadata["closing_balance"] = float(str(meta_src_normalized[balance_key]).replace(",", ""))
                 break
             except ValueError:
                 pass
@@ -104,24 +107,26 @@ def parse_json_statement(file_path, original_filename):
 
     # Search keys mapping
     synonyms = {
-        "date": ('txn_date', 'transaction_date', 'transactionDate', 'date', 'tx_date', 'value_date'),
+        "date": ('txn_date', 'transaction_date', 'transactiondate', 'date', 'tx_date', 'value_date'),
         "description": ('description', 'narration', 'particulars', 'remarks', 'details'),
         "debit": ('debit', 'withdrawal', 'dr', 'dr_amount'),
         "credit": ('credit', 'deposit', 'cr', 'cr_amount'),
-        "amount": ('amount', 'value', 'txn_amount'),
-        "balance": ('balance', 'running_balance', 'runningBalance'),
-        "type": ('type', 'indicator', 'dr_cr', 'drcr')
+        "amount": ('amount', 'value', 'txn_amount', 'transaction_amount'),
+        "balance": ('balance', 'running_balance', 'runningbalance', 'available_balance', 'availablebalance'),
+        "type": ('type', 'indicator', 'dr_cr', 'drcr', 'cr_dr')
     }
 
     for tx in tx_list:
         if not isinstance(tx, dict):
             continue
 
-        # Find mapping keys present in transaction dict
+        # Find mapping keys present in transaction dict using normalized keys
+        tx_normalized = {str(k).lower().replace(' ', '_').replace('-', '_').strip(): v for k, v in tx.items()}
+        
         def find_val(syns):
             for s in syns:
-                if s in tx and tx[s] is not None:
-                    return tx[s]
+                if s in tx_normalized and tx_normalized[s] is not None:
+                    return tx_normalized[s]
             return None
 
         raw_date = find_val(synonyms["date"])

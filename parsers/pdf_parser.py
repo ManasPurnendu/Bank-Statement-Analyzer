@@ -227,7 +227,8 @@ def _extract_metadata_from_text(full_text: str) -> dict:
     # SBI-specific "Clear Balance" is the CURRENT account balance (real-time),
     # NOT the statement period closing balance.  We store it in a separate key
     # so that the last-page summary line can override with the correct period CB.
-    clr = re.search(r'Clear\s*Balance\s*[:\-]\s*([0-9,]+\.?\d*)', full_text, re.IGNORECASE)
+    clr = re.search(
+        r'Clear\s*Balance\s*[:\-]\s*([0-9,]+\.?\d*)', full_text, re.IGNORECASE)
     if clr:
         meta['_clear_balance'] = _parse_amount(clr.group(1))
 
@@ -286,7 +287,8 @@ def _detect_column_layout(header_row: list) -> dict:
       {date, description, debit, credit, amount, balance, type}
     All values are int indices or None.
     """
-    mapping = {k: None for k in ('date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
+    mapping = {k: None for k in (
+        'date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
     synonyms = {
         'date': ['transaction date', 'txn date', 'value date', 'date', 'tx date', 'posting date'],
         'description': ['description', 'narration', 'particulars', 'remarks', 'details',
@@ -319,27 +321,33 @@ def _auto_detect_layout(sample_rows: list, n_cols: int) -> dict:
     Heuristically assign column layout when no header row found.
     Works for the most common PDF layouts.
     """
-    mapping = {k: None for k in ('date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
+    mapping = {k: None for k in (
+        'date', 'description', 'debit', 'credit', 'amount', 'balance', 'type')}
     if n_cols == 7:
         # SBI layout: Date | Date | Description | separator | Debit | separator | Credit | Balance
         # But pdfplumber extracts 7 values:
         # idx 0: date1, 1: date2, 2: description, 3: '-', 4: debit, 5: credit(or '-'), 6: balance
-        mapping.update({'date': 0, 'description': 2, 'debit': 4, 'credit': 5, 'balance': 6})
+        mapping.update({'date': 0, 'description': 2,
+                       'debit': 4, 'credit': 5, 'balance': 6})
     elif n_cols == 6:
         # Date | Description | Ref/Cheque | Debit | Credit | Balance
-        mapping.update({'date': 0, 'description': 1, 'debit': 3, 'credit': 4, 'balance': 5})
+        mapping.update({'date': 0, 'description': 1,
+                       'debit': 3, 'credit': 4, 'balance': 5})
     elif n_cols == 5:
         # Date | Description | Debit | Credit | Balance
-        mapping.update({'date': 0, 'description': 1, 'debit': 2, 'credit': 3, 'balance': 4})
+        mapping.update({'date': 0, 'description': 1,
+                       'debit': 2, 'credit': 3, 'balance': 4})
     elif n_cols == 4:
         # Date | Description | Amount | Balance
-        mapping.update({'date': 0, 'description': 1, 'amount': 2, 'balance': 3})
+        mapping.update({'date': 0, 'description': 1,
+                       'amount': 2, 'balance': 3})
     elif n_cols == 3:
         # Date | Description | Amount(signed)
         mapping.update({'date': 0, 'description': 1, 'amount': 2})
     else:
         # Best guess
-        mapping.update({'date': 0, 'description': 1, 'amount': 2, 'balance': n_cols - 1})
+        mapping.update({'date': 0, 'description': 1,
+                       'amount': 2, 'balance': n_cols - 1})
     return mapping
 
 
@@ -406,7 +414,8 @@ def _parse_row(row: list, mapping: dict) -> dict | None:
             return None
         if typ_i is not None and typ_i < len(row):
             raw_type = str(row[typ_i]).upper().strip()
-            txn_type = 'Credit' if any(k in raw_type for k in ('CR', 'CREDIT', '+')) else 'Debit'
+            txn_type = 'Credit' if any(k in raw_type for k in (
+                'CR', 'CREDIT', '+')) else 'Debit'
         else:
             # Sign-based or CR/DR suffix
             suffix = _cr_or_dr(raw_amt)
@@ -468,19 +477,27 @@ def parse_pdf_statement(file_path: str, original_filename: str, password: str = 
     """
     Parse a PDF bank statement and return canonical parsed data.
     """
-    temp_decrypted_path = None
-
     if is_pdf_encrypted(file_path):
         if not password:
-            raise ValueError("PasswordRequired")
-        temp_decrypted_path = file_path + "_decrypted.pdf"
-        if not decrypt_pdf(file_path, temp_decrypted_path, password):
-            if os.path.exists(temp_decrypted_path):
-                os.remove(temp_decrypted_path)
+            # Try empty password first for PDFs with only a permissions password
+            try:
+                with open(file_path, 'rb') as f:
+                    reader = PyPDF2.PdfReader(f)
+                    if reader.decrypt(''):
+                        password = ''
+                    else:
+                        raise ValueError("PasswordRequired")
+            except Exception:
+                raise ValueError("PasswordRequired")
+
+        # Verify password is correct
+        try:
+            with open(file_path, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                if reader.decrypt(password) == 0:
+                    raise ValueError("IncorrectPassword")
+        except Exception:
             raise ValueError("IncorrectPassword")
-        parse_target = temp_decrypted_path
-    else:
-        parse_target = file_path
 
     metadata = {
         "file_name": original_filename,
@@ -497,113 +514,108 @@ def parse_pdf_statement(file_path: str, original_filename: str, password: str = 
     rules = load_category_rules()
     transactions = []
 
-    try:
-        with pdfplumber.open(parse_target) as pdf:
-            total_pages = len(pdf.pages)
+    with pdfplumber.open(file_path, password=password or '') as pdf:
+        total_pages = len(pdf.pages)
 
-            # ---- Step 1: Extract metadata from first 3 pages ----
-            try:
-                header_text = ""
-                for page in pdf.pages[:3]:
-                    header_text += (page.extract_text() or "") + "\n"
-                meta_from_text = _extract_metadata_from_text(header_text)
-                metadata.update({k: v for k, v in meta_from_text.items() if v})
-            except Exception as e:
-                print(f"[pdf_parser] header metadata error: {e}")
+        # ---- Step 1: Extract metadata from first 3 pages ----
+        try:
+            header_text = ""
+            for page in pdf.pages[:3]:
+                header_text += (page.extract_text() or "") + "\n"
+            meta_from_text = _extract_metadata_from_text(header_text)
+            metadata.update({k: v for k, v in meta_from_text.items() if v})
+        except Exception as e:
+            print(f"[pdf_parser] header metadata error: {e}")
 
-            # ---- Step 2: Extract metadata from last page (authoritative) ----
-            try:
-                last_text = pdf.pages[-1].extract_text() or ""
-                summary_meta = _extract_summary_line(last_text)
-                # Summary-line data is authoritative (period-specific) – always override
-                for k, v in summary_meta.items():
-                    if v:
-                        metadata[k] = v
-            except Exception as e:
-                print(f"[pdf_parser] last-page metadata error: {e}")
+        # ---- Step 2: Extract metadata from last page (authoritative) ----
+        try:
+            last_text = pdf.pages[-1].extract_text() or ""
+            summary_meta = _extract_summary_line(last_text)
+            # Summary-line data is authoritative (period-specific) – always override
+            for k, v in summary_meta.items():
+                if v:
+                    metadata[k] = v
+        except Exception as e:
+            print(f"[pdf_parser] last-page metadata error: {e}")
 
-            # Use _clear_balance as last-resort closing balance if still 0
-            if not metadata.get('closing_balance') and metadata.get('_clear_balance'):
-                metadata['closing_balance'] = metadata['_clear_balance']
-            metadata.pop('_clear_balance', None)
+        # Use _clear_balance as last-resort closing balance if still 0
+        if not metadata.get('closing_balance') and metadata.get('_clear_balance'):
+            metadata['closing_balance'] = metadata['_clear_balance']
+        metadata.pop('_clear_balance', None)
 
-            # ---- Step 3: Collect raw table rows from all pages ----
+        # ---- Step 3: Collect raw table rows from all pages ----
+        raw_table_rows = []
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            for table in tables:
+                for row in table:
+                    cleaned = [str(v).strip() if v is not None else '' for v in row]
+                    if any(v for v in cleaned):
+                        raw_table_rows.append(cleaned)
+
+        # ---- Step 4: Fall back to text-based row extraction ----
+        if len(raw_table_rows) < 3:
             raw_table_rows = []
+            date_pat = re.compile(
+                r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})')
             for page in pdf.pages:
-                tables = page.extract_tables()
-                for table in tables:
-                    for row in table:
-                        cleaned = [str(v).strip() if v is not None else '' for v in row]
-                        if any(v for v in cleaned):
-                            raw_table_rows.append(cleaned)
+                page_text = page.extract_text() or ""
+                for line in page_text.split('\n'):
+                    line = line.strip()
+                    if date_pat.match(line):
+                        tokens = line.split()
+                        if len(tokens) >= 3:
+                            raw_table_rows.append(tokens)
 
-            # ---- Step 4: Fall back to text-based row extraction ----
-            if len(raw_table_rows) < 3:
-                raw_table_rows = []
-                date_pat = re.compile(
-                    r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})')
-                for page in pdf.pages:
-                    page_text = page.extract_text() or ""
-                    for line in page_text.split('\n'):
-                        line = line.strip()
-                        if date_pat.match(line):
-                            tokens = line.split()
-                            if len(tokens) >= 3:
-                                raw_table_rows.append(tokens)
+        if not raw_table_rows:
+            raise ValueError("No transaction rows could be extracted from the PDF.")
 
-            if not raw_table_rows:
-                raise ValueError("No transaction rows could be extracted from the PDF.")
+        # ---- Step 5: Detect header row & column layout ----
+        header_idx = -1
+        mapping = None
 
-            # ---- Step 5: Detect header row & column layout ----
-            header_idx = -1
-            mapping = None
+        for i, row in enumerate(raw_table_rows[:15]):
+            row_lower = [str(v).lower() for v in row]
+            has_date = any('date' in v for v in row_lower)
+            has_desc = any(kw in v for kw in
+                           ('desc', 'narr', 'part', 'detail', 'particular') for v in row_lower)
+            if has_date and has_desc:
+                header_idx = i
+                mapping = _detect_column_layout(row)
+                break
 
-            for i, row in enumerate(raw_table_rows[:15]):
-                row_lower = [str(v).lower() for v in row]
-                has_date = any('date' in v for v in row_lower)
-                has_desc = any(kw in v for kw in
-                               ('desc', 'narr', 'part', 'detail', 'particular') for v in row_lower)
-                if has_date and has_desc:
-                    header_idx = i
-                    mapping = _detect_column_layout(row)
-                    break
+        # Determine data rows
+        if header_idx != -1:
+            data_rows = raw_table_rows[header_idx + 1:]
+        else:
+            data_rows = raw_table_rows
 
-            # Determine data rows
-            if header_idx != -1:
-                data_rows = raw_table_rows[header_idx + 1:]
+        # If no header found or mapping incomplete, auto-detect from sample row width
+        if mapping is None or (mapping.get('date') is None):
+            # Find the most common row length
+            from collections import Counter
+            lengths = [len(r) for r in data_rows if len(r) >= 3]
+            if lengths:
+                modal_len = Counter(lengths).most_common(1)[0][0]
             else:
-                data_rows = raw_table_rows
+                modal_len = 5
+            mapping = _auto_detect_layout(data_rows[:10], modal_len)
 
-            # If no header found or mapping incomplete, auto-detect from sample row width
-            if mapping is None or (mapping.get('date') is None):
-                # Find the most common row length
-                from collections import Counter
-                lengths = [len(r) for r in data_rows if len(r) >= 3]
-                if lengths:
-                    modal_len = Counter(lengths).most_common(1)[0][0]
-                else:
-                    modal_len = 5
-                mapping = _auto_detect_layout(data_rows[:10], modal_len)
+        # ---- Step 6: Parse each data row ----
+        skip_keywords = {'date', 'balance', 'narration', 'description',
+                         'particulars', 'debit', 'credit', 'amount', 'withdrawal',
+                         'deposit', 'brought forward', 'page', 'total'}
 
-            # ---- Step 6: Parse each data row ----
-            skip_keywords = {'date', 'balance', 'narration', 'description',
-                             'particulars', 'debit', 'credit', 'amount', 'withdrawal',
-                             'deposit', 'brought forward', 'page', 'total'}
+        for row in data_rows:
+            # Skip header repetitions
+            row_lower_set = {str(v).lower().strip() for v in row}
+            if row_lower_set & skip_keywords:
+                continue
 
-            for row in data_rows:
-                # Skip header repetitions
-                row_lower_set = {str(v).lower().strip() for v in row}
-                if row_lower_set & skip_keywords:
-                    continue
-
-                txn = _parse_row(row, mapping)
-                if txn is None:
-                    continue
-                transactions.append(txn)
-
-    finally:
-        if temp_decrypted_path and os.path.exists(temp_decrypted_path):
-            os.remove(temp_decrypted_path)
+            txn = _parse_row(row, mapping)
+            if txn is None:
+                continue
+            transactions.append(txn)
 
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the PDF file.")

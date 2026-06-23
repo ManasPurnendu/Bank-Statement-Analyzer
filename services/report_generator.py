@@ -59,19 +59,19 @@ class NumberedCanvas(canvas.Canvas):
             
         self.restoreState()
 
-def generate_pdf_report(dest_path, report_type="Summary", date_range="All Time", selected_sections=None, start_date=None, end_date=None):
+def generate_pdf_report(dest_path, report_type="Summary", date_range="All Time", selected_sections=None, start_date=None, end_date=None, user_id=None):
     """
     Builds a styled ReportLab PDF report.
     report_type: "Summary", "Detailed", "Analytics", "Custom"
     """
-    analytics = calculate_analytics(start_date, end_date)
+    analytics = calculate_analytics(start_date, end_date, user_id=user_id)
     kpis = analytics["kpis"]
     category_spending = analytics["category_spending"]
     top_merchants = analytics["top_merchants"]
     top_contacts = analytics["top_contacts"]
     subscriptions = analytics["subscriptions"]
     
-    forecast = generate_forecast(start_date=start_date, end_date=end_date)
+    forecast = generate_forecast(start_date=start_date, end_date=end_date, user_id=user_id)
     insights = generate_insights(analytics)
     
     # Document Setup (0.75 in margins: 54 points)

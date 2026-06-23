@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const path = window.location.pathname;
     
     if (path === '/' || path === '') {
-        initLandingPage();
+        // initLandingPage was removed, logic moved to initUploadFlow which runs globally
     } else if (path.includes('/dashboard')) {
         initDashboardPage();
     } else if (path.includes('/transactions')) {
@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (path.includes('/report')) {
         initReportsPage();
     }
+    
+    // Always initialize the upload modal logic (if it exists on the page)
+    initUploadFlow();
     
     // Always fetch sidebar metadata to show loaded statements (unless on landing/upload panel)
     if (path !== '/' && path !== '') {
@@ -238,9 +241,11 @@ function fetchSidebarData() {
     });
 }
 
-/* --- LANDING & UPLOAD COMPONENT --- */
-function initLandingPage() {
+/* --- GLOBAL UPLOAD MODAL COMPONENT --- */
+function initUploadFlow() {
     const dropzone = document.getElementById("dropzone");
+    if (!dropzone) return; // Not present on this page
+    
     const fileInput = document.getElementById("fileInput");
     const browseBtn = document.getElementById("browseBtn");
     const loadDemoBtn = document.getElementById("loadDemoBtn");
@@ -296,11 +301,26 @@ function initLandingPage() {
             method: 'POST',
             body: formData
         })
-        .then(res => res.json())
+        .then(res => {
+            if (res.status === 401) {
+                return res.json().then(data => {
+                    if (data.message === "Unauthorized") {
+                        window.location.href = '/auth/login';
+                    }
+                    return null;
+                });
+            }
+            return res.json();
+        })
         .then(data => {
+            if (!data) return;
             if (data.success) {
                 runSimulationSteps(() => {
-                    window.location.href = '/dashboard';
+                    if (window.location.pathname.includes('/dashboard')) {
+                        window.location.reload();
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
                 });
             } else {
                 alert("Failed to load demo data: " + data.message);
@@ -323,7 +343,11 @@ function initLandingPage() {
         if (pendingFiles.length === 0) {
             // Done uploading all
             runSimulationSteps(() => {
-                window.location.href = '/dashboard';
+                if (window.location.pathname.includes('/dashboard')) {
+                    window.location.reload();
+                } else {
+                    window.location.href = '/dashboard';
+                }
             });
             return;
         }
@@ -348,8 +372,12 @@ function initLandingPage() {
         })
         .then(res => {
             if (res.status === 401) {
-                // Password Required / Incorrect
+                // Password Required / Incorrect OR Unauthorized
                 return res.json().then(data => {
+                    if (data.message === "Unauthorized") {
+                        window.location.href = '/auth/login';
+                        return null;
+                    }
                     stopProcessingAnimation();
                     passwordModal.show();
                     if (data.error === "IncorrectPassword") {
@@ -557,9 +585,9 @@ function updateIncomeExpenseChart(analytics) {
         data: {
             labels: months,
             datasets: [
-                { label: 'Income', data: incomes, backgroundColor: '#10b981', borderRadius: 4 },
-                { label: 'Expenses', data: expenses, backgroundColor: '#ef4444', borderRadius: 4 },
-                { label: 'Savings', data: savings, backgroundColor: '#2563eb', borderRadius: 4 }
+                { label: 'Income', data: incomes, backgroundColor: 'rgba(34, 197, 94, 0.85)', borderRadius: 4 },
+                { label: 'Expenses', data: expenses, backgroundColor: 'rgba(239, 68, 68, 0.85)', borderRadius: 4 },
+                { label: 'Savings', data: savings, backgroundColor: 'rgba(96, 165, 250, 0.85)', borderRadius: 4 }
             ]
         },
         options: {
@@ -1395,7 +1423,7 @@ function renderAnalyticsView(analytics, range = 'this-year') {
             labels: payLabels,
             datasets: [{
                 data: payValues,
-                backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#64748b'],
+                backgroundColor: ['rgba(96, 165, 250, 0.85)', 'rgba(34, 197, 94, 0.85)', 'rgba(245, 158, 11, 0.85)', 'rgba(100, 116, 139, 0.85)'],
                 borderWidth: 2,
                 borderColor: document.documentElement.getAttribute("data-theme") === 'dark' ? '#151b2c' : '#ffffff'
             }]
@@ -1905,9 +1933,9 @@ function renderForecastView(data, horizon = 6) {
         data: {
             labels: fMonths,
             datasets: [
-                { label: 'Inflow', data: fInflows, backgroundColor: '#10b981', borderRadius: 2 },
-                { label: 'Outflow', data: fOutflows, backgroundColor: '#ef4444', borderRadius: 2 },
-                { label: 'Net Savings', data: fNets, backgroundColor: '#2563eb', borderRadius: 2 }
+                { label: 'Inflow', data: fInflows, backgroundColor: 'rgba(34, 197, 94, 0.85)', borderRadius: 2 },
+                { label: 'Outflow', data: fOutflows, backgroundColor: 'rgba(239, 68, 68, 0.85)', borderRadius: 2 },
+                { label: 'Net Savings', data: fNets, backgroundColor: 'rgba(96, 165, 250, 0.85)', borderRadius: 2 }
             ]
         },
         options: {
@@ -2349,10 +2377,11 @@ let activeDeleteStatementId = null;
 window.deleteStatement = function(statementId, fileName) {
     activeDeleteStatementId = statementId;
     
-    // Set the file name in the modal body
+    // Set the file name in the modal body (basename only)
     const fileNameSpan = document.getElementById("deleteConfirmFileName");
     if (fileNameSpan) {
-        fileNameSpan.textContent = fileName;
+        const basename = fileName ? fileName.split(/[\\/]/).pop() : "Unknown File";
+        fileNameSpan.textContent = basename;
     }
     
     // Initialize modal if not done already

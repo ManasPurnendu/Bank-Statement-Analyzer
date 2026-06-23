@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-0 auth-split-container" style="min-height: 100vh;">
+    <!-- Left Side: Hero Section -->
+    <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-between position-relative bg-primary overflow-hidden" style="padding: 4rem;">
+        <!-- Background Elements -->
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 100%); z-index: 1;"></div>
+        <div class="position-absolute rounded-circle" style="width: 600px; height: 600px; background: rgba(255,255,255,0.05); top: -20%; right: -10%; z-index: 1;"></div>
+        <div class="position-absolute rounded-circle" style="width: 400px; height: 400px; background: rgba(255,255,255,0.05); bottom: -10%; left: -10%; z-index: 1;"></div>
+        
+        <!-- Brand -->
+        <div style="z-index: 2;">
+            <a href="{{ url_for('landing_page') }}" class="text-decoration-none d-flex align-items-center text-white">
+                <i class="bi bi-bar-chart-fill brand-icon me-2 fs-3"></i>
+                <div class="brand-text">
+                    <span class="brand-title text-white">Bank Statement</span>
+                    <span class="brand-subtitle text-white-50">Analyzer</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Typography Hero -->
+        <div style="z-index: 2; margin-top: auto; margin-bottom: auto;">
+            <h1 class="display-4 fw-bolder text-white mb-4" style="font-family: var(--font-heading); line-height: 1.2;">
+                Understand your<br>
+                <span style="color: #60a5fa;">Finances</span> better.
+            </h1>
+            <p class="lead text-white-50 mb-0" style="max-width: 400px;">
+                Upload, categorize, and gain unparalleled insights into your spending habits with AI-powered analytics.
+            </p>
+        </div>
+        
+        <!-- Footer info -->
+        <div style="z-index: 2;">
+            <div class="d-flex align-items-center text-white-50 small">
+                <i class="bi bi-shield-check me-2 fs-5 text-success"></i>
+                <span>Enterprise-grade security & end-to-end encryption.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Form Section -->
+    <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center bg-surface" style="padding: 2rem;">
+        
+        <!-- Mobile Header (Visible only on small screens) -->
+        <div class="d-lg-none w-100 text-center mb-5 position-absolute top-0 pt-4">
+            <a href="{{ url_for('landing_page') }}" class="text-decoration-none d-inline-flex align-items-center">
+                <i class="bi bi-bar-chart-fill brand-icon text-primary me-2 fs-3"></i>
+                <div class="brand-text text-start">
+                    <span class="brand-title">Bank Statement</span>
+                    <span class="brand-subtitle">Analyzer</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="w-100" style="max-width: 420px; z-index: 2; margin-top: 3rem;">
+            <div class="mb-5">
+                <h2 class="fw-bold mb-2" style="font-family: var(--font-heading); font-size: 2rem;">Create Account</h2>
+                <p class="text-secondary">Join Bank Statement Analyzer today</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.register_page') }}">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-secondary small mb-1">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted px-3"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control border-start-0 ps-0 py-2" name="email" required placeholder="name@example.com">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold text-secondary small mb-0">Password</label>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted px-3"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control border-start-0 ps-0 py-2" name="password" required placeholder="Create a password">
+                    </div>
+                    <div class="form-text small text-muted mt-2" style="font-size: 0.8rem;">
+                        Must be at least 8 chars, with 1 uppercase, 1 lowercase, 1 number, and 1 special char.
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm mt-3">
+                    Sign Up <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+            
+            <div class="text-center mt-5">
+                <span class="text-secondary">Already have an account?</span>
+                <a href="{{ url_for('auth.login_page') }}" class="text-primary fw-bold text-decoration-none ms-1">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Prevent base.html header padding from interfering */
+    .app-container { padding-top: 0 !important; }
+    .landing-navbar { display: none !important; }
+    
+    /* Input Styling Enhancements */
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: none;
+    }
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .form-control {
+        border-color: var(--primary) !important;
+    }
+</style>
+{% endblock %}

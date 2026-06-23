@@ -18,8 +18,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body data-theme="light">
-    <div class="app-container {% if request.path == '/' or request.path == '' %}no-sidebar{% endif %}">
-        {% if request.path != '/' and request.path != '' %}
+    <div class="app-container {% if request.path == '/' or request.path == '' or request.path.startswith('/auth') %}no-sidebar{% endif %}">
+        {% if request.path != '/' and request.path != '' and not request.path.startswith('/auth') %}
         <!-- Mobile Header (visible only on small screens) -->
         <header class="mobile-header" id="mobileHeader">
             <button class="mobile-hamburger" id="sidebarToggleBtn" type="button" aria-label="Open navigation menu">
@@ -83,9 +83,9 @@
                     <!-- Statements populated via JS -->
                 </div>
                 
-                <a href="{{ url_for('landing_page') }}" class="btn btn-outline-primary btn-sm w-100 mt-2 py-2" id="sidebar-upload-btn">
+                <button class="btn btn-outline-primary btn-sm w-100 mt-2 py-2" data-bs-toggle="modal" data-bs-target="#uploadModal" id="sidebar-upload-btn">
                     <i class="bi bi-plus-lg me-1"></i> Upload More
-                </a>
+                </button>
 
                 <hr class="sidebar-divider">
                 <div class="sidebar-section-title">Data Coverage</div>
@@ -95,7 +95,18 @@
             </div>
 
             <div class="sidebar-footer">
-                <div class="dark-mode-toggle-wrapper">
+                {% if session.get('user_id') %}
+                <div class="user-profile mb-3 px-2">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4 me-2" style="color: var(--primary);"></i>
+                        <div class="text-truncate">
+                            <span class="fw-medium text-truncate" style="max-width: 150px; display: inline-block; font-size: 0.85rem;">{{ session.get('email') }}</span>
+                            <small class="d-block text-muted" style="font-size: 0.75rem;">{{ session.get('role', 'user') | title }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="dark-mode-toggle-wrapper mb-3">
                     <div class="dark-mode-label">
                         <i class="bi bi-moon-fill me-2"></i>
                         <span>Dark Mode</span>
@@ -104,6 +115,11 @@
                         <input class="form-check-input" type="checkbox" id="darkModeToggle">
                     </div>
                 </div>
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger w-100 btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </a>
+                {% endif %}
             </div>
         </aside>
         {% endif %}
@@ -112,6 +128,108 @@
         <main class="main-content">
             {% block content %}{% endblock %}
         </main>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i> Upload Statement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <!-- Upload Panel -->
+                    <div id="upload-panel">
+                        <div class="upload-dropzone mb-3" id="dropzone">
+                            <i class="bi bi-cloud-arrow-up-fill text-primary" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3 text-dark fw-bold">Drag & Drop your bank statement</h4>
+                            <p class="text-muted small">Supports PDF, Excel (XLS, XLSX), CSV and JSON</p>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.xls,.xlsx,.csv,.json" style="display: none;">
+                            <button class="btn btn-primary mt-2 px-4 rounded-pill" id="browseBtn">Browse Files</button>
+                            <div class="mt-4 pt-3 border-top text-center w-100">
+                                <p class="text-muted small mb-2">Want to see how it works without uploading?</p>
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="loadDemoBtn">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Load Demo Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processing Panel -->
+                    <div id="processing-panel" style="display: none; padding: 2rem;">
+                        <h4 class="text-center mb-4 fw-bold" id="processing-title">Processing Statement...</h4>
+                        <div class="processing-steps">
+                            <div class="processing-step" id="step-upload">
+                                <i class="bi bi-circle"></i>
+                                <span>Uploading file securely</span>
+                            </div>
+                            <div class="processing-step" id="step-analyze">
+                                <i class="bi bi-circle"></i>
+                                <span>Analyzing document structure</span>
+                            </div>
+                            <div class="processing-step" id="step-extract">
+                                <i class="bi bi-circle"></i>
+                                <span>Extracting transactions</span>
+                            </div>
+                            <div class="processing-step" id="step-categorize">
+                                <i class="bi bi-circle"></i>
+                                <span>Running AI categorization</span>
+                            </div>
+                            <div class="processing-step" id="step-insights">
+                                <i class="bi bi-circle"></i>
+                                <span>Generating financial insights</span>
+                            </div>
+                            <div class="processing-step" id="step-ready">
+                                <i class="bi bi-circle"></i>
+                                <span>Dashboard ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-lock-fill me-2 text-warning"></i> Password Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closePasswordBtn"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="text-secondary small">The uploaded PDF statement is password protected. Please enter the password to proceed with extraction.</p>
+                    <input type="password" class="form-control mb-2" id="pdfPassword" placeholder="Enter PDF Password">
+                    <div class="invalid-feedback" id="passwordError">Incorrect password. Please try again.</div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal" id="cancelPasswordBtn">Cancel</button>
+                    <button type="button" class="btn btn-primary px-4 py-2" id="submitPasswordBtn">Unlock & Parse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Modal -->
+    <div class="modal fade" id="duplicateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-warning"><i class="bi bi-exclamation-triangle-fill me-2"></i> Duplicate Statement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDuplicateBtn"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="text-secondary small mb-2" id="duplicateDetails"></p>
+                    <p class="text-secondary small mb-0 fw-semibold">What would you like to do?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2" id="duplicateSkipBtn">Skip this File</button>
+                    <button type="button" class="btn btn-warning px-4 py-2" id="duplicateReplaceBtn">Replace Existing</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -122,7 +240,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDeleteConfirmBtn"></button>
                 </div>
                 <div class="modal-body py-4">
-                    <p class="text-secondary small mb-0" id="deleteConfirmDetails">Are you sure you want to delete the statement "<strong id="deleteConfirmFileName"></strong>"? This will delete all its associated transactions and update all charts.</p>
+                    <p class="text-secondary small mb-0" id="deleteConfirmDetails">Are you sure you want to delete the statement "<strong id="deleteConfirmFileName" style="word-break: break-all;"></strong>"? This will delete all its associated transactions and update all charts.</p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-outline-secondary px-3 py-2" data-bs-dismiss="modal" id="cancelDeleteConfirmBtn">Cancel</button>

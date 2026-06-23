@@ -2,6 +2,7 @@ from database.db import get_db_connection
 import sqlite3
 import hashlib
 import re
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def compute_transaction_hash(account_number, date, description, amount, txn_type, balance):
     # Normalize description: lowercase, strip, collapse multiple spaces
@@ -20,82 +21,107 @@ def compute_transaction_hash(account_number, date, description, amount, txn_type
     hash_str = f"{account_number or 'Unknown'}||{date}||{norm_desc}||{norm_amount}||{txn_type}||{norm_balance}"
     return hashlib.md5(hash_str.encode('utf-8')).hexdigest()
 
-def add_statement(file_name, file_type, account_holder, account_number, bank_name, 
-                  statement_month, start_date, end_date, transaction_count, 
-                  opening_balance, closing_balance, file_hash=None):
+def add_statement(file_name, file_type, account_holder, account_number, bank_name,
+                  statement_month, start_date, end_date, transaction_count,
+                  opening_balance, closing_balance, file_hash=None, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO statements (
             file_name, file_type, account_holder, account_number, bank_name,
             statement_month, start_date, end_date, transaction_count,
-            opening_balance, closing_balance, file_hash
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            opening_balance, closing_balance, file_hash, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (file_name, file_type, account_holder, account_number, bank_name,
           statement_month, start_date, end_date, transaction_count,
-          opening_balance, closing_balance, file_hash))
+          opening_balance, closing_balance, file_hash, user_id))
     statement_id = cursor.lastrowid
     conn.commit()
     conn.close()
     return statement_id
 
-def get_statement(statement_id):
+def get_statement(statement_id, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM statements WHERE statement_id = ?', (statement_id,))
+    if user_id:
+        cursor.execute('SELECT * FROM statements WHERE statement_id = ? AND user_id = ?', (statement_id, user_id))
+    else:
+        cursor.execute('SELECT * FROM statements WHERE statement_id = ?', (statement_id,))
     row = cursor.fetchone()
     conn.close()
     return dict(row) if row else None
 
-def get_all_statements():
+def get_all_statements(user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM statements ORDER BY start_date DESC')
+    if user_id:
+        cursor.execute('SELECT * FROM statements WHERE user_id = ? ORDER BY start_date DESC', (user_id,))
+    else:
+        cursor.execute('SELECT * FROM statements ORDER BY start_date DESC')
     rows = cursor.fetchall()
     conn.close()
     return [dict(row) for row in rows]
 
-def delete_statement(statement_id):
+def delete_statement(statement_id, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     # Deleting statement will cascade delete transactions because of ON DELETE CASCADE
-    cursor.execute('DELETE FROM statements WHERE statement_id = ?', (statement_id,))
+    if user_id:
+        cursor.execute('DELETE FROM statements WHERE statement_id = ? AND user_id = ?', (statement_id, user_id))
+    else:
+        cursor.execute('DELETE FROM statements WHERE statement_id = ?', (statement_id,))
     conn.commit()
     conn.close()
 
-def check_duplicate_statement(account_number, start_date, end_date, transaction_count, file_hash=None):
+def check_duplicate_statement(account_number, start_date, end_date, transaction_count, file_hash=None, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     if file_hash:
-        cursor.execute('SELECT statement_id FROM statements WHERE file_hash = ?', (file_hash,))
+        if user_id:
+            cursor.execute('SELECT statement_id FROM statements WHERE file_hash = ? AND user_id = ?', (file_hash, user_id))
+        else:
+            cursor.execute('SELECT statement_id FROM statements WHERE file_hash = ?', (file_hash,))
         row = cursor.fetchone()
         if row:
             conn.close()
             return row['statement_id']
             
-    cursor.execute('''
-        SELECT statement_id FROM statements 
-        WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ?
-    ''', (account_number, start_date, end_date, transaction_count))
+    if user_id:
+        cursor.execute('''
+            SELECT statement_id FROM statements 
+            WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ? AND user_id = ?
+        ''', (account_number, start_date, end_date, transaction_count, user_id))
+    else:
+        cursor.execute('''
+            SELECT statement_id FROM statements 
+            WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ?
+        ''', (account_number, start_date, end_date, transaction_count))
+        
     row = cursor.fetchone()
     conn.close()
     return row['statement_id'] if row else None
 
-def delete_statement_by_details(account_number, start_date, end_date, transaction_count):
+def delete_statement_by_details(account_number, start_date, end_date, transaction_count, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
-        DELETE FROM statements 
-        WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ?
-    ''', (account_number, start_date, end_date, transaction_count))
+    if user_id:
+        cursor.execute('''
+            DELETE FROM statements 
+            WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ? AND user_id = ?
+        ''', (account_number, start_date, end_date, transaction_count, user_id))
+    else:
+        cursor.execute('''
+            DELETE FROM statements 
+            WHERE account_number = ? AND start_date = ? AND end_date = ? AND transaction_count = ?
+        ''', (account_number, start_date, end_date, transaction_count))
     conn.commit()
     conn.close()
 
 def add_transactions_bulk(transactions_data):
     """
     transactions_data: list of dicts with keys:
-    statement_id, transaction_date, description, amount, transaction_type, balance,
-    category_id, payee_name, merchant_name, payment_method, is_subscription, transaction_hash
+    statement_id, transaction_date, description, amount, transaction_type,
+    balance, category_id, payee_name, merchant_name, payment_method, is_subscription, transaction_hash, user_id
     """
     if not transactions_data:
         return
@@ -105,11 +131,11 @@ def add_transactions_bulk(transactions_data):
         INSERT OR IGNORE INTO transactions (
             statement_id, transaction_date, description, amount, transaction_type,
             balance, category_id, payee_name, merchant_name, payment_method, is_subscription,
-            transaction_hash
+            transaction_hash, user_id
         ) VALUES (
             :statement_id, :transaction_date, :description, :amount, :transaction_type,
             :balance, :category_id, :payee_name, :merchant_name, :payment_method, :is_subscription,
-            :transaction_hash
+            :transaction_hash, :user_id
         )
     ''', transactions_data)
     conn.commit()
@@ -130,7 +156,7 @@ def auto_classify_p2p_payees():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Fetch category ID for 'Peer-to-Peer'
+    # 1. Fetch category ID for 'Peer-to-P2P'
     cursor.execute('SELECT category_id FROM categories WHERE category_name = "Peer-to-Peer"')
     p2p_row = cursor.fetchone()
     if not p2p_row:
@@ -198,10 +224,12 @@ def auto_classify_p2p_payees():
     if rules_added > 0:
         conn.commit()
     conn.close()
+    
+    return
 
 def get_transactions(search_query=None, category_id=None, type_filter=None, 
                      start_date=None, end_date=None, sort_by='transaction_date', 
-                     sort_order='DESC', offset=0, limit=50):
+                     sort_order='DESC', offset=0, limit=50, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -214,6 +242,10 @@ def get_transactions(search_query=None, category_id=None, type_filter=None,
     '''
     params = []
     
+    if user_id:
+        query += " AND t.user_id = ?"
+        params.append(user_id)
+        
     if search_query:
         query += " AND (t.description LIKE ? OR t.payee_name LIKE ? OR t.merchant_name LIKE ?)"
         lk = f"%{search_query}%"
@@ -257,7 +289,7 @@ def get_transactions(search_query=None, category_id=None, type_filter=None,
     return [dict(row) for row in rows]
 
 def get_transactions_count(search_query=None, category_id=None, type_filter=None, 
-                           start_date=None, end_date=None):
+                           start_date=None, end_date=None, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -269,6 +301,10 @@ def get_transactions_count(search_query=None, category_id=None, type_filter=None
     '''
     params = []
     
+    if user_id:
+        query += " AND t.user_id = ?"
+        params.append(user_id)
+        
     if search_query:
         query += " AND (t.description LIKE ? OR t.payee_name LIKE ? OR t.merchant_name LIKE ?)"
         lk = f"%{search_query}%"
@@ -295,14 +331,21 @@ def get_transactions_count(search_query=None, category_id=None, type_filter=None
     conn.close()
     return row['count'] if row else 0
 
-def update_transaction_category(transaction_id, category_id):
+def update_transaction_category(transaction_id, category_id, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('''
-        UPDATE transactions 
-        SET category_id = ? 
-        WHERE transaction_id = ?
-    ''', (category_id, transaction_id))
+    if user_id:
+        cursor.execute('''
+            UPDATE transactions 
+            SET category_id = ? 
+            WHERE transaction_id = ? AND user_id = ?
+        ''', (category_id, transaction_id, user_id))
+    else:
+        cursor.execute('''
+            UPDATE transactions 
+            SET category_id = ? 
+            WHERE transaction_id = ?
+        ''', (category_id, transaction_id))
     conn.commit()
     conn.close()
 
@@ -375,7 +418,7 @@ def get_category_id_by_name(category_name):
     conn.close()
     return row['category_id'] if row else None
 
-def get_all_transactions_for_analytics(start_date=None, end_date=None):
+def get_all_transactions_for_analytics(start_date=None, end_date=None, user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     query = '''
@@ -386,6 +429,9 @@ def get_all_transactions_for_analytics(start_date=None, end_date=None):
         WHERE 1=1
     '''
     params = []
+    if user_id is not None:
+        query += " AND t.user_id = ?"
+        params.append(user_id)
     if start_date:
         query += " AND t.transaction_date >= ?"
         params.append(start_date)
@@ -398,3 +444,68 @@ def get_all_transactions_for_analytics(start_date=None, end_date=None):
     rows = cursor.fetchall()
     conn.close()
     return [dict(row) for row in rows]
+
+def get_user_by_email(email):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_user_by_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def create_user(email, password, role='user'):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    password_hash = generate_password_hash(password)
+    try:
+        cursor.execute('''
+            INSERT INTO users (email, password_hash, role)
+            VALUES (?, ?, ?)
+        ''', (email, password_hash, role))
+        user_id = cursor.lastrowid
+        conn.commit()
+    except sqlite3.IntegrityError:
+        user_id = None
+    finally:
+        conn.close()
+    return user_id
+
+def verify_user_credentials(email, password):
+    user = get_user_by_email(email)
+    if user and check_password_hash(user['password_hash'], password):
+        return user
+    return None
+
+def record_failed_login(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE users 
+        SET failed_attempts = failed_attempts + 1,
+            locked_until = CASE WHEN failed_attempts + 1 >= 5 THEN datetime('now', '+15 minutes') ELSE locked_until END
+        WHERE user_id = ?
+    ''', (user_id,))
+    conn.commit()
+    conn.close()
+
+def reset_failed_attempts(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE user_id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def set_user_role(user_id, role):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET role = ? WHERE user_id = ?', (role, user_id))
+    conn.commit()
+    conn.close()

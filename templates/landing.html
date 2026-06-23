@@ -1,522 +1,835 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Statement Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
 
-{% block content %}
-<div class="container py-4" id="upload-panel">
-    <!-- Top Header Navigation -->
-    <header class="landing-navbar">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-bar-chart-fill brand-icon"></i>
-            <div class="brand-text">
-                <span class="brand-title">Bank Statement</span>
-                <span class="brand-subtitle">Analyzer</span>
-            </div>
-        </div>
-        <ul class="landing-nav-links d-none d-lg-flex">
-            <li><a href="#features" class="landing-nav-link">Features</a></li>
-            <li><a href="#how-it-works" class="landing-nav-link">How It Works</a></li>
-            <li><a href="#security" class="landing-nav-link">Security</a></li>
-            <li><a href="#faq" class="landing-nav-link">FAQ</a></li>
-            <li><a href="#pricing" class="landing-nav-link">Pricing</a></li>
-        </ul>
-        <button type="button" class="btn btn-primary px-4 py-2 rounded-pill" id="navUploadBtn">
-            <i class="bi bi-cloud-arrow-up me-2"></i> Upload Statement
-        </button>
-    </header>
+        html {
+            scroll-behavior: smooth;
+        }
 
-    <!-- Hero Section -->
-    <div class="row align-items-center landing-hero mb-5">
-        <div class="col-lg-6 mb-5 mb-lg-0">
-            <span class="badge-ai">
-                <i class="bi bi-stars"></i> AI-Powered Financial Insights
-            </span>
-            <h1 class="display-4 fw-extrabold mb-3 lh-sm" style="font-family: var(--font-heading); font-size: 3.25rem;">
-                Understand Your <br><span class="text-primary">Finances Better</span>
-            </h1>
-            <p class="lead text-secondary mb-4" style="font-size: 1.15rem;">
-                Upload your bank statements and get intelligent insights about your income, expenses, savings and more.
-            </p>
-            <div class="hero-pill-badges">
-                <span class="hero-pill-badge"><i class="bi bi-shield-check text-success"></i> 100% Secure</span>
-                <span class="hero-pill-badge"><i class="bi bi-cpu-fill text-primary"></i> AI-Powered</span>
-                <span class="hero-pill-badge"><i class="bi bi-eye-slash-fill text-primary"></i> Private & Confidential</span>
-            </div>
-            
-            <!-- Upload Box Card -->
-            <div class="card p-3 border-dashed rounded-4 bg-surface" style="border: 2px dashed var(--primary-light-border); box-shadow: var(--shadow-sm);">
-                <div class="upload-dropzone" id="dropzone" style="border: none; padding: 20px;">
-                    <i class="bi bi-cloud-arrow-up upload-icon mb-2" style="font-size: 40px;"></i>
-                    <h5 class="fw-bold m-0" style="font-size: 1.1rem;">Upload Bank Statement</h5>
-                    <p class="text-secondary small mb-2">Drag and drop your bank statement here, or</p>
-                    <input type="file" id="fileInput" multiple accept=".pdf,.xls,.xlsx,.csv,.json" style="display: none;">
-                    <button type="button" class="btn btn-primary px-4 py-2 mb-2" id="browseBtn">
-                        Choose File
-                    </button>
-                    <p class="text-muted small m-0" style="font-size: 0.75rem;">Supports PDF, Excel, CSV & JSON formats • Max file size 16MB</p>
-                </div>
-            </div>
+        body {
+            font-family: var(--font-main);
+            background-color: var(--background);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
 
-            <!-- Load Demo Button Wrapper -->
-            <div class="d-flex align-items-center mt-3 gap-2 px-2">
-                <span class="small text-secondary">No statement? Test features with</span>
-                <button type="button" class="btn btn-link btn-sm p-0 fw-semibold text-primary" id="loadDemoBtn" style="text-decoration: none;">
-                    <i class="bi bi-magic me-1"></i> Demo Statement Data
-                </button>
-            </div>
-        </div>
+        /* Navbar */
+        .navbar-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 4rem;
+            background-color: var(--background); /* Same as body */
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .brand-icon {
+            font-size: 1.75rem;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .brand-text-col {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-title-main {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text-dark);
+        }
+
+        .brand-subtitle-main {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-menu a:hover { color: var(--primary); }
+
+        .btn-upload {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-upload:hover { background-color: var(--primary-hover); color: white; }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            gap: 4rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        .left-pane { flex: 1.3; }
+        .right-pane { flex: 0.9; display: flex; justify-content: center; align-items: flex-start; }
+
+        /* Left Pane Content */
+        .welcome-title {
+            font-family: var(--font-heading);
+            font-size: 3.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        /* Complex Mockup */
+        .mockup-wrapper {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            display: flex;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            user-select: none;
+        }
+
+        /* Mockup Sidebar */
+        .mockup-sidebar {
+            width: 140px;
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            background: #fdfdfd;
+        }
+        .mockup-brand { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.5rem; margin-bottom: 2rem; }
+        .mockup-brand i { color: var(--primary); font-size: 1.2rem; }
+        .mockup-brand div { line-height: 1.1; }
+        .mockup-brand strong { font-size: 0.75rem; display: block; color: var(--text-dark); }
+        .mockup-brand span { font-size: 0.55rem; color: var(--text-muted); }
+
+        .mockup-nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+        .mockup-nav-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        .mockup-nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            position: relative;
+        }
+        .mockup-nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 10%; height: 80%; width: 3px;
+            background: var(--primary); border-radius: 0 4px 4px 0;
+        }
         
-        <!-- Dashboard Mockup Viewport -->
-        <div class="col-lg-6">
-            <div class="dashboard-mockup-wrapper">
-                <!-- Mock Sidebar -->
-                <div class="mock-sidebar">
-                    <div class="mock-sidebar-logo">
+        .mockup-theme {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 0.75rem; font-size: 0.7rem; color: var(--text-muted); font-weight: 500;
+            margin-top: 2rem;
+        }
+
+        /* Mockup Content */
+        .mockup-content {
+            flex: 1;
+            padding: 1.5rem;
+            background: var(--surface);
+        }
+        .mockup-header-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .mockup-greeting { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+        .mockup-date { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .mockup-picker {
+            border: 1px solid var(--border-color); padding: 0.35rem 0.75rem; border-radius: 6px;
+            font-size: 0.75rem; color: var(--text-dark); font-weight: 500; display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .mockup-kpis { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .m-kpi { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; flex: 1; }
+        .m-kpi-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .m-kpi-val { font-size: 1.25rem; font-weight: 700; font-family: var(--font-heading); color: var(--text-dark); }
+        .m-kpi-trend { font-size: 0.7rem; font-weight: 600; margin-top: 0.25rem; }
+        .c-green { color: #10b981; } .c-red { color: #ef4444; }
+
+        .mockup-charts-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .m-chart-card { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; flex: 1; }
+        .m-chart-title { font-size: 0.8rem; font-weight: 600; color: var(--text-dark); margin-bottom: 1rem; }
+        
+        .m-bars { display: flex; align-items: flex-end; justify-content: space-around; height: 80px; }
+        .m-bar-group { display: flex; gap: 3px; align-items: flex-end; height: 100%; }
+        .m-bar { width: 10px; border-radius: 2px 2px 0 0; }
+        .m-bg-green { background: #10b981; } .m-bg-red { background: #ef4444; }
+        
+        .m-donut-container { display: flex; justify-content: center; align-items: center; height: 100px; }
+        .m-donut {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: conic-gradient(#3b82f6 0% 30%, #10b981 30% 55%, #f59e0b 55% 75%, #ef4444 75% 100%);
+            position: relative;
+        }
+        .m-donut::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: white; border-radius: 50%;
+        }
+
+        .m-tx-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .m-tx-table th { text-align: left; padding: 0.5rem 0; font-weight: 500; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .m-tx-table td { padding: 0.6rem 0; border-bottom: 1px solid var(--border-color); }
+        .m-tx-table tr:last-child td { border-bottom: none; }
+
+        /* Enhanced Privacy Section */
+        .privacy-section-wrapper {
+            margin-top: 1rem;
+            padding: 2.25rem;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        .privacy-section-wrapper::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--primary), #38bdf8);
+        }
+
+        .privacy-header { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1rem; }
+        .shield-icon {
+            width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary-light), #e0e7ff); color: var(--primary);
+            border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+        }
+        .privacy-title { font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; margin: 0; color: var(--text-dark); letter-spacing: -0.01em; }
+        .privacy-desc { font-size: 1rem; color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6; max-width: 90%; }
+        
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 14px;
+            display: flex; gap: 1rem; align-items: flex-start;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+        .feature-icon-wrapper {
+            background: var(--primary-light); color: var(--primary); width: 44px; height: 44px;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover .feature-icon-wrapper {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+        .feature-text h4 { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--text-dark); }
+        .feature-text p { font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+        /* Login Card */
+        .login-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+        }
+
+        .login-icon-top {
+            width: 60px; height: 60px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem auto;
+        }
+
+        .login-title {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding-right: 0;
+        }
+
+        .form-control {
+            border: none;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            background: transparent;
+            color: var(--text-dark);
+        }
+        .form-control:focus { box-shadow: none; }
+        .form-control::placeholder { color: #cbd5e1; }
+
+        .password-toggle { cursor: pointer; border: none; background: transparent; padding-right: 1rem; color: #94a3b8; }
+
+        .options-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; margin-top: 1rem;
+        }
+        .form-check-label { font-size: 0.85rem; color: var(--text-muted); cursor: pointer; }
+        .forgot-link { color: var(--primary); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .btn-login {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: 0.85rem;
+            border-radius: 8px;
+            width: 100%;
+            border: none;
+            display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-login:hover { background-color: var(--primary-hover); }
+
+        .divider {
+            display: flex; align-items: center; text-align: center;
+            margin: 1.5rem 0; color: #94a3b8; font-size: 0.85rem;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+        .divider:not(:empty)::before { margin-right: 1em; }
+        .divider:not(:empty)::after { margin-left: 1em; }
+
+        .btn-google {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 8px;
+            width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 0.75rem;
+            transition: background 0.2s; text-decoration: none; font-size: 0.95rem;
+        }
+        .btn-google:hover { background: #f8fafc; }
+        
+        .create-account { text-align: center; margin-top: 2rem; font-size: 0.95rem; color: var(--text-muted); }
+        .create-account a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .create-account a:hover { text-decoration: underline; }
+        
+        .flashes { margin-bottom: 1.5rem; }
+
+        /* Extended Features Section */
+        .bottom-features-section {
+            background: #ffffff;
+            padding: 6rem 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .features-grid-extended {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .f-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .f-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            border-color: #cbd5e1;
+        }
+        .f-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: transparent; transition: background 0.3s;
+        }
+        .f-card:hover::before { background: var(--primary); }
+        
+        .f-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .f-card:hover .f-icon { transform: scale(1.05); }
+        .f-icon.blue { background: #eff6ff; color: #2563eb; }
+        .f-icon.green { background: #ecfdf5; color: #10b981; }
+        .f-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .f-icon.orange { background: #fffbeb; color: #f59e0b; }
+        .f-icon.rose { background: #fff1f2; color: #e11d48; }
+        .f-icon.indigo { background: #eef2ff; color: #4f46e5; }
+        
+        .f-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+        .f-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; padding: 2rem; gap: 3rem; }
+            .right-pane { width: 100%; }
+            .login-card { max-width: 500px; margin: 0 auto; }
+            .navbar-custom { padding: 1rem 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar-custom">
+        <a href="{{ url_for('landing_page') }}" class="brand-wrapper">
+            <i class="bi bi-bar-chart-fill brand-icon"></i>
+            <div class="brand-text-col">
+                <span class="brand-title-main">Bank Statement</span>
+                <span class="brand-subtitle-main">Analyzer</span>
+            </div>
+        </a>
+        
+        <ul class="nav-menu d-none d-lg-flex">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#features">Security</a></li>
+            <li><a href="#faq" onclick="alert('FAQs coming soon!'); return false;">FAQ</a></li>
+            <li><a href="#pricing" onclick="alert('Pricing is completely free for early access!'); return false;">Pricing</a></li>
+        </ul>
+        
+        <a href="{{ url_for('auth.login_page') }}" class="btn-upload">
+            <i class="bi bi-cloud-arrow-up"></i> Upload Statement
+        </a>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        
+        <!-- Left Pane -->
+        <div class="left-pane">
+            <h1 class="welcome-title">Understand your <span style="color: var(--primary);">Finances</span> better</h1>
+            <p class="welcome-subtitle">Access your financial dashboard, reports, analytics and forecasts.</p>
+
+            <!-- Mockup Widget -->
+            <div class="mockup-wrapper">
+                <!-- Sidebar -->
+                <div class="mockup-sidebar">
+                    <div class="mockup-brand">
                         <i class="bi bi-bar-chart-fill"></i>
-                        <span>Bank Statement<br><span style="color:var(--text-muted)">Analyzer</span></span>
+                        <div>
+                            <strong>Bank Statement</strong>
+                            <span>Analyzer</span>
+                        </div>
                     </div>
-                    <div class="mock-nav-item active">
-                        <i class="bi bi-grid-1x2-fill"></i>
-                        <span>Dashboard</span>
+                    <div class="mockup-nav">
+                        <div class="mockup-nav-item active"><i class="bi bi-grid-1x2"></i> Dashboard</div>
+                        <div class="mockup-nav-item"><i class="bi bi-arrow-left-right"></i> Transactions</div>
+                        <div class="mockup-nav-item"><i class="bi bi-pie-chart"></i> Analytics</div>
+                        <div class="mockup-nav-item"><i class="bi bi-graph-up"></i> Forecasts</div>
+                        <div class="mockup-nav-item"><i class="bi bi-file-text"></i> Reports</div>
                     </div>
-                    <div class="mock-nav-item">
-                        <i class="bi bi-arrow-left-right"></i>
-                        <span>Transactions</span>
-                    </div>
-                    <div class="mock-nav-item">
-                        <i class="bi bi-pie-chart-fill"></i>
-                        <span>Analytics</span>
-                    </div>
-                    <div class="mock-nav-item">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <span>Forecasts</span>
-                    </div>
-                    <div class="mock-nav-item">
-                        <i class="bi bi-file-earmark-text-fill"></i>
-                        <span>Reports</span>
+                    <div class="mockup-theme">
+                        <span><i class="bi bi-moon-fill me-1"></i> Dark Mode</span>
+                        <div style="width: 24px; height: 12px; background: #e2e8f0; border-radius: 6px; position: relative;">
+                            <div style="width: 10px; height: 10px; background: white; border-radius: 50%; position: absolute; left: 1px; top: 1px; box-shadow: 0 1px 2px rgba(0,0,0,0.2);"></div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Mock Main Viewport -->
-                <div class="mock-main">
-                    <div class="mock-header">
+
+                <!-- Content -->
+                <div class="mockup-content">
+                    <div class="mockup-header-row">
                         <div>
-                            <div class="mock-title">Welcome, Manas 👋</div>
-                            <div class="mock-subtitle">Here's your financial overview for May 2025</div>
+                            <div class="mockup-greeting">Welcome 👋</div>
+                            <div class="mockup-date">Financial overview for May 2025</div>
                         </div>
-                        <div class="mock-date">
-                            01 May 2025 - 31 May 2025 <i class="bi bi-chevron-down ms-1" style="font-size:8px"></i>
-                        </div>
-                    </div>
-                    
-                    <!-- KPI Row -->
-                    <div class="mock-kpis">
-                        <div class="mock-kpi-card" style="border-left: 2px solid var(--primary)">
-                            <div class="mock-kpi-title">Current Balance</div>
-                            <div class="mock-kpi-val">₹ 45,680.50</div>
-                            <div class="mock-kpi-sub" style="color:var(--text-muted); font-size:6px">as on 31 May 2025</div>
-                        </div>
-                        <div class="mock-kpi-card" style="border-left: 2px solid var(--success)">
-                            <div class="mock-kpi-title">Total Income</div>
-                            <div class="mock-kpi-val">₹ 1,24,560.00</div>
-                            <div class="mock-kpi-sub"><i class="bi bi-arrow-up-short"></i> 18.6% vs Apr</div>
-                        </div>
-                        <div class="mock-kpi-card" style="border-left: 2px solid var(--danger)">
-                            <div class="mock-kpi-title">Total Expenses</div>
-                            <div class="mock-kpi-val">₹ 78,879.50</div>
-                            <div class="mock-kpi-sub" style="color:var(--danger)"><i class="bi bi-arrow-up-short"></i> 12.3% vs Apr</div>
-                        </div>
-                        <div class="mock-kpi-card" style="border-left: 2px solid #7c3aed">
-                            <div class="mock-kpi-title">Savings Rate</div>
-                            <div class="mock-kpi-val">28.6%</div>
-                            <div class="mock-kpi-sub"><i class="bi bi-arrow-up-short"></i> 6.2% vs Apr</div>
+                        <div class="mockup-picker">
+                            <i class="bi bi-calendar3"></i> 01 May 2025 - 31 May 2025 <i class="bi bi-chevron-down ms-1"></i>
                         </div>
                     </div>
-                    
-                    <!-- Charts Row -->
-                    <div class="mock-charts">
-                        <div class="mock-chart-card">
-                            <div class="mock-chart-title">Income vs Expenses</div>
-                            <div class="mock-bars">
-                                <div class="mock-bar-pair">
-                                    <div class="mock-bar-in" style="height: 35px"></div>
-                                    <div class="mock-bar-out" style="height: 25px"></div>
-                                </div>
-                                <div class="mock-bar-pair">
-                                    <div class="mock-bar-in" style="height: 42px"></div>
-                                    <div class="mock-bar-out" style="height: 28px"></div>
-                                </div>
-                                <div class="mock-bar-pair">
-                                    <div class="mock-bar-in" style="height: 48px"></div>
-                                    <div class="mock-bar-out" style="height: 52px"></div>
-                                </div>
-                                <div class="mock-bar-pair">
-                                    <div class="mock-bar-in" style="height: 50px"></div>
-                                    <div class="mock-bar-out" style="height: 35px"></div>
-                                </div>
-                                <div class="mock-bar-pair">
-                                    <div class="mock-bar-in" style="height: 58px; background-color: var(--primary)"></div>
-                                    <div class="mock-bar-out" style="height: 40px; background-color: var(--danger)"></div>
-                                </div>
+
+                    <div class="mockup-kpis">
+                        <div class="m-kpi">
+                            <div class="m-kpi-label">Current Balance</div>
+                            <div class="m-kpi-val" style="color: #2563eb;">₹ 7,28,317.00</div>
+                            <div class="m-kpi-trend c-green"><i class="bi bi-arrow-up-right"></i> as of today</div>
+                        </div>
+                        <div class="m-kpi">
+                            <div class="m-kpi-label">Total Income</div>
+                            <div class="m-kpi-val c-green">₹ 26,35,402.00</div>
+                            <div class="m-kpi-trend c-green"><i class="bi bi-arrow-up-right"></i> 18.6% vs Apr</div>
+                        </div>
+                        <div class="m-kpi">
+                            <div class="m-kpi-label">Total Expenses</div>
+                            <div class="m-kpi-val c-red">₹ 17,33,345.00</div>
+                            <div class="m-kpi-trend c-red"><i class="bi bi-arrow-down-right"></i> 12.3% vs Apr</div>
+                        </div>
+                        <div class="m-kpi">
+                            <div class="m-kpi-label">Savings Rate</div>
+                            <div class="m-kpi-val">34.2%</div>
+                            <div class="m-kpi-trend c-green"><i class="bi bi-arrow-up-right"></i> 6.2% vs Apr</div>
+                        </div>
+                    </div>
+
+                    <div class="mockup-charts-row">
+                        <div class="m-chart-card" style="flex: 1.2;">
+                            <div class="m-chart-title">Income vs Expenses</div>
+                            <div class="m-bars">
+                                <div class="m-bar-group"><div class="m-bar m-bg-green" style="height: 60%;"></div><div class="m-bar m-bg-red" style="height: 40%;"></div></div>
+                                <div class="m-bar-group"><div class="m-bar m-bg-green" style="height: 85%;"></div><div class="m-bar m-bg-red" style="height: 35%;"></div></div>
+                                <div class="m-bar-group"><div class="m-bar m-bg-green" style="height: 55%;"></div><div class="m-bar m-bg-red" style="height: 70%;"></div></div>
+                                <div class="m-bar-group"><div class="m-bar m-bg-green" style="height: 90%;"></div><div class="m-bar m-bg-red" style="height: 45%;"></div></div>
+                                <div class="m-bar-group"><div class="m-bar m-bg-green" style="height: 75%;"></div><div class="m-bar m-bg-red" style="height: 50%;"></div></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2" style="font-size: 0.65rem; color: var(--text-muted); padding: 0 2px;">
+                                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span>
                             </div>
                         </div>
-                        <div class="mock-chart-card">
-                            <div class="mock-chart-title">Expenses by Category</div>
-                            <div class="mock-donut-wrapper">
-                                <div class="mock-donut">
-                                    <div class="mock-donut-inner"></div>
-                                </div>
+                        <div class="m-chart-card">
+                            <div class="m-chart-title text-center">Expenses by Category</div>
+                            <div class="m-donut-container">
+                                <div class="m-donut"></div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Recent Transactions Table -->
-                    <div class="mock-table-card">
-                        <div class="mock-chart-title mb-2">Recent Transactions</div>
-                        <table class="mock-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Description</th>
-                                    <th>Category</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>31 May 2025</td>
-                                    <td>Salary Credit</td>
-                                    <td><span style="color:var(--success)">Income</span></td>
-                                    <td><span class="mock-amount-credit">+ ₹ 75,000.00</span></td>
-                                </tr>
-                                <tr>
-                                    <td>30 May 2025</td>
-                                    <td>Amazon Pay</td>
-                                    <td><span style="color:var(--primary)">Shopping</span></td>
-                                    <td><span class="mock-amount-debit">- ₹ 2,450.00</span></td>
-                                </tr>
-                                <tr>
-                                    <td>30 May 2025</td>
-                                    <td>Swiggy</td>
-                                    <td><span style="color:var(--warning)">Food & Dining</span></td>
-                                    <td><span class="mock-amount-debit">- ₹ 518.00</span></td>
-                                </tr>
-                            </tbody>
+
+                    <div>
+                        <div class="m-chart-title" style="margin-bottom: 0.5rem;">Recent Transactions</div>
+                        <table class="m-tx-table">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th style="text-align: right;">Amount</th>
+                            </tr>
+                            <tr>
+                                <td>31 May 2025</td>
+                                <td style="font-weight: 600; color: var(--text-dark);">Salary Credit</td>
+                                <td class="c-green">Income</td>
+                                <td style="text-align: right; font-weight: 600;" class="c-green">+ ₹ 75,000.00</td>
+                            </tr>
+                            <tr>
+                                <td>30 May 2025</td>
+                                <td style="font-weight: 600; color: var(--text-dark);">Amazon Pay</td>
+                                <td style="color: #f59e0b;">Shopping</td>
+                                <td style="text-align: right; font-weight: 600; color: var(--text-dark);">- ₹ 2,450.00</td>
+                            </tr>
+                            <tr>
+                                <td>30 May 2025</td>
+                                <td style="font-weight: 600; color: var(--text-dark);">Swiggy</td>
+                                <td style="color: #ef4444;">Food & Dining</td>
+                                <td style="text-align: right; font-weight: 600; color: var(--text-dark);">- ₹ 518.00</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Features Section -->
-    <div class="text-center mt-5 pt-3" id="features">
-        <h3 class="fw-bold mb-1" style="font-family: var(--font-heading);">Why Choose Bank Statement Analyzer?</h3>
-        <p class="text-secondary small mb-4">Complete client-side local financial intelligence with zero privacy trade-offs</p>
-        <div class="landing-feature-grid">
-            <div class="landing-feature-card">
-                <i class="bi bi-file-text text-primary fs-2 mb-2 d-inline-block"></i>
-                <h6 class="fw-bold">AI-Powered Insights</h6>
-                <p class="small text-secondary mb-0">Get intelligent analysis and insights powered by advanced logic and rule engines.</p>
             </div>
-            <div class="landing-feature-card">
-                <i class="bi bi-shield-check text-success fs-2 mb-2 d-inline-block"></i>
-                <h6 class="fw-bold">Bank-Level Security</h6>
-                <p class="small text-secondary mb-0">Your data is encrypted and processed securely. We never store your bank credentials.</p>
-            </div>
-            <div class="landing-feature-card">
-                <i class="bi bi-pie-chart text-primary fs-2 mb-2 d-inline-block"></i>
-                <h6 class="fw-bold">Detailed Analytics</h6>
-                <p class="small text-secondary mb-0">Understand your spending patterns with beautiful charts and detailed reports.</p>
-            </div>
-            <div class="landing-feature-card">
-                <i class="bi bi-graph-up-arrow text-warning fs-2 mb-2 d-inline-block"></i>
-                <h6 class="fw-bold">Save More</h6>
-                <p class="small text-secondary mb-0">Identify opportunities to save money and achieve your financial goals.</p>
-            </div>
-            <div class="landing-feature-card">
-                <i class="bi bi-file-earmark-pdf text-danger fs-2 mb-2 d-inline-block"></i>
-                <h6 class="fw-bold">Export Reports</h6>
-                <p class="small text-secondary mb-0">Generate and export professional reports in PDF format with just one click.</p>
+
+        </div>
+
+        <!-- Right Pane: Login Card -->
+        <div class="right-pane">
+            <div class="login-card">
+                <div class="login-icon-top">
+                    <i class="bi bi-lock-fill"></i>
+                </div>
+                <h2 class="login-title">Login</h2>
+                <p class="login-subtitle">Welcome! Please sign in to continue.</p>
+
+                <!-- Flash Messages -->
+                <div class="flashes">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show py-2 small" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login_page') }}">
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" name="email" required placeholder="Enter your email address">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <label class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" name="password" id="passwordInput" required placeholder="Enter your password">
+                            <button type="button" class="input-group-text password-toggle" onclick="togglePassword()"><i class="bi bi-eye" id="eyeIcon"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="options-row">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Login <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="divider">or continue with</div>
+
+                <a href="#" class="btn-google">
+                    <!-- Google Logo SVG -->
+                    <svg width="20" height="20" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Continue with Google
+                </a>
+
+                <div class="create-account">
+                    Don't have an account? <a href="{{ url_for('auth.register_page') }}">Create Account</a>
+                </div>
             </div>
         </div>
-    </div>
+
+    </main>
 
     <!-- How It Works Section -->
-    <div class="mt-5 pt-5" id="how-it-works">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold mb-1">How It Works</h3>
-            <p class="text-secondary small">Analyze your statements in 4 simple steps</p>
+    <section id="how-it-works" style="background: var(--surface); padding: 5rem 2rem; border-top: 1px solid var(--border-color);">
+        <div class="section-header" style="margin-bottom: 3rem;">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Get started in three simple, private steps.</p>
         </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-3">
-                <div class="card-premium h-100 text-center p-4">
-                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                        <i class="bi bi-upload fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold">1. Upload Statement</h6>
-                    <p class="text-secondary small mb-0">Drag and drop your PDF or Excel statement. Encrypted statements are supported.</p>
-                </div>
+        <div style="display: flex; gap: 2rem; max-width: 1000px; margin: 0 auto; text-align: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+                <div style="width: 60px; height: 60px; background: #eff6ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem auto;">1</div>
+                <h4 style="font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem;">Upload Statement</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Securely select your PDF or Excel bank statement. No bank login required.</p>
             </div>
-            <div class="col-md-3">
-                <div class="card-premium h-100 text-center p-4">
-                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                        <i class="bi bi-shield-lock fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold">2. Local Decryption</h6>
-                    <p class="text-secondary small mb-0">Password-protected files are decrypted in-memory locally. No data leaves your machine.</p>
-                </div>
+            <div style="flex: 1; min-width: 250px;">
+                <div style="width: 60px; height: 60px; background: #eff6ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem auto;">2</div>
+                <h4 style="font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem;">Local Parsing</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Our engine extracts and categorizes your transactions offline.</p>
             </div>
-            <div class="col-md-3">
-                <div class="card-premium h-100 text-center p-4">
-                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                        <i class="bi bi-cpu fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold">3. Auto-Categorization</h6>
-                    <p class="text-secondary small mb-0">Transactions are auto-tagged by category. Create custom rules to classify future items.</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card-premium h-100 text-center p-4">
-                    <div class="rounded-circle bg-primary-light text-primary mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                        <i class="bi bi-magic fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold">4. Analytics & Forecast</h6>
-                    <p class="text-secondary small mb-0">Explore spending trends, subscription protection, future cash flows, and generate PDFs.</p>
-                </div>
+            <div style="flex: 1; min-width: 250px;">
+                <div style="width: 60px; height: 60px; background: #eff6ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem auto;">3</div>
+                <h4 style="font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem;">Get Insights</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Instantly view beautiful analytics, categorized expenses, and AI forecasts.</p>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Security Section -->
-    <div class="mt-5 pt-5" id="security">
-        <div class="card-premium p-5" style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--primary-light) 100%); border: 1px solid var(--primary-light-border);">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <span class="badge bg-success text-white mb-3 px-3 py-2 rounded-pill"><i class="bi bi-shield-fill-check me-1"></i> Bank-Grade Privacy</span>
-                    <h3 class="fw-bold mb-3" style="font-family: var(--font-heading);">Your Financial Privacy is Non-Negotiable</h3>
-                    <p class="text-secondary mb-4">Unlike other personal finance apps that upload your sensitive bank statements to cloud databases and share your data with advertisers, <strong>Bank Statement Analyzer works 100% locally.</strong></p>
-                    <div class="row g-3">
-                        <div class="col-sm-6 d-flex align-items-start gap-2">
-                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold mb-0">Local SQLite DB</h6>
-                                <p class="text-secondary small mb-0">Data is kept in a local SQLite file on your device.</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 d-flex align-items-start gap-2">
-                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold mb-0">Zero API Uploads</h6>
-                                <p class="text-secondary small mb-0">All parsing and ML-like rule matching is executed offline.</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 d-flex align-items-start gap-2">
-                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold mb-0">Immediate File Purge</h6>
-                                <p class="text-secondary small mb-0">Uploaded statement PDFs/Excel sheets are deleted after parsing.</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 d-flex align-items-start gap-2">
-                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold mb-0">No Third-Party Access</h6>
-                                <p class="text-secondary small mb-0">Your bank transactions are never visible to anyone else.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 text-center d-none d-lg-block">
-                    <i class="bi bi-shield-lock-fill text-primary" style="font-size: 140px; filter: drop-shadow(0 10px 15px rgba(37, 99, 235, 0.2));"></i>
-                </div>
-            </div>
+    <!-- Features Section -->
+    <section id="features" class="bottom-features-section">
+        <div class="section-header">
+            <h2 class="section-title">Everything you need to master your finances</h2>
+            <p class="section-subtitle">
+                A powerful suite of tools designed to help you analyze, track, and forecast your financial health with absolute privacy.
+            </p>
         </div>
-    </div>
 
-    <!-- FAQ Section -->
-    <div class="mt-5 pt-5" id="faq">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold mb-1">Frequently Asked Questions</h3>
-            <p class="text-secondary small">Everything you need to know about Bank Statement Analyzer</p>
+        <div class="features-grid-extended">
+            <!-- Feature 1 -->
+            <div class="f-card">
+                <div class="f-icon blue"><i class="bi bi-shield-lock-fill"></i></div>
+                <h3>100% Local Processing</h3>
+                <p>We never store or share your bank statements. All data is processed completely offline directly on your device.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="f-card">
+                <div class="f-icon green"><i class="bi bi-tags-fill"></i></div>
+                <h3>Smart Categorization</h3>
+                <p>Our intelligent engine automatically groups your transactions into categories like Food, Utilities, and Shopping.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="f-card">
+                <div class="f-icon purple"><i class="bi bi-pie-chart-fill"></i></div>
+                <h3>Visual Analytics</h3>
+                <p>Gain insights instantly with beautiful, interactive charts that track your income and expenses over time.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="f-card">
+                <div class="f-icon orange"><i class="bi bi-graph-up-arrow"></i></div>
+                <h3>AI-Powered Forecasts</h3>
+                <p>Predict your future balances and spending trends based on your historical transaction data.</p>
+            </div>
+            <!-- Feature 5 -->
+            <div class="f-card">
+                <div class="f-icon rose"><i class="bi bi-person-x-fill"></i></div>
+                <h3>No Bank Login Needed</h3>
+                <p>We will never ask for your bank credentials. Simply upload your standard PDF or Excel statements directly.</p>
+            </div>
+            <!-- Feature 6 -->
+            <div class="f-card">
+                <div class="f-icon indigo"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
+                <h3>Universal Export</h3>
+                <p>Export your consolidated, cleanly categorized data to Excel or CSV format at any time for your personal records.</p>
+            </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="accordion accordion-flush" id="faqAccordion">
-                    <div class="accordion-item bg-transparent border-bottom py-3">
-                        <h2 class="accordion-header" id="faq-h1">
-                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c1" aria-expanded="false" aria-controls="faq-c1">
-                                Is my data uploaded to external servers?
-                            </button>
-                        </h2>
-                        <div id="faq-c1" class="accordion-collapse collapse" aria-labelledby="faq-h1" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body px-0 py-3 text-secondary small">
-                                No. The entire application runs locally on your computer. Your statements are parsed, analyzed, and stored in a local SQLite database file on your hard drive. No transaction data leaves your machine.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item bg-transparent border-bottom py-3">
-                        <h2 class="accordion-header" id="faq-h2">
-                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c2" aria-expanded="false" aria-controls="faq-c2">
-                                How does PDF statement decryption work?
-                            </button>
-                        </h2>
-                        <div id="faq-c2" class="accordion-collapse collapse" aria-labelledby="faq-h2" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body px-0 py-3 text-secondary small">
-                                If your bank statement PDF is password-protected, the app will prompt you for the password. Decryption is performed in-memory on your computer. The password is never stored, logged, or shared.
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item bg-transparent border-bottom py-3">
-                        <h2 class="accordion-header" id="faq-h3">
-                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c3" aria-expanded="false" aria-controls="faq-c3">
-                                Can I delete a statement after importing it?
-                            </button>
-                        </h2>
-                        <div id="faq-c3" class="accordion-collapse collapse" aria-labelledby="faq-h3" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body px-0 py-3 text-secondary small">
-                                Yes. You can click the Trash icon next to any loaded statement in the sidebar. This immediately deletes the statement and all its transactions from your local database, updating the entire dashboard and charts.
-                            </div>
-                        </div>
-                    </div>
+    </section>
 
-                    <div class="accordion-item bg-transparent border-bottom py-3">
-                        <h2 class="accordion-header" id="faq-h4">
-                            <button class="accordion-button collapsed bg-transparent fw-bold text-primary p-0 border-0 fs-6 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#faq-c4" aria-expanded="false" aria-controls="faq-c4">
-                                Which statement formats are supported?
-                            </button>
-                        </h2>
-                        <div id="faq-c4" class="accordion-collapse collapse" aria-labelledby="faq-h4" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body px-0 py-3 text-secondary small">
-                                We support standard bank statement PDF formats, Excel exports, CSV files, and JSON formats (e.g., HDFC, ICICI, SBI, Axis, etc.). The parser automatically identifies transaction columns, deposits, withdrawals, dates, and balances.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pricing Section -->
-    <div class="mt-5 pt-5 mb-5" id="pricing">
-        <div class="text-center mb-5">
-            <h3 class="fw-bold mb-1">Simple, Transparent Pricing</h3>
-            <p class="text-secondary small">Free, private, and unlimited local processing</p>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card-premium text-center p-5 border-primary" style="border: 2px solid var(--primary);">
-                    <span class="badge bg-primary text-white mb-2 px-3 py-1 text-uppercase rounded-pill" style="font-size: 10px;">Offline Forever</span>
-                    <h4 class="fw-bold my-2">Local Free Tier</h4>
-                    <div class="my-4">
-                        <span class="display-5 fw-extrabold text-primary">₹0</span>
-                        <span class="text-muted">/ lifetime</span>
-                    </div>
-                    <ul class="list-unstyled text-start mb-4 px-3 d-flex flex-column gap-2" style="font-size: 14px;">
-                        <li><i class="bi bi-check-lg text-success me-2"></i> <strong>100% private</strong> local analytics</li>
-                        <li><i class="bi bi-check-lg text-success me-2"></i> Unlimited statements processing</li>
-                        <li><i class="bi bi-check-lg text-success me-2"></i> Custom categorization rules</li>
-                        <li><i class="bi bi-check-lg text-success me-2"></i> Subscription protection filters</li>
-                        <li><i class="bi bi-check-lg text-success me-2"></i> Cash flow forecasting</li>
-                        <li><i class="bi bi-check-lg text-success me-2"></i> High-quality PDF reports</li>
-                    </ul>
-                    <a href="#upload-panel" class="btn btn-primary w-100 py-2 rounded-pill" style="text-decoration: none;">
-                        Get Started Free
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Footer band -->
-    <footer class="landing-footer">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-lock-fill text-muted me-2" style="font-size: 16px;"></i>
-            <span>Your privacy is our priority. Your data is processed locally and never shared with third parties.</span>
-        </div>
-        <a href="#security" class="text-primary fw-semibold text-decoration-none">
-            Learn more about our security <i class="bi bi-arrow-right ms-1"></i>
-        </a>
-    </footer>
-</div>
-
-<!-- Decryption Password Prompt Modal -->
-<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-shield-lock-fill text-warning me-2"></i> PDF is Encrypted</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closePasswordBtn"></button>
-            </div>
-            <div class="modal-body py-4">
-                <p class="text-secondary small mb-3">The PDF file you uploaded is password-protected. Please enter the decryption password below. This password is processed strictly in-memory and is never saved.</p>
-                <div class="form-group mb-3">
-                    <label class="form-label fw-bold">Statement Password</label>
-                    <input type="password" class="form-control" id="pdfPassword" placeholder="Enter password...">
-                    <div class="invalid-feedback" id="passwordError">Incorrect password. Please try again.</div>
-                </div>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-secondary px-3 py-2" data-bs-dismiss="modal" id="cancelPasswordBtn">Cancel</button>
-                <button type="button" class="btn btn-primary px-4 py-2" id="submitPasswordBtn">Decrypt & Parse</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Duplicate Statement Action Modal -->
-<div class="modal fade" id="duplicateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Statement Already Exists</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeDuplicateBtn"></button>
-            </div>
-            <div class="modal-body py-4">
-                <p class="text-secondary small mb-1" id="duplicateDetails">This statement appears to have been uploaded previously.</p>
-                <p class="text-secondary small">Would you like to overwrite it with the new file or skip processing?</p>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary px-3 py-2" id="duplicateSkipBtn">Skip File</button>
-                <button type="button" class="btn btn-danger px-4 py-2" id="duplicateReplaceBtn">Replace Existing</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Processing Page (Transition screen visible after file ingestion) -->
-<div class="container" id="processing-panel" style="display: none;">
-    <div class="processing-container">
-        <div class="spinner-premium"></div>
-        <h3 class="fw-bold m-0" id="processing-title">Uploading Files...</h3>
-        <p class="text-secondary">Please keep this browser window open while the parser normalizes your bank statement.</p>
-        
-        <div class="processing-steps">
-            <div class="processing-step active" id="step-upload">
-                <i class="bi bi-circle"></i>
-                <span>Uploading Files...</span>
-            </div>
-            <div class="processing-step" id="step-analyze">
-                <i class="bi bi-circle"></i>
-                <span>Analyzing Statements...</span>
-            </div>
-            <div class="processing-step" id="step-extract">
-                <i class="bi bi-circle"></i>
-                <span>Extracting Transactions...</span>
-            </div>
-            <div class="processing-step" id="step-categorize">
-                <i class="bi bi-circle"></i>
-                <span>Categorizing Transactions...</span>
-            </div>
-            <div class="processing-step" id="step-insights">
-                <i class="bi bi-circle"></i>
-                <span>Generating Insights...</span>
-            </div>
-            <div class="processing-step" id="step-ready">
-                <i class="bi bi-circle"></i>
-                <span>Preparing Dashboard...</span>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    </script>
+</body>
+</html>

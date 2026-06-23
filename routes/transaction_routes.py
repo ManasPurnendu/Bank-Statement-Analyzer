@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
+from utils.decorators import login_required
 from database.models import get_transactions, get_transactions_count, get_all_categories, update_transaction_category, update_merchant_category_rules
 from database.db import get_db_connection
 import math
@@ -6,8 +7,10 @@ import math
 transaction_bp = Blueprint('transaction', __name__)
 
 @transaction_bp.route('/transactions', methods=['GET'])
+@login_required
 def fetch_transactions():
     try:
+        user_id = session.get('user_id')
         search_query = request.args.get('q', None)
         category_id = request.args.get('category_id', None)
         type_filter = request.args.get('type_filter', None)
@@ -28,10 +31,10 @@ def fetch_transactions():
             
         transactions = get_transactions(
             search_query, category_id, type_filter, start_date, end_date,
-            sort_by, sort_order, offset, limit
+            sort_by, sort_order, offset, limit, user_id=user_id
         )
         
-        total = get_transactions_count(search_query, category_id, type_filter, start_date, end_date)
+        total = get_transactions_count(search_query, category_id, type_filter, start_date, end_date, user_id=user_id)
         categories = get_all_categories()
         
         pages = math.ceil(total / limit) if total > 0 else 1
@@ -54,8 +57,10 @@ def fetch_transactions():
         }), 500
 
 @transaction_bp.route('/transaction/category', methods=['PUT'])
+@login_required
 def edit_category():
     try:
+        user_id = session.get('user_id')
         data = request.json or {}
         transaction_id = data.get('transaction_id')
         category_id = data.get('category_id')
@@ -68,7 +73,7 @@ def edit_category():
         # Get transaction details
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT description, merchant_name, payee_name, amount FROM transactions WHERE transaction_id = ?', (transaction_id,))
+        cursor.execute('SELECT description, merchant_name, payee_name, amount FROM transactions WHERE transaction_id = ? AND user_id = ?', (transaction_id, user_id))
         row = cursor.fetchone()
         conn.close()
         
@@ -81,7 +86,7 @@ def edit_category():
         amount_val = row['amount']
         
         # Always update the category for the current transaction
-        update_transaction_category(transaction_id, category_id)
+        update_transaction_category(transaction_id, category_id, user_id=user_id)
         
         if remember:
             # Create rule for merchant or payee
@@ -107,6 +112,7 @@ def edit_category():
         }), 500
 
 @transaction_bp.route('/categories', methods=['GET'])
+@login_required
 def get_categories():
     try:
         categories = get_all_categories()

@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, start_date=None, end_date=None):
+def generate_forecast(reduction_category=None, reduction_pct=0.0, horizon=3, start_date=None, end_date=None, user_id=None):
     """
     Generates 1, 3, 6, and 9-month projections using moving-average and trend analysis.
     Supports What-If scenario modifications and dynamic horizons.
     """
-    analytics = calculate_analytics(start_date, end_date)
+    analytics = calculate_analytics(start_date, end_date, user_id=user_id)
     monthly_trends = analytics["monthly_trends"]
     kpis = analytics["kpis"]
     category_spending = analytics["category_spending"]
