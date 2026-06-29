@@ -74,6 +74,37 @@ def init_db():
         )
     ''')
     
+    # Create Income Intelligence Reports Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS income_intelligence_reports (
+            report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            statement_id INTEGER,
+            engine_version TEXT NOT NULL,
+            data_sufficiency_grade TEXT,
+            eligibility_status TEXT NOT NULL,
+            base_salary REAL,
+            fixed_emi_obligations REAL,
+            foir_percentage REAL,
+            stability_score REAL,
+            statement_health_score REAL,
+            surplus_score REAL,
+            buffer_score REAL,
+            final_readiness_score REAL,
+            risk_flags TEXT,
+            positive_signals TEXT,
+            report_generation_time_ms REAL,
+            calculation_metadata TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (statement_id) REFERENCES statements(statement_id) ON DELETE CASCADE
+        )
+    ''')
+    
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_reports_user_id ON income_intelligence_reports(user_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_reports_statement_id ON income_intelligence_reports(statement_id)')
+
+    
     # Run dynamic alter migrations for existing databases
     try:
         cursor.execute("ALTER TABLE statements ADD COLUMN file_hash TEXT")

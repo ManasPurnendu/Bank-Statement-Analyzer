@@ -405,32 +405,61 @@ def _parse_row(row: list, mapping: dict) -> dict | None:
         elif val_crd > 0 and (raw_crd not in ('', '-', 'nan', 'None')):
             amount = val_crd
             txn_type = 'Credit'
-        else:
-            return None  # zero transaction
-    elif amt_i is not None and amt_i < len(row):
+    
+    if amount == 0 and amt_i is not None and amt_i < len(row):
         raw_amt = str(row[amt_i]).strip()
         val_amt = _parse_amount(raw_amt)
-        if val_amt == 0:
-            return None
-        if typ_i is not None and typ_i < len(row):
-            raw_type = str(row[typ_i]).upper().strip()
-            txn_type = 'Credit' if any(k in raw_type for k in (
-                'CR', 'CREDIT', '+')) else 'Debit'
-        else:
-            # Sign-based or CR/DR suffix
-            suffix = _cr_or_dr(raw_amt)
-            if suffix == 'CR':
-                txn_type = 'Credit'
-            elif suffix == 'DR':
-                txn_type = 'Debit'
+        if val_amt > 0:
+            if typ_i is not None and typ_i < len(row):
+                raw_type = str(row[typ_i]).upper().strip()
+                txn_type = 'Credit' if any(k in raw_type for k in (
+                    'CR', 'CREDIT', '+')) else 'Debit'
             else:
-                # negative = debit (common in some exports)
-                try:
-                    raw_signed = re.sub(r'[^\d\.\-]', '', raw_amt)
-                    txn_type = 'Debit' if float(raw_signed) < 0 else 'Credit'
-                except ValueError:
+                suffix = _cr_or_dr(raw_amt)
+                if suffix == 'CR':
                     txn_type = 'Credit'
-        amount = val_amt
+                elif suffix == 'DR':
+                    txn_type = 'Debit'
+                else:
+                    try:
+                        raw_signed = re.sub(r'[^\d\.\-]', '', raw_amt)
+                        txn_type = 'Debit' if float(raw_signed) < 0 else 'Credit'
+                    except ValueError:
+                        txn_type = 'Credit'
+            amount = val_amt
+
+    # Advanced Regex Fallback for space-split lines (like Velocity Bank)
+    if amount == 0:
+        line_str = " ".join(str(v) for v in row)
+        # Match: <Date> ... <Amount> <Balance> at the end of the string
+        # e.g., "Rs. 247,043.19 Rs. 448,092.94" or "247043.19 448092.94"
+        amt_match = re.search(r'(?:Rs\.?\s*)?([\d,]+\.\d{2})\s+(?:Rs\.?\s*)?([\d,]+\.\d{2})(?:\s*(Cr|Dr|CR|DR))?$', line_str.strip())
+        if amt_match:
+            amount = _parse_amount(amt_match.group(1))
+            balance = _parse_amount(amt_match.group(2))
+            
+            # Extract description by removing date and amounts
+            desc_str = line_str[:amt_match.start()].strip()
+            desc_str = re.sub(r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})', '', desc_str).strip()
+            
+            # Infer type from description "Cr-" or "Dr-" or default to Credit
+            if 'Dr-' in desc_str or 'WDL' in desc_str or 'Withdrawal' in desc_str:
+                txn_type = 'Debit'
+            elif 'Cr-' in desc_str or 'DEP' in desc_str:
+                txn_type = 'Credit'
+            elif amt_match.group(3):
+                txn_type = 'Credit' if amt_match.group(3).upper() == 'CR' else 'Debit'
+            else:
+                txn_type = 'Debit' # Default guess, or could use balance delta
+
+            if amount > 0:
+                return {
+                    'transaction_date': _fmt_date(parsed_date),
+                    'description': desc_str,
+                    'amount': round(amount, 2),
+                    'transaction_type': txn_type,
+                    'balance': round(balance, 2),
+                }
     else:
         # Last resort: find numbers in cols from index 2 onwards
         numbers = []

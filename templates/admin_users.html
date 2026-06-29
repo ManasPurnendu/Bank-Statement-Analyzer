@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary me-2"></i> User Directory</h2>
+            <p class="text-secondary mb-0">Manage users and run Income Intelligence analysis.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <i class="bi bi-cloud-arrow-up-fill me-1"></i> Direct Upload
+            </button>
+            <button class="btn btn-primary shadow-sm" onclick="fetchUsers()">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-premium animate-slide-up stagger-2" style="padding: 0; overflow-x: auto;">
+            <table class="table-premium mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">ID</th>
+                            <th class="py-3">Email Address</th>
+                            <th class="py-3 text-center">Statements</th>
+                            <th class="py-3 text-center">Eligibility Pre-Check</th>
+                            <th class="px-4 py-3 text-end">Intelligence Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p class="text-muted mt-2">Loading users...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Intelligence Report Viewer Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-shield-check text-success me-2"></i> Intelligence Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-light p-4" id="reportModalBody">
+                <!-- Report Content Injected Here -->
+            </div>
+            <div class="modal-footer border-top py-2 px-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    fetchUsers();
+});
+
+function getBadgeClass(status) {
+    if (!status) return 'bg-secondary text-white';
+    switch(status.toUpperCase()) {
+        case 'EXCELLENT_PROFILE': return 'bg-success text-white';
+        case 'STABLE_PROFILE': return 'bg-primary text-white';
+        case 'MARGINAL_PROFILE': return 'bg-warning text-dark';
+        case 'INSUFFICIENT_DATA': return 'bg-secondary text-white';
+        case 'NON_SALARIED': return 'bg-danger text-white';
+        case 'PROCESSING_ERROR': return 'bg-dark text-white';
+        default: return 'bg-secondary text-white';
+    }
+}
+
+async function fetchUsers() {
+    try {
+        const response = await fetch('/api/admin/api/users');
+        const data = await response.json();
+        
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = '';
+        
+        if (data.users.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No users found.</td></tr>`;
+            return;
+        }
+        
+        data.users.forEach(user => {
+            const statusBadge = user.eligibility_status 
+                ? `<span class="badge ${getBadgeClass(user.eligibility_status)} px-3 py-2 rounded-pill">${user.eligibility_status}</span>`
+                : `<span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">Not Assessed</span>`;
+                
+            let actionButtons = '';
+            
+            if (user.statement_count > 0) {
+                actionButtons = `
+                    <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
+                        <i class="bi bi-cloud-arrow-up-fill"></i> Upload
+                    </button>
+                    <button id="analyze-btn-${user.user_id}" class="btn btn-sm btn-outline-primary fw-semibold me-2" onclick="runIntelligence(${user.user_id})" title="Run Intelligence Engine">
+                        <i class="bi bi-cpu-fill"></i> Analyze
+                    </button>
+                `;
+                if (user.eligibility_status) {
+                    actionButtons += `
+                        <button class="btn btn-sm btn-dark fw-semibold" onclick="viewReport(${user.user_id})" title="View Report">
+                            <i class="bi bi-file-text-fill"></i> View Report
+                        </button>
+                    `;
+                }
+            } else {
+                actionButtons = `
+                    <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
+                        <i class="bi bi-cloud-arrow-up-fill"></i> Upload
+                    </button>
+                    <span class="text-muted small"><i class="bi bi-lock-fill"></i> Awaiting Data</span>
+                `;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="px-4 fw-semibold text-secondary">#${user.user_id}</td>
+                <td>
+                    <div class="fw-bold text-dark">${user.email}</div>
+                    <div class="small text-muted">${user.role.toUpperCase()}</div>
+                </td>
+                <td class="text-center fw-semibold text-primary fs-5">${user.statement_count}</td>
+                <td class="text-center">${statusBadge}</td>
+                <td class="px-4 text-end">${actionButtons}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error("Failed to load users", e);
+        document.getElementById('usersTableBody').innerHTML = `
+            <tr><td colspan="5" class="text-center py-4 text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Error loading users.</td></tr>
+        `;
+    }
+}
+
+function openUploadForUser(userId) {
+    window.targetUploadUserId = userId;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('uploadModal')).show();
+}
+
+async function runIntelligence(userId) {
+    const btn = document.getElementById(`analyze-btn-${userId}`);
+    const originalContent = btn.innerHTML;
+    
+    // Replace with spinner
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...`;
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch(`/api/admin/intelligence/generate/${userId}`, { method: 'POST' });
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Success', `Analysis complete! Profile: ${data.eligibility_status.replace(/_/g, ' ')}`, 'success');
+            fetchUsers();
+        } else {
+            showToast('Error', "Analysis failed: " + data.message, 'danger');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    } catch (e) {
+        showToast('Error', "Server error occurred.", 'danger');
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    }
+}
+
+function showToast(title, message, type) {
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        const div = document.createElement('div');
+        div.id = 'toast-container';
+        div.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        div.style.zIndex = '1055';
+        document.body.appendChild(div);
+        toastContainer = div;
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const bgClass = type === 'success' ? 'bg-success text-white' : 'bg-danger text-white';
+    
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong><br>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toastEl = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+    toast.show();
+    
+    toastEl.addEventListener('hidden.bs.toast', () => {
+        toastEl.remove();
+    });
+}
+
+async function viewReport(userId) {
+    try {
+        const response = await fetch(`/api/admin/intelligence/report/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            renderReport(data.report);
+            new bootstrap.Modal(document.getElementById('reportModal')).show();
+        } else {
+            alert("Could not load report: " + data.message);
+        }
+    } catch (e) {
+        alert("Server error occurred.");
+    }
+}
+
+function getColorClass(key, val) {
+    if (typeof val !== 'number') return 'text-dark';
+    const k = key.toLowerCase();
+    
+    if (k.includes('score') || k === 'total_confidence_score' || k === 'best_score' || k === 'stability_score' || k === 'raw_score' || k === 'capped_score') {
+        return val >= 80 ? 'text-success' : val >= 60 ? 'text-warning' : 'text-danger';
+    }
+    if (k.includes('foir')) {
+        return val < 30 ? 'text-success' : val <= 50 ? 'text-warning' : 'text-danger';
+    }
+    if (k.includes('events') || k.includes('variance_days') || k.includes('detected_count') || k === 'negative_events' || k === 'low_events' || k === 'return_events') {
+        return val === 0 ? 'text-success' : val <= 2 ? 'text-warning' : 'text-danger';
+    }
+    if (k.includes('amount_cv') || k.includes('downward_variance_pct') || k.includes('variance')) {
+        if (val === 0) return 'text-success';
+        if (val <= 10 && val > 0.1) return 'text-warning';
+        if (val <= 0.1 && val > 0) return 'text-warning';
+        return 'text-danger';
+    }
+    if (k.includes('buffer')) {
+        return val >= 3 ? 'text-success' : val >= 1 ? 'text-warning' : 'text-danger';
+    }
+    if (k.includes('surplus_pct')) {
+        return val >= 10 ? 'text-success' : val >= 0 ? 'text-warning' : 'text-danger';
+    }
+    
+    return 'text-dark';
+}
+
+function renderReport(report) {
+    const r = report;
+    const meta = r.calculation_metadata || {};
+    
+    const keyTranslations = {
+        'data_sufficiency_grade': 'Data Sufficiency',
+        'best_score': 'Confidence Score',
+        'band': 'Salary Band',
+        'details': 'Detection Details',
+        'keyword_match': 'Keyword Strength',
+        'recurrence_ratio': 'Recurrence Reliability',
+        'amount_cv': 'Amount Variance (CV)',
+        'sender_consistency': 'Sender Consistency',
+        'total_confidence_score': 'Total Confidence',
+        'stability': 'Employer Stability',
+        'employers': 'Identified Employers',
+        'downward_variance_pct': 'Salary Drop (%)',
+        'stability_score': 'Stability Score',
+        'max_variance_days': 'Max Date Shift (Days)',
+        'adjusted_variance_days': 'Adjusted Shift (Days)',
+        'score': 'Consistency Score',
+        'total_obligations': 'Total Obligations (₹)',
+        'detected_count': 'Detected EMIs',
+        'foir_pct': 'Debt-to-Income (FOIR) %',
+        'negative_events': 'Bounces/Penalties',
+        'low_events': 'Low Balance Warnings',
+        'return_events': 'Return Events',
+        'absolute_surplus': 'Avg Monthly Surplus (₹)',
+        'surplus_pct': 'Surplus Margin (%)',
+        'avg_daily_balance': 'Avg Daily Balance (₹)',
+        'total_investments_seen': 'Total Investments (₹)',
+        'months_of_buffer': 'Emergency Buffer (Months)',
+        'raw_score': 'Raw Readiness Score',
+        'capped_score': 'Capped Score',
+        'assigned_profile': 'Assigned Profile',
+        'Contributors': 'Positive Signals',
+        'Deductions': 'Risk Flags'
+    };
+    
+    let html = `
+        <div class="row g-4">
+            <!-- Summary Header -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge ${getBadgeClass(r.eligibility_status)} mb-2 fs-6 px-3 py-2 rounded-pill">${r.eligibility_status.replace(/_/g, ' ')}</span>
+                            <h3 class="fw-bold mb-0">Readiness Score: <span class="text-primary">${r.final_readiness_score || 0}/100</span></h3>
+                            <p class="text-muted mb-0 small mt-1"><i class="bi bi-clock-history"></i> Generated in ${r.report_generation_time_ms}ms</p>
+                            <p class="text-muted mb-0 small"><i class="bi bi-collection-fill"></i> Calculated from all uploaded statements for this user</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold fs-3 text-success">₹${(r.base_salary || 0).toLocaleString('en-IN')}</div>
+                            <div class="text-secondary small text-uppercase fw-semibold">Estimated Base Salary</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body text-center">
+                        <div class="text-muted small text-uppercase fw-semibold mb-2">FOIR (Fixed Obligations)</div>
+                        <h4 class="fw-bold mb-1">${r.foir_percentage || 0}%</h4>
+                        <div class="text-danger small">₹${(r.fixed_emi_obligations || 0).toLocaleString('en-IN')}/mo</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body text-center">
+                        <div class="text-muted small text-uppercase fw-semibold mb-2">Stability Score</div>
+                        <h4 class="fw-bold mb-0">${r.stability_score || 0}/100</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body text-center">
+                        <div class="text-muted small text-uppercase fw-semibold mb-2">Surplus Score</div>
+                        <h4 class="fw-bold mb-0">${r.surplus_score || 0}/100</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body text-center">
+                        <div class="text-muted small text-uppercase fw-semibold mb-2">Buffer Score</div>
+                        <h4 class="fw-bold mb-0">${r.buffer_score || 0}/100</h4>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk & Signals -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i> Risk Flags</h6>
+                        ${r.risk_flags && r.risk_flags.length > 0 ? 
+                            '<ul class="list-group list-group-flush">' + 
+                            r.risk_flags.map(f => `<li class="list-group-item px-0 border-0 py-1"><i class="bi bi-x-circle-fill text-danger me-2"></i><strong>${f.severity}:</strong> ${f.reason}</li>`).join('') +
+                            '</ul>' : '<p class="text-muted mb-0 small">No significant risks detected.</p>'
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i> Positive Signals</h6>
+                        ${r.positive_signals && r.positive_signals.length > 0 ? 
+                            '<ul class="list-group list-group-flush">' + 
+                            r.positive_signals.map(s => `<li class="list-group-item px-0 border-0 py-1"><i class="bi bi-check2-circle text-success me-2"></i>${s}</li>`).join('') +
+                            '</ul>' : '<p class="text-muted mb-0 small">No explicit positive signals.</p>'
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calculation Metadata / Audit Trail -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-diagram-3-fill me-2 text-primary"></i> Engine Audit Trail</h6>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                            ${Object.keys(meta).map((engineName, index) => {
+                                const engineData = meta[engineName];
+                                const isArray = Array.isArray(engineData);
+                                
+                                // Format the inner data nicely
+                                let innerHtml = '';
+                                if (isArray) {
+                                    innerHtml = '<ul class="list-group list-group-flush small">' + 
+                                        engineData.map(item => `<li class="list-group-item px-0 py-2 border-bottom text-secondary">${typeof item === 'object' ? JSON.stringify(item) : item}</li>`).join('') +
+                                    '</ul>';
+                                } else if (typeof engineData === 'object' && engineData !== null) {
+                                    innerHtml = '<div class="d-flex flex-column gap-2">' + 
+                                        Object.entries(engineData).map(([k, v]) => {
+                                            let formattedVal = v;
+                                            
+                                            if (Array.isArray(v)) {
+                                                formattedVal = '<div class="text-end mt-1">' + v.map(i => `<div class="small text-secondary fw-normal lh-sm mb-1">${i}</div>`).join('') + '</div>';
+                                            } else if (typeof v === 'object' && v !== null) {
+                                                formattedVal = '<div class="d-flex flex-column gap-1 mt-2 w-100">' + 
+                                                    Object.entries(v).map(([subK, subV]) => {
+                                                        const subKeyFormat = keyTranslations[subK] || subK.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                                        let displaySubV = subV;
+                                                        if (typeof subV === 'number' && !Number.isInteger(subV)) displaySubV = subV.toFixed(2);
+                                                        return `<div class="d-flex justify-content-between small border-bottom border-light pb-1">
+                                                                    <span class="text-muted fw-normal">${subKeyFormat}</span>
+                                                                    <span class="fw-bold ${getColorClass(subK, subV)} text-end">${displaySubV}</span>
+                                                                </div>`;
+                                                    }).join('') + '</div>';
+                                            } else if (typeof v === 'number') {
+                                                const colorClass = getColorClass(k, v);
+                                                formattedVal = `<span class="${colorClass}">${!Number.isInteger(v) ? v.toFixed(2) : v}</span>`;
+                                            } else if (typeof v === 'string' && (v.startsWith('{') || v.startsWith('['))) {
+                                                try {
+                                                    formattedVal = JSON.stringify(JSON.parse(v));
+                                                } catch(e) {}
+                                            }
+                                            
+                                            const formattedKey = keyTranslations[k] || k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                            return `
+                                                <div class="d-flex flex-column border-bottom pb-2">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <span class="text-muted small fw-semibold me-3">${formattedKey}</span>
+                                                        <span class="fw-bold text-end text-break" style="word-break: break-word; font-size: 0.9em;">${formattedVal}</span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('') +
+                                    '</div>';
+                                } else {
+                                    innerHtml = `<div class="small text-dark fw-semibold">${engineData}</div>`;
+                                }
+
+                                return `
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow rounded-4 animate-slide-up" style="animation-delay: ${index * 0.05}s; background: linear-gradient(145deg, #ffffff, #fcfdff); border-top: 4px solid var(--bs-primary) !important;">
+                                        <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0 px-4">
+                                            <h6 class="fw-bold mb-0 d-flex align-items-center" style="color: #2c3e50;">
+                                                <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center shadow-sm" style="width:36px; height:36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                                    <i class="bi bi-cpu text-white"></i>
+                                                </div>
+                                                ${engineName.replace(/([A-Z][a-z]+)/g, ' $1').trim()}
+                                            </h6>
+                                        </div>
+                                        <div class="card-body p-4 pt-3" style="max-height: 250px; overflow-y: auto;">
+                                            ${innerHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('reportModalBody').innerHTML = html;
+}
+</script>
+{% endblock %}

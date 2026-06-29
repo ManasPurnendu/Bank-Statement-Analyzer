@@ -9,7 +9,7 @@ from routes.analytics_routes import analytics_bp
 from routes.forecast_routes import forecast_bp
 from routes.report_routes import report_bp
 from routes.auth_routes import auth_bp
-from utils.decorators import login_required
+from utils.decorators import login_required, admin_required
 
 app = Flask(__name__)
 
@@ -91,6 +91,13 @@ def forecast_page():
 @login_required
 def reports_page():
     return render_template('reports.html')
+
+@app.route('/admin/users')
+@login_required
+@admin_required
+def admin_users_page():
+    return render_template('admin_users.html')
+
 
 # --- Error Handlers ---
 @app.errorhandler(413)

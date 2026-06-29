@@ -509,3 +509,97 @@ def set_user_role(user_id, role):
     cursor.execute('UPDATE users SET role = ? WHERE user_id = ?', (role, user_id))
     conn.commit()
     conn.close()
+
+def add_intelligence_report(report_data):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # We serialize list/dict to JSON strings if they aren't already
+    import json
+    
+    risk_flags_str = report_data.get('risk_flags')
+    if isinstance(risk_flags_str, list):
+        risk_flags_str = json.dumps(risk_flags_str)
+        
+    positive_signals_str = report_data.get('positive_signals')
+    if isinstance(positive_signals_str, list):
+        positive_signals_str = json.dumps(positive_signals_str)
+        
+    calculation_metadata_str = report_data.get('calculation_metadata')
+    if isinstance(calculation_metadata_str, dict):
+        calculation_metadata_str = json.dumps(calculation_metadata_str)
+        
+    cursor.execute('''
+        INSERT INTO income_intelligence_reports (
+            user_id, statement_id, engine_version, data_sufficiency_grade,
+            eligibility_status, base_salary, fixed_emi_obligations,
+            foir_percentage, stability_score, statement_health_score,
+            surplus_score, buffer_score, final_readiness_score,
+            risk_flags, positive_signals, report_generation_time_ms,
+            calculation_metadata
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+    ''', (
+        report_data.get('user_id'),
+        report_data.get('statement_id'),
+        report_data.get('engine_version', 'v2.3'),
+        report_data.get('data_sufficiency_grade'),
+        report_data.get('eligibility_status', 'PROCESSING_ERROR'),
+        report_data.get('base_salary'),
+        report_data.get('fixed_emi_obligations'),
+        report_data.get('foir_percentage'),
+        report_data.get('stability_score'),
+        report_data.get('statement_health_score'),
+        report_data.get('surplus_score'),
+        report_data.get('buffer_score'),
+        report_data.get('final_readiness_score'),
+        risk_flags_str,
+        positive_signals_str,
+        report_data.get('report_generation_time_ms'),
+        calculation_metadata_str
+    ))
+    
+    report_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return report_id
+
+def get_latest_intelligence_report(user_id=None, statement_id=None):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = 'SELECT * FROM income_intelligence_reports WHERE 1=1'
+    params = []
+    
+    if user_id is not None:
+        query += ' AND user_id = ?'
+        params.append(user_id)
+    if statement_id is not None:
+        query += ' AND statement_id = ?'
+        params.append(statement_id)
+        
+    query += ' ORDER BY created_at DESC LIMIT 1'
+    
+    cursor.execute(query, params)
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row:
+        return None
+        
+    result = dict(row)
+    import json
+    # Deserialize JSON fields
+    if result.get('risk_flags'):
+        try: result['risk_flags'] = json.loads(result['risk_flags'])
+        except: pass
+    if result.get('positive_signals'):
+        try: result['positive_signals'] = json.loads(result['positive_signals'])
+        except: pass
+    if result.get('calculation_metadata'):
+        try: result['calculation_metadata'] = json.loads(result['calculation_metadata'])
+        except: pass
+        
+    return result
+

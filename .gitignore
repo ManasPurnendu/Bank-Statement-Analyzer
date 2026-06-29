@@ -22,6 +22,7 @@ generated_reports/
 uploads/
 
 # Database backups
+*.db
 *.db-journal
 database/bank_statement_test.db
 # Project documentation and internship files

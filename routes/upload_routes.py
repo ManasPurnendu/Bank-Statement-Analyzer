@@ -17,6 +17,13 @@ def allowed_file(filename):
 @login_required
 def upload_file():
     user_id = session.get('user_id')
+    
+    # If admin is uploading for another user
+    if session.get('role') == 'admin' and request.form.get('target_user_id'):
+        target_id = request.form.get('target_user_id')
+        if target_id:
+            user_id = int(target_id)
+            
     # Check if this is a request to seed demo data
     if request.form.get('demo') == 'true':
         try:

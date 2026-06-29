@@ -250,11 +250,21 @@ function initUploadFlow() {
     const browseBtn = document.getElementById("browseBtn");
     const loadDemoBtn = document.getElementById("loadDemoBtn");
     
-    const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+    // Clear targetUploadUserId when the generic Direct Upload button is clicked
+    const genericUploadBtn = document.querySelector('[data-bs-target="#uploadModal"]');
+    if (genericUploadBtn) {
+        genericUploadBtn.addEventListener('click', () => {
+            if (!genericUploadBtn.closest('td')) { // don't clear if it's from the table
+                window.targetUploadUserId = null;
+            }
+        });
+    }
+    
+    const passwordModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('passwordModal'));
     const submitPasswordBtn = document.getElementById("submitPasswordBtn");
     const pdfPasswordInput = document.getElementById("pdfPassword");
     
-    const duplicateModal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+    const duplicateModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('duplicateModal'));
     const duplicateSkipBtn = document.getElementById("duplicateSkipBtn");
     const duplicateReplaceBtn = document.getElementById("duplicateReplaceBtn");
     
@@ -343,7 +353,9 @@ function initUploadFlow() {
         if (pendingFiles.length === 0) {
             // Done uploading all
             runSimulationSteps(() => {
-                if (window.location.pathname.includes('/dashboard')) {
+                if (window.location.pathname.includes('/admin/users')) {
+                    window.location.reload();
+                } else if (window.location.pathname.includes('/dashboard')) {
                     window.location.reload();
                 } else {
                     window.location.href = '/dashboard';
@@ -362,6 +374,10 @@ function initUploadFlow() {
             formData.append("password", currentPassword);
         }
         if (action) formData.append("action", action);
+        
+        if (window.targetUploadUserId) {
+            formData.append("target_user_id", window.targetUploadUserId);
+        }
         
         startProcessingAnimation();
         updateProcessingStep('upload', 'active');
@@ -426,8 +442,16 @@ function initUploadFlow() {
     submitPasswordBtn.addEventListener("click", () => {
         const password = pdfPasswordInput.value;
         if (!password) return;
+        // Don't shift pendingFiles here, just retry upload with password
         passwordModal.hide();
         uploadNextFile(password);
+    });
+
+    pdfPasswordInput.addEventListener("keypress", function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitPasswordBtn.click();
+        }
     });
 
     // Duplicate Replace / Skip
