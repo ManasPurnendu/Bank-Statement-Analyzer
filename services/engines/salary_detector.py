@@ -24,23 +24,24 @@ class SalaryDetector:
         'CASHBACK', 'REWARD', 'LOAN', 'EMI'
     ]
 
+    # Precompile regex for massive speedup
+    EXCLUSION_PATTERN = re.compile(r'REFUND|CASH DEP|CASH DEPOSIT|UPI|WALLET|SWIGGY|ZOMATO|AMAZON|FLIPKART|REVERSAL|CASHBACK|REWARD|LOAN|EMI')
+    STRONG_PATTERN = re.compile(r'SALARY|PAYROLL|SAL|EMPLOYEE|HR |WAGES|REMUNERATION|ACH CREDIT|CMS CREDIT|NEFT SALARY|SALARY CREDIT')
+    WEAK_PATTERN = re.compile(r'NEFT|IMPS|TRANSFER|BANK CREDIT')
+
     @staticmethod
     def run(ctx: StatementContext):
-        credits = [t for t in ctx.transactions if t['transaction_type'] == 'Credit']
-        
         # 1. Filter out obvious exclusions and below floor amount
         valid_candidates = []
-        for t in credits:
+        for t in ctx.credits:
             amt = float(t.get('amount', 0))
             if amt < SalaryDetector.FLOOR_AMOUNT:
                 continue
                 
-            desc = str(t.get('description', '')).upper()
-            payee = str(t.get('payee_name', '')).upper()
-            combined_text = f"{desc} {payee}"
+            combined_text = t.get('combined_text', '')
             
-            # Check exclusions
-            if any(ex in combined_text for ex in SalaryDetector.EXCLUSION_KEYWORDS):
+            # Check exclusions using regex
+            if SalaryDetector.EXCLUSION_PATTERN.search(combined_text):
                 # Hard exclusion for UPI credits unless it explicitly says SALARY
                 if 'UPI' in combined_text and 'SALARY' not in combined_text:
                     continue
@@ -82,11 +83,11 @@ class SalaryDetector:
             audit = {}
             
             # A. Keyword Match (+40)
-            combined_all_text = " ".join([f"{t.get('description','')} {t.get('payee_name','')}" for t in txns]).upper()
-            if any(kw in combined_all_text for kw in SalaryDetector.STRONG_KEYWORDS):
+            combined_all_text = " ".join([t.get('combined_text', '') for t in txns])
+            if SalaryDetector.STRONG_PATTERN.search(combined_all_text):
                 score += 40
                 audit['keyword_match'] = "Strong"
-            elif any(kw in combined_all_text for kw in SalaryDetector.WEAK_KEYWORDS):
+            elif SalaryDetector.WEAK_PATTERN.search(combined_all_text):
                 score += 20
                 audit['keyword_match'] = "Weak"
             else:

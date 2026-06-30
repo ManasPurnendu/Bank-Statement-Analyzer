@@ -1,5 +1,6 @@
 from collections import defaultdict
 import statistics
+import re
 from services.engines.context import StatementContext
 
 class EMIDetector:
@@ -19,20 +20,20 @@ class EMIDetector:
         'HOME LOAN', 'PERSONAL LOAN', 'AUTO LOAN', 'KOTAK MAHINDRA PRIME'
     ]
 
+    # Precompile regex for speed
+    EXCLUSION_PATTERN = re.compile(r'NETFLIX|SPOTIFY|YOUTUBE|AMAZON|APPLE|GOOGLE|SWIGGY|ZEPTO|HOTSTAR|JIOCINEMA|ZOMATO|BLINKIT|SIP|MUTUAL FUND|ZERODHA|GROWW|LIC|INSURANCE')
+    INCLUSION_PATTERN = re.compile(r'LOAN|EMI|FINANCE|BAJAJ|MORTGAGE|REPAYMENT|HOME LOAN|PERSONAL LOAN|AUTO LOAN|KOTAK MAHINDRA PRIME')
+
     @staticmethod
     def run(ctx: StatementContext):
-        debits = [t for t in ctx.transactions if t['transaction_type'] == 'Debit']
-        
         # Group debits by rounded amount (EMIs are typically exact amounts)
         # We will group by amount + sender
         grouped_debits = defaultdict(list)
         
-        for t in debits:
-            desc = str(t.get('description', '')).upper()
-            payee = str(t.get('payee_name', '')).upper()
-            combined = f"{desc} {payee}"
+        for t in ctx.debits:
+            combined = t.get('combined_text', '')
             
-            if any(ex in combined for ex in EMIDetector.EXCLUSION_DICT):
+            if EMIDetector.EXCLUSION_PATTERN.search(combined):
                 continue
                 
             amt = float(t['amount'])

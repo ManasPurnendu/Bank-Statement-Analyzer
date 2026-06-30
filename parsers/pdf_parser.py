@@ -23,9 +23,22 @@ import os
 import re
 import pandas as pd
 from datetime import datetime
+import concurrent.futures
 from services.categorizer import (categorize_transaction, detect_merchant_and_payee,
                                    detect_payment_method, detect_subscription, load_category_rules)
 from database.models import compute_transaction_hash
+
+def _process_pdf_page(file_path, password, page_idx):
+    """Worker function for multiprocessing PDF page extraction."""
+    try:
+        with pdfplumber.open(file_path, password=password or '') as pdf:
+            page = pdf.pages[page_idx]
+            tables = page.extract_tables()
+            text = page.extract_text() or ""
+            return (page_idx, tables, text)
+    except Exception as e:
+        print(f"Error processing page {page_idx}: {e}")
+        return (page_idx, [], "")
 
 
 # ---------------------------------------------------------------------------
@@ -543,61 +556,76 @@ def parse_pdf_statement(file_path: str, original_filename: str, password: str = 
     rules = load_category_rules()
     transactions = []
 
-    with pdfplumber.open(file_path, password=password or '') as pdf:
-        total_pages = len(pdf.pages)
+    # Get total pages via PyPDF2 quickly
+    total_pages = 0
+    with open(file_path, 'rb') as f:
+        reader = PyPDF2.PdfReader(f)
+        if reader.is_encrypted:
+            reader.decrypt(password or '')
+        total_pages = len(reader.pages)
 
-        # ---- Step 1: Extract metadata from first 3 pages ----
-        try:
-            header_text = ""
-            for page in pdf.pages[:3]:
-                header_text += (page.extract_text() or "") + "\n"
-            meta_from_text = _extract_metadata_from_text(header_text)
-            metadata.update({k: v for k, v in meta_from_text.items() if v})
-        except Exception as e:
-            print(f"[pdf_parser] header metadata error: {e}")
+    page_results = []
+    # Multiprocessing across CPU cores
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(_process_pdf_page, file_path, password, i) for i in range(total_pages)]
+        for future in concurrent.futures.as_completed(futures):
+            page_results.append(future.result())
 
-        # ---- Step 2: Extract metadata from last page (authoritative) ----
-        try:
-            last_text = pdf.pages[-1].extract_text() or ""
-            summary_meta = _extract_summary_line(last_text)
-            # Summary-line data is authoritative (period-specific) – always override
-            for k, v in summary_meta.items():
-                if v:
-                    metadata[k] = v
-        except Exception as e:
-            print(f"[pdf_parser] last-page metadata error: {e}")
+    # Sort results by page index to keep chronological order
+    page_results.sort(key=lambda x: x[0])
 
-        # Use _clear_balance as last-resort closing balance if still 0
-        if not metadata.get('closing_balance') and metadata.get('_clear_balance'):
-            metadata['closing_balance'] = metadata['_clear_balance']
-        metadata.pop('_clear_balance', None)
+    header_text = ""
+    last_text = ""
+    raw_table_rows = []
+    text_fallback_rows = []
+    date_pat = re.compile(r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})')
 
-        # ---- Step 3: Collect raw table rows from all pages ----
-        raw_table_rows = []
-        for page in pdf.pages:
-            tables = page.extract_tables()
-            for table in tables:
-                for row in table:
-                    cleaned = [str(v).strip() if v is not None else '' for v in row]
-                    if any(v for v in cleaned):
-                        raw_table_rows.append(cleaned)
+    for idx, tables, text in page_results:
+        if idx < 3:
+            header_text += text + "\n"
+        if idx == total_pages - 1:
+            last_text = text
 
-        # ---- Step 4: Fall back to text-based row extraction ----
-        if len(raw_table_rows) < 3:
-            raw_table_rows = []
-            date_pat = re.compile(
-                r'^(\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}|\d{1,2}\s+[A-Za-z]{3}\s+\d{2,4})')
-            for page in pdf.pages:
-                page_text = page.extract_text() or ""
-                for line in page_text.split('\n'):
-                    line = line.strip()
-                    if date_pat.match(line):
-                        tokens = line.split()
-                        if len(tokens) >= 3:
-                            raw_table_rows.append(tokens)
+        for table in tables:
+            for row in table:
+                cleaned = [str(v).strip() if v is not None else '' for v in row]
+                if any(v for v in cleaned):
+                    raw_table_rows.append(cleaned)
 
-        if not raw_table_rows:
-            raise ValueError("No transaction rows could be extracted from the PDF.")
+        for line in text.split('\n'):
+            line = line.strip()
+            if date_pat.match(line):
+                tokens = line.split()
+                if len(tokens) >= 3:
+                    text_fallback_rows.append(tokens)
+
+    # ---- Step 1: Extract metadata from first 3 pages ----
+    try:
+        meta_from_text = _extract_metadata_from_text(header_text)
+        metadata.update({k: v for k, v in meta_from_text.items() if v})
+    except Exception as e:
+        print(f"[pdf_parser] header metadata error: {e}")
+
+    # ---- Step 2: Extract metadata from last page (authoritative) ----
+    try:
+        summary_meta = _extract_summary_line(last_text)
+        for k, v in summary_meta.items():
+            if v:
+                metadata[k] = v
+    except Exception as e:
+        print(f"[pdf_parser] last-page metadata error: {e}")
+
+    # Use _clear_balance as last-resort closing balance if still 0
+    if not metadata.get('closing_balance') and metadata.get('_clear_balance'):
+        metadata['closing_balance'] = metadata['_clear_balance']
+    metadata.pop('_clear_balance', None)
+
+    # ---- Step 4: Fall back to text-based row extraction ----
+    if len(raw_table_rows) < 3:
+        raw_table_rows = text_fallback_rows
+
+    if not raw_table_rows:
+        raise ValueError("No transaction rows could be extracted from the PDF.")
 
         # ---- Step 5: Detect header row & column layout ----
         header_idx = -1

@@ -57,9 +57,12 @@ def init_db():
             merchant_name TEXT,
             payment_method TEXT, -- 'UPI', 'Card', 'ATM', 'NEFT', 'IMPS', 'RTGS', 'Cheque', 'Other'
             is_subscription BOOLEAN DEFAULT 0,
-            transaction_hash TEXT UNIQUE,
+            transaction_hash TEXT,
+            user_id INTEGER,
             FOREIGN KEY (statement_id) REFERENCES statements(statement_id) ON DELETE CASCADE,
-            FOREIGN KEY (category_id) REFERENCES categories(category_id)
+            FOREIGN KEY (category_id) REFERENCES categories(category_id),
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+            UNIQUE(user_id, transaction_hash)
         )
     ''')
     

@@ -36,11 +36,24 @@ class StatementContext:
             self.end_date = None
             self.months_of_data = 0
             
-        # Group by month string (YYYY-MM)
+        # Group by month string (YYYY-MM) and pre-categorize for performance
         self.monthly_transactions = defaultdict(list)
+        self.credits = []
+        self.debits = []
+        
         for t in self.transactions:
             month_key = t['transaction_date'][:7]
             self.monthly_transactions[month_key].append(t)
+            
+            # Pre-compute combined text for faster regex searching across engines
+            desc = str(t.get('description', ''))
+            payee = str(t.get('payee_name', ''))
+            t['combined_text'] = f"{desc} {payee}".upper()
+            
+            if t.get('transaction_type') == 'Credit':
+                self.credits.append(t)
+            elif t.get('transaction_type') == 'Debit':
+                self.debits.append(t)
             
         # --- Engine Outputs (Populated during pipeline execution) ---
         
