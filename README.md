@@ -110,19 +110,24 @@ The analytical brain of the project consists of multiple decoupled "Engines" tha
 *(Screenshots will be attached here)*
 
 ### 1. The Dashboard View
-`<!-- Attach Dashboard Screenshot Here -->`
+![Dashboard](assets/screenshots/screenshot-1.png)
+![Dashboard 2](assets/screenshots/screenshot-2.png)
 *Real-time data visualization via Chart.js, rendering asynchronous spending charts and predictive zero-balance dates.*
 
 ### 2. Upload & Parsing Flow
-`<!-- Attach Upload Screenshot Here -->`
+![Upload Flow](assets/screenshots/screenshot-3.png)
+![Upload Flow 2](assets/screenshots/screenshot-4.png)
 *Seamless drag-and-drop interface with password decryption support.*
 
 ### 3. Income Intelligence Report
-`<!-- Attach Report Screenshot Here -->`
+![Report](assets/screenshots/screenshot-5.png)
+![Report 2](assets/screenshots/screenshot-6.png)
+![Report 3](assets/screenshots/screenshot-7.png)
 *The final underwriter-grade output, detailing FOIR, surplus cash, and the algorithmic stability score.*
 
 ### 4. Admin Audit Panel
-`<!-- Attach Admin Panel Screenshot Here -->`
+![Admin Panel](assets/screenshots/screenshot-8.png)
+![Admin Panel 2](assets/screenshots/screenshot-9.png)
 *Role-restricted view allowing administrators to audit user profiles and inspect calculation metadata traces.*
 
 ---
