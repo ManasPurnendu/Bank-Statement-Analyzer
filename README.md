@@ -1,61 +1,138 @@
 # Bank Statement Analyzer & Income Intelligence Engine
 
-An advanced, full-stack financial analysis platform that automates the extraction, categorization, and risk assessment of raw bank statements to generate underwriter-grade credit profiles. 
+![Project Banner](https://img.shields.io/badge/Status-Active-success) ![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue) ![Flask](https://img.shields.io/badge/Framework-Flask-black) ![License](https://img.shields.io/badge/License-MIT-green)
 
-Unlike naive "keyword matching" systems, this engine utilizes Explainable AI (XAI) and statistical variance to mathematically detect true income stability, gig-economy cash flows, and hidden debt obligations.
+An enterprise-grade, full-stack financial analysis platform that automates the extraction, categorization, and risk assessment of raw bank statements to generate underwriter-grade credit profiles. 
 
-## 🚀 Key Features
+Moving beyond naive "keyword matching", this engine utilizes **Explainable AI (XAI)** principles and statistical variance to mathematically detect true income stability, gig-economy cash flows, and hidden debt obligations.
 
-- **Unified Format-Agnostic Parsers:** Seamlessly ingest and parse PDFs, CSVs, and Excel files (XLS/XLSX), including bypass support for password-encrypted documents (`msoffcrypto`, `pdfplumber`).
-- **Income Intelligence Pipeline:** A robust 12-point pipeline that calculates Fixed Obligation to Income Ratios (FOIR), Surplus Cash, and Salary Stability.
-- **Explainable Scoring:** Rule-based heuristics generate a `calculation_metadata` trace, explaining exactly *why* every score was awarded for strict financial auditability.
-- **Robust Security & RBAC:** Role-Based Access Control, Werkzeug password hashing, and cascading SQLite schema for data privacy.
-- **Dynamic Asynchronous Dashboards:** Real-time data visualization via Chart.js without requiring full page reloads.
+---
 
-## 🏗 Architecture Diagram
+## 📖 Table of Contents
+- [Business Value & Problem Statement](#-business-value--problem-statement)
+- [System Architecture](#-system-architecture)
+- [The Income Intelligence Pipeline](#-the-income-intelligence-pipeline)
+- [Data Engineering & Parsing](#-data-engineering--parsing)
+- [Security & RBAC](#-security--rbac)
+- [Screenshots](#-screenshots)
+- [Installation & Setup](#-installation--setup)
+- [Testing & Synthetic Data](#-testing--synthetic-data)
+- [Future Scope](#-future-scope)
+
+---
+
+## 🎯 Business Value & Problem Statement
+
+Traditional financial underwriting relies heavily on manual statement reviews or simple regex patterns to find "salary" deposits. This approach fails to account for modern gig-economy workers, hides massive outgoing debt obligations, and struggles to parse dirty, unstructured PDF data. 
+
+**The Solution:** This project completely automates the underwriting analysis phase. By standardizing dirty data across formats (PDF, CSV, XLS) and running it through a deterministic 12-point heuristic pipeline, it provides lenders with immediate, mathematically-backed insights into a user's *true* financial health.
+
+---
+
+## 🏗 System Architecture
+
+The application is built on a monolithic MVC pattern using Flask Blueprints. It utilizes a highly optimized state management pattern (`StatementContext`) to prevent expensive $O(N^2)$ dataset loops when passing data through the various analytical engines.
 
 ```mermaid
 graph TD
-    A[Client User / Admin] -->|Upload Statement| B(Flask App Routing)
-    B --> C{Format Parser}
-    C -->|PDF| D[pdfplumber]
-    C -->|XLS/XLSX| E[pandas + msoffcrypto]
-    C -->|CSV| F[csv_parser]
+    %% Core Architecture Diagram
+    A[Client UI / Admin] -->|Upload Statement| B(Flask App Routing)
+    B --> C{Format-Agnostic Parser}
     
-    D --> G[Data Normalizer]
+    subgraph Data Extraction Layer
+        C -->|PDF| D[pdfplumber]
+        C -->|XLS/XLSX| E[pandas + msoffcrypto]
+        C -->|CSV| F[csv_parser]
+    end
+    
+    D --> G[Data Normalizer & Deduplicator]
     E --> G
     F --> G
     
-    G --> H[(SQLite Database)]
+    G --> H[(SQLite Relational DB)]
     
-    H --> I[Income Intelligence Orchestrator]
-    I --> J[StatementContext State]
+    subgraph Intelligence Engine Pipeline
+        H --> I[Income Intelligence Orchestrator]
+        I --> J[StatementContext Object]
+        
+        J --> K[Salary Detector Engine]
+        J --> L[Surplus & Buffer Engine]
+        J --> M[FOIR Calculation Engine]
+    end
     
-    J --> K[Salary Detector Engine]
-    J --> L[Surplus & Buffer Engine]
-    J --> M[FOIR Calculation Engine]
-    
-    K --> N[Intelligence Reports]
+    K --> N[Intelligence Reports & Metadata]
     L --> N
     M --> N
     
     N --> O[Chart.js Frontend Dashboards]
 ```
 
+---
+
+## 🧠 The Income Intelligence Pipeline
+
+The analytical brain of the project consists of multiple decoupled "Engines" that sequentially mutate a central state object. Key engines include:
+
+1. **Salary Detector & Stability Engine:**
+   - Calculates the **Coefficient of Variation (CV)** and standard deviation of historical deposits.
+   - Mathematically differentiates between a stable corporate salary (low CV) and volatile freelance/business income (high CV).
+   - Isolates downward volatility so users aren't penalized for positive income spikes (like bonuses).
+2. **Surplus & Buffer Engines:**
+   - Calculates unencumbered end-of-month cash (Surplus).
+   - Implements an outlier-capping algorithm to prevent massive one-off purchases (e.g., buying a car) from destroying average living expense calculations.
+   - Categorizes outbound investments (Mutual Funds, Stocks) as liquid "Buffers" rather than burned cash.
+3. **FOIR (Fixed Obligation to Income Ratio) Engine:**
+   - Detects recurring loan payments (EMIs) via string matching and calculates the critical debt-to-income ratio used by major lending institutions.
+
+*Crucially, all engines generate a `calculation_metadata` trace. This ensures strict auditability by explaining exactly **why** a specific score was awarded.*
+
+---
+
+## 🛠 Data Engineering & Parsing
+
+- **Format-Agnostic Ingestion:** A unified pipeline capable of processing PDFs, CSVs, and Excel files interchangeably.
+- **Decryption Support:** Integrates `msoffcrypto` to seamlessly bypass file encryption on password-protected documents (common with official bank statements).
+- **Graceful Error Handling:** Advanced Pandas date normalization handles `NaT` (Not-a-Time) edge cases and standardizes wildly varied date formats across different banks.
+- **Idempotency:** Implements SHA-256 cryptographic hashing on parsed transaction strings to guarantee idempotency and prevent duplicate database insertions upon re-uploads.
+
+---
+
+## 🔒 Security & RBAC
+
+- **Relational Schema Design:** Designed normalized SQLite tables with `ON DELETE CASCADE` constraints to strictly adhere to PII data privacy standards.
+- **Authentication:** Role-Based Access Control (Admin vs. User) secured by Werkzeug password hashing.
+- **Brute-Force Protection:** Implemented automatic account lockout mechanisms after consecutive failed login attempts.
+
+---
+
 ## 📸 Screenshots
 
 *(Screenshots will be attached here)*
-- **Dashboard View:** `<!-- Attach Dashboard Screenshot Here -->`
-- **Upload Flow:** `<!-- Attach Upload Screenshot Here -->`
-- **Income Intelligence Report:** `<!-- Attach Report Screenshot Here -->`
-- **Admin Panel:** `<!-- Attach Admin Panel Screenshot Here -->`
+
+### 1. The Dashboard View
+`<!-- Attach Dashboard Screenshot Here -->`
+*Real-time data visualization via Chart.js, rendering asynchronous spending charts and predictive zero-balance dates.*
+
+### 2. Upload & Parsing Flow
+`<!-- Attach Upload Screenshot Here -->`
+*Seamless drag-and-drop interface with password decryption support.*
+
+### 3. Income Intelligence Report
+`<!-- Attach Report Screenshot Here -->`
+*The final underwriter-grade output, detailing FOIR, surplus cash, and the algorithmic stability score.*
+
+### 4. Admin Audit Panel
+`<!-- Attach Admin Panel Screenshot Here -->`
+*Role-restricted view allowing administrators to audit user profiles and inspect calculation metadata traces.*
+
+---
 
 ## ⚙️ Installation & Setup
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/bank-statement-analyzer.git
-   cd bank-statement-analyzer
+   git clone https://github.com/ManasPurnendu/Bank-Statement-Analyser.git
+   cd Bank-Statement-Analyser
    ```
 
 2. **Create a virtual environment:**
@@ -69,19 +146,34 @@ graph TD
    pip install -r requirements.txt
    ```
 
-4. **Run the Application:**
+4. **Initialize the Database:**
+   *(Ensure SQLite3 is installed, then run the app to auto-generate schemas)*
+
+5. **Run the Application:**
    ```bash
    python app.py
    ```
-   The application will start on `http://127.0.0.1:5000/`.
-
-## 🧪 Testing
-
-The repository includes a synthetic data generation pipeline (`generate_scenarios.py`) capable of generating mathematically modeled, fictional transaction histories covering specific financial personas (Ideal Borrower, High-Risk Defaulter, etc.) without requiring real-world PII.
-
-## 🔮 Future Scope
-
-- **Product Recommendation Engine:** Next-generation recommendation layer to cross-sell targeted mutual funds and credit cards based on FOIR and surplus cash flow.
+   The application will start locally on `http://127.0.0.1:5000/`.
 
 ---
-*Built as an internship project demonstrating full-stack engineering, complex data processing pipelines, and resilient system architecture.*
+
+## 🧪 Testing & Synthetic Data
+
+Due to the highly sensitive nature of banking PII, this repository includes a **synthetic data generation pipeline** (`generate_scenarios.py`). 
+
+This tool dynamically generates mathematically modeled, fictional transaction histories covering specific financial personas:
+- *Ideal Borrower* (High stable salary, low FOIR)
+- *High-Risk Defaulter* (Bouncing cheques, low surplus)
+- *Gig Economy Worker* (High volatility, multiple micro-deposits)
+
+This allows developers to rigorously stress-test the heuristics and edge cases of the intelligence pipeline without exposing real-world data.
+
+---
+
+## 🔮 Future Scope & Business Strategy
+
+- **Product Recommendation Engine:** Designing a next-generation recommendation layer that leverages the Income Intelligence profiles to cross-sell and up-sell in-house financial products (e.g., tailored mutual funds, specialized credit cards, and insurance policies).
+- **Targeted Marketing Integration:** By matching a user's Surplus Cash and FOIR to specific product risk profiles, the system transitions from a purely analytical tool into a proactive revenue-generating engine.
+
+---
+*Built to demonstrate full-stack engineering, complex data processing pipelines, and resilient system architecture.*
