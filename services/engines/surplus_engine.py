@@ -33,6 +33,10 @@ class SurplusEngine:
         absolute_surplus = ctx.confirmed_salary - ctx.total_fixed_obligations - ctx.average_monthly_expenses
         surplus_pct = (absolute_surplus / ctx.confirmed_salary) * 100 if ctx.confirmed_salary > 0 else 0
         
+        # Fix ISS-004: Clamp negative surplus floor
+        if surplus_pct < -100:
+            surplus_pct = -100.0
+        
         if surplus_pct > 40:
             ctx.surplus_score = 100.0
         elif surplus_pct >= 25:

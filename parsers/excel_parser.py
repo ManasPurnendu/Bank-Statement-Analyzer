@@ -6,7 +6,7 @@ import msoffcrypto
 from datetime import datetime
 from services.categorizer import categorize_transaction, detect_merchant_and_payee, detect_payment_method, detect_subscription, load_category_rules
 from database.models import compute_transaction_hash
-from parsers.utils import normalize_date, normalize_amount, normalize_headers, clean_description, finalize_metadata
+from parsers.utils import normalize_date, normalize_amount, normalize_headers, clean_description, finalize_metadata, is_numeric_string
 
 def is_excel_encrypted(file_path):
     """
@@ -194,6 +194,65 @@ def parse_excel_statement(file_path, original_filename, password=None):
         elif any(kw in col_lower for kw in ['type', 'indicator', 'dr/cr', 'cr/dr']):
             if not type_col: type_col = col
             
+    # Smart Format-Agnostic Inference Fallback
+    if not date_col or not desc_col:
+        # 1. Identify Date Column
+        date_scores = {}
+        for col in headers:
+            valid_dates = 0
+            total_vals = 0
+            for val in data_df[col].head(30):
+                if pd.notna(val) and str(val).strip():
+                    total_vals += 1
+                    try:
+                        normalize_date(str(val))
+                        valid_dates += 1
+                    except Exception:
+                        pass
+            if total_vals > 0 and (valid_dates / total_vals) > 0.8:
+                date_scores[col] = valid_dates / total_vals
+                
+        if date_scores:
+            date_col = max(date_scores, key=date_scores.get)
+            
+        # 2. Identify Numeric Columns (Amount/Debit/Credit/Balance)
+        numeric_cols = []
+        for col in headers:
+            if col == date_col: continue
+            valid_nums = 0
+            total_vals = 0
+            for val in data_df[col].head(30):
+                if pd.notna(val) and str(val).strip() not in ('', '-', 'nan', 'None'):
+                    total_vals += 1
+                    if is_numeric_string(val):
+                        valid_nums += 1
+            if total_vals > 0 and (valid_nums / total_vals) > 0.8:
+                numeric_cols.append(col)
+                
+        # Assign based on count
+        if not amount_col and not debit_col and not credit_col:
+            if len(numeric_cols) == 1:
+                amount_col = numeric_cols[0]
+            elif len(numeric_cols) == 2:
+                debit_col = numeric_cols[0]
+                credit_col = numeric_cols[1]
+            elif len(numeric_cols) >= 3:
+                debit_col = numeric_cols[0]
+                credit_col = numeric_cols[1]
+                balance_col = numeric_cols[2]
+                
+        # 3. Identify Description Column
+        if not desc_col:
+            desc_scores = {}
+            for col in headers:
+                if col == date_col or col in numeric_cols: continue
+                vals = [str(val).strip() for val in data_df[col].head(30) if pd.notna(val) and str(val).strip()]
+                if vals:
+                    avg_len = sum(len(v) for v in vals) / len(vals)
+                    desc_scores[col] = avg_len
+            if desc_scores:
+                desc_col = max(desc_scores, key=desc_scores.get)
+
     if not date_col or not desc_col:
         raise ValueError("Bank statement must contain 'Date' and 'Description' columns.")
 

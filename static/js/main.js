@@ -1,3 +1,17 @@
+// --- GLOBAL FETCH CSRF INTERCEPTOR (ISS-005) ---
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    let [resource, config] = arguments;
+    if (config && ['POST', 'PUT', 'DELETE', 'PATCH'].includes((config.method || '').toUpperCase())) {
+        config.headers = config.headers || {};
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken) {
+            config.headers['X-CSRFToken'] = csrfToken;
+        }
+    }
+    return originalFetch(resource, config);
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     // --- GLOBAL SETUP ---
     initTheme();
@@ -379,63 +393,99 @@ function initUploadFlow() {
             formData.append("target_user_id", window.targetUploadUserId);
         }
         
-        startProcessingAnimation();
-        updateProcessingStep('upload', 'active');
-        
-        fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => {
-            if (res.status === 401) {
-                // Password Required / Incorrect OR Unauthorized
-                return res.json().then(data => {
-                    if (data.message === "Unauthorized") {
-                        window.location.href = '/auth/login';
-                        return null;
-                    }
-                    stopProcessingAnimation();
-                    passwordModal.show();
-                    if (data.error === "IncorrectPassword") {
-                        document.getElementById("passwordError").style.display = "block";
-                        pdfPasswordInput.classList.add("is-invalid");
-                    } else {
-                        document.getElementById("passwordError").style.display = "none";
-                        pdfPasswordInput.classList.remove("is-invalid");
-                    }
-                    return null; // Signal to skip the next .then()
-                });
-            } else if (res.status === 409) {
-                // Duplicate Statement
-                return res.json().then(data => {
-                    stopProcessingAnimation();
-                    duplicateInfo = data.details;
-                    document.getElementById("duplicateDetails").innerText = 
-                        `Statement '${duplicateInfo.file_name}' for account ${duplicateInfo.account_number} (${duplicateInfo.period}) is already uploaded.`;
-                    duplicateModal.show();
-                    return null; // Signal to skip the next .then()
-                });
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (!data) return; // Handled via modal popups
+        const progressContainer = document.getElementById('uploadProgressContainer');
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressText = document.getElementById('uploadProgressText');
+
+        const executeFetch = () => {
+            startProcessingAnimation();
+            updateProcessingStep('upload', 'active');
             
-            if (data.success) {
-                // Shift file from array and parse next
-                pendingFiles.shift();
-                // Retain currentPassword for subsequent files in this batch upload
-                uploadNextFile();
-            } else {
-                alert("Upload failed: " + data.message);
-                resetUploadView();
-            }
-        })
-        .catch(err => {
-            console.error("Upload error:", err);
-            alert("An error occurred: " + err.message);
-            resetUploadView();
-        });
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                if (res.status === 401) {
+                    return res.json().then(data => {
+                        if (data.message === "Unauthorized") {
+                            window.location.href = '/auth/login';
+                            return null;
+                        }
+                        stopProcessingAnimation();
+                        passwordModal.show();
+                        if (data.error === "IncorrectPassword") {
+                            document.getElementById("passwordError").style.display = "block";
+                            pdfPasswordInput.classList.add("is-invalid");
+                        } else {
+                            document.getElementById("passwordError").style.display = "none";
+                            pdfPasswordInput.classList.remove("is-invalid");
+                        }
+                        return null; 
+                    });
+                } else if (res.status === 409) {
+                    return res.json().then(data => {
+                        stopProcessingAnimation();
+                        duplicateInfo = data.details;
+                        document.getElementById("duplicateDetails").innerText = 
+                            `Statement '${duplicateInfo.file_name}' for account ${duplicateInfo.account_number} (${duplicateInfo.period}) is already uploaded.`;
+                        duplicateModal.show();
+                        return null; 
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return; 
+                
+                if (data.success) {
+                    pendingFiles.shift();
+                    uploadNextFile();
+                } else {
+                    showUploadError("Upload failed: " + data.message);
+                }
+            })
+            .catch(err => {
+                console.error("Upload error:", err);
+                showUploadError("An error occurred: " + err.message);
+            });
+        };
+
+        if (progressContainer) {
+            progressContainer.classList.add('active');
+            progressBar.style.width = '0%';
+            progressText.innerText = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    progressBar.style.width = '100%';
+                    progressText.innerText = 'Uploading: 100%';
+                    
+                    setTimeout(() => {
+                        executeFetch();
+                    }, 300);
+                } else {
+                    progressBar.style.width = progress + '%';
+                    progressText.innerText = `Uploading: ${progress}%`;
+                }
+            }, 50);
+        } else {
+            executeFetch();
+        }
+    }
+
+    function showUploadError(message) {
+        resetUploadView();
+        const errDiv = document.getElementById("upload-error");
+        const errText = document.getElementById("upload-error-text");
+        if (errDiv && errText) {
+            errText.innerText = message;
+            errDiv.style.display = "block";
+        }
     }
 
     // Password submit

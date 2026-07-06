@@ -74,3 +74,12 @@ class EMIDetector:
         
         ctx.add_audit_trail("EMIDetector", "total_obligations", ctx.total_fixed_obligations)
         ctx.add_audit_trail("EMIDetector", "detected_count", len(confirmed_emis))
+        
+        # Add detailed human-readable explanation
+        if confirmed_emis:
+            explanation = f"Detected {len(confirmed_emis)} active EMI obligations totaling ₹{ctx.total_fixed_obligations:,.2f}. "
+            for i, emi in enumerate(confirmed_emis, 1):
+                explanation += f"({i}) ₹{emi['amount']:,.2f} ({emi['confidence_band']}, {emi['occurrences']} hits). "
+            ctx.add_audit_trail("EMIDetector", "explanation", explanation.strip())
+        else:
+            ctx.add_audit_trail("EMIDetector", "explanation", "No active EMI obligations detected.")

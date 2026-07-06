@@ -141,6 +141,15 @@ class SalaryDetector:
         else:
             ctx.salary_confidence_band = "Rejected"
             
+        explanation = (
+            f"Salary detection assigned a confidence band of '{ctx.salary_confidence_band}' "
+            f"with a score of {best_score}/100. "
+            f"Keyword Match: {best_metadata.get('keyword_match', 'None')}, "
+            f"Recurrence: {best_metadata.get('recurrence_ratio', 0):.0%}, "
+            f"Amount Variation (CV): {best_metadata.get('amount_cv', 'N/A')}."
+        )
+        
+        ctx.add_audit_trail("SalaryDetector", "explanation", explanation)
         ctx.add_audit_trail("SalaryDetector", "best_score", best_score)
         ctx.add_audit_trail("SalaryDetector", "band", ctx.salary_confidence_band)
         ctx.add_audit_trail("SalaryDetector", "details", best_metadata)

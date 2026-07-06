@@ -11,7 +11,7 @@ from services.engines.foir_engine import FOIREngine
 from services.engines.statement_health import StatementHealthEngine
 from services.engines.surplus_engine import SurplusEngine
 from services.engines.buffer_engine import BufferEngine
-from services.engines.readiness_engine import ReadinessEngine
+from services.engines.confidence_scoring_engine import ConfidenceScoringEngine
 
 class IncomeIntelligenceOrchestrator:
     """
@@ -30,7 +30,7 @@ class IncomeIntelligenceOrchestrator:
         StatementValidator.validate_initial(ctx)
         
         # If the file is completely corrupt or has zero txns, abort early
-        if ctx.eligibility_status == "PROCESSING_ERROR":
+        if ctx.income_classification == "PROCESSING_ERROR":
             return IncomeIntelligenceOrchestrator._build_output(ctx, start_time)
             
         # Phase 2: Base Detection
@@ -38,7 +38,7 @@ class IncomeIntelligenceOrchestrator:
         StatementValidator.validate_salary_presence(ctx)
         
         # If it's definitely not salaried, abort heavy calculation
-        if ctx.eligibility_status == "NON_SALARIED":
+        if ctx.income_classification == "NON_SALARIED":
             return IncomeIntelligenceOrchestrator._build_output(ctx, start_time)
             
         # Phase 3: Advanced Engines
@@ -55,7 +55,7 @@ class IncomeIntelligenceOrchestrator:
         BufferEngine.run(ctx)
         
         # Phase 4: Final Scoring
-        ReadinessEngine.run(ctx)
+        ConfidenceScoringEngine.run(ctx)
         
         return IncomeIntelligenceOrchestrator._build_output(ctx, start_time)
         
@@ -67,7 +67,7 @@ class IncomeIntelligenceOrchestrator:
         return {
             "engine_version": "v2.3",
             "data_sufficiency_grade": ctx.data_sufficiency_grade,
-            "eligibility_status": ctx.eligibility_status,
+            "income_classification": ctx.income_classification,
             "base_salary": ctx.confirmed_salary,
             "fixed_emi_obligations": ctx.total_fixed_obligations,
             "foir_percentage": ctx.foir_percentage,
@@ -75,7 +75,7 @@ class IncomeIntelligenceOrchestrator:
             "statement_health_score": ctx.statement_health_score,
             "surplus_score": ctx.surplus_score,
             "buffer_score": ctx.buffer_score,
-            "final_readiness_score": ctx.final_readiness_score,
+            "income_confidence_score": ctx.income_confidence_score,
             "risk_flags": ctx.risk_flags,
             "positive_signals": ctx.positive_signals,
             "calculation_metadata": ctx.calculation_metadata,

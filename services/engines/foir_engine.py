@@ -16,6 +16,12 @@ class FOIREngine:
         foir = (ctx.total_fixed_obligations / ctx.confirmed_salary) * 100
         ctx.foir_percentage = round(foir, 2)
         
+        explanation = (
+            f"Calculated FOIR of {ctx.foir_percentage}% based on total fixed obligations "
+            f"of ₹{ctx.total_fixed_obligations:,.2f} against a confirmed monthly salary "
+            f"of ₹{ctx.confirmed_salary:,.2f}."
+        )
+        ctx.add_audit_trail("FOIREngine", "explanation", explanation)
         ctx.add_audit_trail("FOIREngine", "foir_pct", ctx.foir_percentage)
         
         if ctx.foir_percentage > 60.0:

@@ -59,6 +59,23 @@ def normalize_date(date_str: str) -> str:
 # Amount normalisation
 # ---------------------------------------------------------------------------
 
+def is_numeric_string(amount_val) -> bool:
+    """
+    Check if a string represents a numeric money value.
+    """
+    if amount_val is None:
+        return False
+    val_str = str(amount_val).strip()
+    if val_str in ('', '-', 'nan', 'None', 'N/A', 'NA'):
+        return False
+    val_str = re.sub(r'(?i)(cr|dr)$', '', val_str).replace(',', '')
+    try:
+        float(val_str)
+        return True
+    except ValueError:
+        return False
+
+
 def normalize_amount(amount_val) -> float:
     """
     Convert a money string / number to a plain Python float.

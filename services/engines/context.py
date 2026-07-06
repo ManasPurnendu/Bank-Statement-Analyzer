@@ -58,7 +58,7 @@ class StatementContext:
         # --- Engine Outputs (Populated during pipeline execution) ---
         
         # Validation & Sufficiency
-        self.eligibility_status = None # EXCELLENT_PROFILE, STABLE_PROFILE, MARGINAL_PROFILE, NON_SALARIED, INSUFFICIENT_DATA, PROCESSING_ERROR
+        self.income_classification = None # EXCELLENT_PROFILE, STABLE_PROFILE, MARGINAL_PROFILE, NON_SALARIED, INSUFFICIENT_DATA, PROCESSING_ERROR
         self.data_sufficiency_grade = None # Bronze, Silver, Gold
         
         # Salary & Employer
@@ -83,7 +83,7 @@ class StatementContext:
         self.buffer_score = 0.0
         
         # Final Outputs
-        self.final_readiness_score = 0.0
+        self.income_confidence_score = 0.0
         self.risk_flags = []       # Dicts with severity, reason, action
         self.positive_signals = [] # Strings
         

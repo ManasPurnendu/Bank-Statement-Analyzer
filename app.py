@@ -1,6 +1,11 @@
 from flask import Flask, render_template, redirect, url_for, jsonify, session
 import os
 import secrets
+import logging
+from logging.handlers import RotatingFileHandler
+from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
+
 from database.db import init_db
 from routes.upload_routes import upload_bp
 from routes.dashboard_routes import dashboard_bp
@@ -11,18 +16,24 @@ from routes.report_routes import report_bp
 from routes.auth_routes import auth_bp
 from utils.decorators import login_required, admin_required
 
+# --- Load Environment Variables ---
+load_dotenv()
+
 app = Flask(__name__)
 
-# --- Security: Flask Secret Key ---
-# NEVER hardcode secret keys in source code. A leaked key allows attackers to
-# forge session cookies and hijack user sessions.
-#
-# In production, set the SECRET_KEY environment variable to a strong random value:
-#   export SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-#
-# For local development, a random fallback is generated automatically. Note that
-# sessions will not persist across server restarts when using the fallback.
+# --- Setup Logging (ISS-003) ---
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app.log')
+file_handler = RotatingFileHandler(log_file, maxBytes=1024000, backupCount=10)
+file_handler.setFormatter(log_formatter)
+file_handler.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
+app.logger.info('Bank Statement Analyser startup')
+
+# --- Security: Flask Secret Key & CSRF (ISS-005) ---
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-fallback-secret-key-do-not-use-in-production')
+csrf = CSRFProtect(app)
 
 # Session configuration
 from datetime import timedelta

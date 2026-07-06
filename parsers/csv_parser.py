@@ -3,7 +3,7 @@ import re
 import os
 import pandas as pd
 from datetime import datetime
-from parsers.utils import normalize_date, normalize_amount, normalize_headers, finalize_metadata
+from parsers.utils import normalize_date, normalize_amount, normalize_headers, finalize_metadata, is_numeric_string
 from services.categorizer import categorize_transaction, detect_merchant_and_payee, detect_payment_method, detect_subscription, load_category_rules
 from database.models import compute_transaction_hash
 
@@ -119,6 +119,69 @@ def parse_csv_statement(file_path, original_filename):
                 header_idx = 0
                 mapping = res
 
+    if header_idx == -1 or mapping is None or mapping["date"] is None or mapping["description"] is None:
+        # Smart Format-Agnostic Inference Fallback
+        if len(raw_rows) > 0:
+            df = pd.DataFrame(raw_rows[1:], columns=range(len(raw_rows[0])))
+            headers = list(range(len(raw_rows[0])))
+            
+            if mapping is None:
+                mapping = {"date": None, "description": None, "debit": None, "credit": None, "amount": None, "balance": None}
+                
+            date_scores = {}
+            for col in headers:
+                valid_dates = 0
+                total_vals = 0
+                for val in df[col].head(30):
+                    if pd.notna(val) and str(val).strip():
+                        total_vals += 1
+                        try:
+                            normalize_date(str(val))
+                            valid_dates += 1
+                        except Exception:
+                            pass
+                if total_vals > 0 and (valid_dates / total_vals) > 0.8:
+                    date_scores[col] = valid_dates / total_vals
+                    
+            if date_scores:
+                mapping['date'] = max(date_scores, key=date_scores.get)
+                
+            numeric_cols = []
+            for col in headers:
+                if col == mapping['date']: continue
+                valid_nums = 0
+                total_vals = 0
+                for val in df[col].head(30):
+                    if pd.notna(val) and str(val).strip() not in ('', '-', 'nan', 'None'):
+                        total_vals += 1
+                        if is_numeric_string(val):
+                            valid_nums += 1
+                if total_vals > 0 and (valid_nums / total_vals) > 0.8:
+                    numeric_cols.append(col)
+                    
+            if len(numeric_cols) == 1:
+                mapping['amount'] = numeric_cols[0]
+            elif len(numeric_cols) == 2:
+                mapping['debit'] = numeric_cols[0]
+                mapping['credit'] = numeric_cols[1]
+            elif len(numeric_cols) >= 3:
+                mapping['debit'] = numeric_cols[0]
+                mapping['credit'] = numeric_cols[1]
+                mapping['balance'] = numeric_cols[2]
+                
+            desc_scores = {}
+            for col in headers:
+                if col == mapping['date'] or col in numeric_cols: continue
+                vals = [str(val).strip() for val in df[col].head(30) if pd.notna(val) and str(val).strip()]
+                if vals:
+                    avg_len = sum(len(v) for v in vals) / len(vals)
+                    desc_scores[col] = avg_len
+            if desc_scores:
+                mapping['description'] = max(desc_scores, key=desc_scores.get)
+                
+            if mapping['date'] is not None and mapping['description'] is not None:
+                header_idx = 0
+                
     if header_idx == -1 or mapping is None or mapping["date"] is None or mapping["description"] is None:
         raise ValueError("CSV parser error: missing required columns. Could not identify Date or Description headers.")
 

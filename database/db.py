@@ -14,6 +14,18 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
+    # Create Users Table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'user',
+            failed_attempts INTEGER DEFAULT 0,
+            locked_until DATETIME
+        )
+    ''')
+    
     # Create Statements Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS statements (
@@ -30,7 +42,9 @@ def init_db():
             transaction_count INTEGER DEFAULT 0,
             opening_balance REAL,
             closing_balance REAL,
-            file_hash TEXT
+            file_hash TEXT,
+            user_id INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
     ''')
     
@@ -85,7 +99,7 @@ def init_db():
             statement_id INTEGER,
             engine_version TEXT NOT NULL,
             data_sufficiency_grade TEXT,
-            eligibility_status TEXT NOT NULL,
+            income_classification TEXT NOT NULL,
             base_salary REAL,
             fixed_emi_obligations REAL,
             foir_percentage REAL,
@@ -93,7 +107,7 @@ def init_db():
             statement_health_score REAL,
             surplus_score REAL,
             buffer_score REAL,
-            final_readiness_score REAL,
+            income_confidence_score REAL,
             risk_flags TEXT,
             positive_signals TEXT,
             report_generation_time_ms REAL,

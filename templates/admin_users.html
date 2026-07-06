@@ -70,9 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
 function getBadgeClass(status) {
     if (!status) return 'bg-secondary text-white';
     switch(status.toUpperCase()) {
-        case 'EXCELLENT_PROFILE': return 'bg-success text-white';
-        case 'STABLE_PROFILE': return 'bg-primary text-white';
-        case 'MARGINAL_PROFILE': return 'bg-warning text-dark';
+        case 'VERIFIED_SALARY': return 'bg-success text-white';
+        case 'LIKELY_SALARY': return 'bg-primary text-white';
+        case 'POSSIBLE_SALARY': return 'bg-info text-dark';
+        case 'UNVERIFIED_INCOME': return 'bg-warning text-dark';
         case 'INSUFFICIENT_DATA': return 'bg-secondary text-white';
         case 'NON_SALARIED': return 'bg-danger text-white';
         case 'PROCESSING_ERROR': return 'bg-dark text-white';
@@ -94,35 +95,24 @@ async function fetchUsers() {
         }
         
         data.users.forEach(user => {
-            const statusBadge = user.eligibility_status 
-                ? `<span class="badge ${getBadgeClass(user.eligibility_status)} px-3 py-2 rounded-pill">${user.eligibility_status}</span>`
+            const statusBadge = user.income_classification 
+                ? `<span class="badge ${getBadgeClass(user.income_classification)} px-3 py-2 rounded-pill">${user.income_classification}</span>`
                 : `<span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">Not Assessed</span>`;
                 
-            let actionButtons = '';
+            let actionButtons = `
+                <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
+                    <i class="bi bi-cloud-arrow-up-fill"></i> Upload
+                </button>
+            `;
             
             if (user.statement_count > 0) {
-                actionButtons = `
-                    <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
-                        <i class="bi bi-cloud-arrow-up-fill"></i> Upload
-                    </button>
-                    <button id="analyze-btn-${user.user_id}" class="btn btn-sm btn-outline-primary fw-semibold me-2" onclick="runIntelligence(${user.user_id})" title="Run Intelligence Engine">
-                        <i class="bi bi-cpu-fill"></i> Analyze
+                actionButtons += `
+                    <button class="btn btn-sm btn-outline-primary fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statements-${user.user_id}">
+                        <i class="bi bi-list-ul"></i> View ${user.statement_count} Statements
                     </button>
                 `;
-                if (user.eligibility_status) {
-                    actionButtons += `
-                        <button class="btn btn-sm btn-dark fw-semibold" onclick="viewReport(${user.user_id})" title="View Report">
-                            <i class="bi bi-file-text-fill"></i> View Report
-                        </button>
-                    `;
-                }
             } else {
-                actionButtons = `
-                    <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
-                        <i class="bi bi-cloud-arrow-up-fill"></i> Upload
-                    </button>
-                    <span class="text-muted small"><i class="bi bi-lock-fill"></i> Awaiting Data</span>
-                `;
+                actionButtons += `<span class="text-muted small ms-2"><i class="bi bi-lock-fill"></i> Awaiting Data</span>`;
             }
 
             const tr = document.createElement('tr');
@@ -137,6 +127,41 @@ async function fetchUsers() {
                 <td class="px-4 text-end">${actionButtons}</td>
             `;
             tbody.appendChild(tr);
+
+            if (user.statements && user.statements.length > 0) {
+                const subTr = document.createElement('tr');
+                let stmtsHtml = user.statements.map(stmt => `
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-white py-3 px-4 border-start-0 border-end-0">
+                        <div>
+                            <div class="fw-bold text-dark d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf text-danger me-2"></i> ${stmt.file_name}
+                            </div>
+                            <div class="small text-muted mt-1">Uploaded: ${new Date(stmt.upload_date).toLocaleString()}</div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            ${stmt.income_classification 
+                                ? `<span class="badge ${getBadgeClass(stmt.income_classification)}">${stmt.income_classification.replace(/_/g, ' ')}</span>
+                                   <button class="btn btn-sm btn-dark fw-semibold" onclick="viewReport(${stmt.statement_id})"><i class="bi bi-file-text-fill"></i> View Report</button>`
+                                : `<button id="analyze-btn-${stmt.statement_id}" class="btn btn-sm btn-primary fw-semibold" onclick="runIntelligence(${stmt.statement_id})"><i class="bi bi-cpu-fill"></i> Analyze</button>`
+                            }
+                        </div>
+                    </li>
+                `).join('');
+                
+                subTr.innerHTML = `
+                    <td colspan="5" class="p-0 border-0">
+                        <div class="collapse bg-light p-0 border-bottom border-top shadow-inner" id="statements-${user.user_id}">
+                            <div class="p-3 ps-4 bg-white border-bottom fw-bold text-secondary d-flex align-items-center gap-2">
+                                <i class="bi bi-folder2-open"></i> Uploaded Statements for User #${user.user_id}
+                            </div>
+                            <ul class="list-group list-group-flush rounded-0 m-0">
+                                ${stmtsHtml}
+                            </ul>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(subTr);
+            }
         });
     } catch (e) {
         console.error("Failed to load users", e);
@@ -151,8 +176,8 @@ function openUploadForUser(userId) {
     bootstrap.Modal.getOrCreateInstance(document.getElementById('uploadModal')).show();
 }
 
-async function runIntelligence(userId) {
-    const btn = document.getElementById(`analyze-btn-${userId}`);
+async function runIntelligence(statementId) {
+    const btn = document.getElementById(`analyze-btn-${statementId}`);
     const originalContent = btn.innerHTML;
     
     // Replace with spinner
@@ -160,25 +185,31 @@ async function runIntelligence(userId) {
     btn.disabled = true;
     
     try {
-        const response = await fetch(`/api/admin/intelligence/generate/${userId}`, { method: 'POST' });
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const response = await fetch(`/api/admin/intelligence/generate/${statementId}`, { 
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        });
         const data = await response.json();
         
         if (data.success) {
-            showToast('Success', `Analysis complete! Profile: ${data.eligibility_status.replace(/_/g, ' ')}`, 'success');
+            showAdminToast('Success', `Analysis complete! Profile: ${data.income_classification.replace(/_/g, ' ')}`, 'success');
             fetchUsers();
         } else {
-            showToast('Error', "Analysis failed: " + data.message, 'danger');
+            showAdminToast('Error', "Analysis failed: " + data.message, 'danger');
             btn.innerHTML = originalContent;
             btn.disabled = false;
         }
     } catch (e) {
-        showToast('Error', "Server error occurred.", 'danger');
+        showAdminToast('Error', "Server error occurred: " + e.message, 'danger');
         btn.innerHTML = originalContent;
         btn.disabled = false;
     }
 }
 
-function showToast(title, message, type) {
+function showAdminToast(title, message, type) {
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
         const div = document.createElement('div');
@@ -213,9 +244,9 @@ function showToast(title, message, type) {
     });
 }
 
-async function viewReport(userId) {
+async function viewReport(statementId) {
     try {
-        const response = await fetch(`/api/admin/intelligence/report/${userId}`);
+        const response = await fetch(`/api/admin/intelligence/report/${statementId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -304,10 +335,10 @@ function renderReport(report) {
                 <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div>
-                            <span class="badge ${getBadgeClass(r.eligibility_status)} mb-2 fs-6 px-3 py-2 rounded-pill">${r.eligibility_status.replace(/_/g, ' ')}</span>
-                            <h3 class="fw-bold mb-0">Readiness Score: <span class="text-primary">${r.final_readiness_score || 0}/100</span></h3>
+                            <span class="badge ${getBadgeClass(r.income_classification)} mb-2 fs-6 px-3 py-2 rounded-pill">${r.income_classification.replace(/_/g, ' ')}</span>
+                            <h3 class="fw-bold mb-0">Salary Confidence Score: <span class="text-primary">${r.income_confidence_score || 0}/100</span></h3>
                             <p class="text-muted mb-0 small mt-1"><i class="bi bi-clock-history"></i> Generated in ${r.report_generation_time_ms}ms</p>
-                            <p class="text-muted mb-0 small"><i class="bi bi-collection-fill"></i> Calculated from all uploaded statements for this user</p>
+                            <p class="text-muted mb-0 small"><i class="bi bi-file-earmark-bar-graph-fill"></i> Calculated from this individual statement</p>
                         </div>
                         <div class="text-end">
                             <div class="fw-bold fs-3 text-success">₹${(r.base_salary || 0).toLocaleString('en-IN')}</div>

@@ -2,6 +2,7 @@ from database.db import get_db_connection
 import sqlite3
 import hashlib
 import re
+from functools import lru_cache
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def compute_transaction_hash(account_number, date, description, amount, txn_type, balance):
@@ -350,12 +351,12 @@ def update_transaction_category(transaction_id, category_id, user_id=None):
     conn.close()
 
 def update_merchant_category_rules(merchant_name, category_id):
-    """
-    Creates/updates a category rule for a merchant/amount and updates all existing 
-    transactions matching it to the new category.
-    """
-    if not merchant_name:
+    if not merchant_name or not category_id:
         return
+    
+    # Invalidate rules cache
+    get_category_rules.cache_clear()
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -389,6 +390,7 @@ def update_merchant_category_rules(merchant_name, category_id):
     conn.commit()
     conn.close()
 
+@lru_cache(maxsize=1)
 def get_all_categories():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -397,6 +399,7 @@ def get_all_categories():
     conn.close()
     return [dict(row) for row in rows]
 
+@lru_cache(maxsize=1)
 def get_category_rules():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -410,6 +413,7 @@ def get_category_rules():
     conn.close()
     return [dict(row) for row in rows]
 
+@lru_cache(maxsize=128)
 def get_category_id_by_name(category_name):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -532,9 +536,9 @@ def add_intelligence_report(report_data):
     cursor.execute('''
         INSERT INTO income_intelligence_reports (
             user_id, statement_id, engine_version, data_sufficiency_grade,
-            eligibility_status, base_salary, fixed_emi_obligations,
+            income_classification, base_salary, fixed_emi_obligations,
             foir_percentage, stability_score, statement_health_score,
-            surplus_score, buffer_score, final_readiness_score,
+            surplus_score, buffer_score, income_confidence_score,
             risk_flags, positive_signals, report_generation_time_ms,
             calculation_metadata
         ) VALUES (
@@ -545,7 +549,7 @@ def add_intelligence_report(report_data):
         report_data.get('statement_id'),
         report_data.get('engine_version', 'v2.3'),
         report_data.get('data_sufficiency_grade'),
-        report_data.get('eligibility_status', 'PROCESSING_ERROR'),
+        report_data.get('income_classification', 'PROCESSING_ERROR'),
         report_data.get('base_salary'),
         report_data.get('fixed_emi_obligations'),
         report_data.get('foir_percentage'),
@@ -553,7 +557,7 @@ def add_intelligence_report(report_data):
         report_data.get('statement_health_score'),
         report_data.get('surplus_score'),
         report_data.get('buffer_score'),
-        report_data.get('final_readiness_score'),
+        report_data.get('income_confidence_score'),
         risk_flags_str,
         positive_signals_str,
         report_data.get('report_generation_time_ms'),

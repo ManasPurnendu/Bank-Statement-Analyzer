@@ -1876,3 +1876,101 @@ h1, h2, h3, h4, h5, h6,
     background-color: rgba(21, 28, 47, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* --- PHASE 3: UX POLISH --- */
+/* Button Standardization & Transitions */
+.btn {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: var(--transition-smooth);
+    letter-spacing: 0.3px;
+}
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.btn-outline-primary {
+    transition: var(--transition-smooth);
+}
+.btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Card Hover Transitions */
+.card {
+    transition: var(--transition-smooth);
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Skeleton Loaders */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-surface-elevated) 25%, var(--border-color) 50%, var(--bg-surface-elevated) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 6px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+.skeleton-title {
+    height: 24px;
+    margin-bottom: 12px;
+    width: 60%;
+}
+.skeleton-chart {
+    height: 250px;
+    width: 100%;
+    border-radius: var(--card-radius);
+}
+.skeleton-stat {
+    height: 36px;
+    width: 50%;
+}
+
+/* Progress Bar indicator for Uploads */
+.upload-progress-container {
+    display: none;
+    margin-top: 20px;
+}
+.upload-progress-container.active {
+    display: block;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--border-color);
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.progress-bar {
+    background-color: var(--primary);
+    transition: width 0.3s ease;
+}
+.progress-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: center;
+    font-weight: 500;
+}

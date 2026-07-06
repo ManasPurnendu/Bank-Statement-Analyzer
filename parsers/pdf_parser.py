@@ -35,6 +35,7 @@ def _process_pdf_page(file_path, password, page_idx):
             page = pdf.pages[page_idx]
             tables = page.extract_tables()
             text = page.extract_text() or ""
+            page.flush_cache()  # Fix ISS-002 memory leak
             return (page_idx, tables, text)
     except Exception as e:
         print(f"Error processing page {page_idx}: {e}")
@@ -83,15 +84,25 @@ _DATE_FORMATS = (
 def _parse_date(raw: str):
     """Return datetime.date or None."""
     raw = str(raw).strip()
-    # Strip trailing time component
-    raw = raw.split()[0] if raw.split() else raw
+    
+    # Extract date using regex to ignore watermark garbage like "C I 01/01/2024"
+    date_match = re.search(r'(\d{1,2}[-/\.]\d{1,2}[-/\.]\d{2,4}|\d{1,2}\s+[A-Za-z]{3,4}\s+\d{2,4})', raw)
+    if date_match:
+        raw = date_match.group(1)
+    else:
+        # Strip trailing time component
+        raw = raw.split()[0] if raw.split() else raw
+        
     for fmt in _DATE_FORMATS:
         try:
             return datetime.strptime(raw, fmt).date()
         except ValueError:
             continue
     try:
-        return pd.to_datetime(raw, dayfirst=True).date()
+        parsed = pd.to_datetime(raw, dayfirst=True).date()
+        if pd.isna(parsed):
+            return None
+        return parsed
     except Exception:
         return None
 
@@ -473,7 +484,7 @@ def _parse_row(row: list, mapping: dict) -> dict | None:
                     'transaction_type': txn_type,
                     'balance': round(balance, 2),
                 }
-    else:
+    if amount == 0:
         # Last resort: find numbers in cols from index 2 onwards
         numbers = []
         for v in row[2:]:
@@ -588,7 +599,8 @@ def parse_pdf_statement(file_path: str, original_filename: str, password: str = 
 
         for table in tables:
             for row in table:
-                cleaned = [str(v).strip() if v is not None else '' for v in row]
+                # Remove internal newlines caused by watermarks
+                cleaned = [re.sub(r'[\n\r]+', ' ', str(v)).strip() if v is not None else '' for v in row]
                 if any(v for v in cleaned):
                     raw_table_rows.append(cleaned)
 
@@ -627,52 +639,52 @@ def parse_pdf_statement(file_path: str, original_filename: str, password: str = 
     if not raw_table_rows:
         raise ValueError("No transaction rows could be extracted from the PDF.")
 
-        # ---- Step 5: Detect header row & column layout ----
-        header_idx = -1
-        mapping = None
+    # ---- Step 5: Detect header row & column layout ----
+    header_idx = -1
+    mapping = None
 
-        for i, row in enumerate(raw_table_rows[:15]):
-            row_lower = [str(v).lower() for v in row]
-            has_date = any('date' in v for v in row_lower)
-            has_desc = any(kw in v for kw in
-                           ('desc', 'narr', 'part', 'detail', 'particular') for v in row_lower)
-            if has_date and has_desc:
-                header_idx = i
-                mapping = _detect_column_layout(row)
-                break
+    for i, row in enumerate(raw_table_rows[:15]):
+        row_lower = [str(v).lower() for v in row]
+        has_date = any('date' in v for v in row_lower)
+        has_desc = any(kw in v for kw in
+                       ('desc', 'narr', 'part', 'detail', 'particular') for v in row_lower)
+        if has_date and has_desc:
+            header_idx = i
+            mapping = _detect_column_layout(row)
+            break
 
-        # Determine data rows
-        if header_idx != -1:
-            data_rows = raw_table_rows[header_idx + 1:]
+    # Determine data rows
+    if header_idx != -1:
+        data_rows = raw_table_rows[header_idx + 1:]
+    else:
+        data_rows = raw_table_rows
+
+    # If no header found or mapping incomplete, auto-detect from sample row width
+    if mapping is None or (mapping.get('date') is None):
+        # Find the most common row length
+        from collections import Counter
+        lengths = [len(r) for r in data_rows if len(r) >= 3]
+        if lengths:
+            modal_len = Counter(lengths).most_common(1)[0][0]
         else:
-            data_rows = raw_table_rows
+            modal_len = 5
+        mapping = _auto_detect_layout(data_rows[:10], modal_len)
 
-        # If no header found or mapping incomplete, auto-detect from sample row width
-        if mapping is None or (mapping.get('date') is None):
-            # Find the most common row length
-            from collections import Counter
-            lengths = [len(r) for r in data_rows if len(r) >= 3]
-            if lengths:
-                modal_len = Counter(lengths).most_common(1)[0][0]
-            else:
-                modal_len = 5
-            mapping = _auto_detect_layout(data_rows[:10], modal_len)
+    # ---- Step 6: Parse each data row ----
+    skip_keywords = {'date', 'balance', 'narration', 'description',
+                     'particulars', 'debit', 'credit', 'amount', 'withdrawal',
+                     'deposit', 'brought forward', 'page', 'total'}
 
-        # ---- Step 6: Parse each data row ----
-        skip_keywords = {'date', 'balance', 'narration', 'description',
-                         'particulars', 'debit', 'credit', 'amount', 'withdrawal',
-                         'deposit', 'brought forward', 'page', 'total'}
+    for row in data_rows:
+        # Skip header repetitions
+        row_lower_set = {str(v).lower().strip() for v in row}
+        if row_lower_set & skip_keywords:
+            continue
 
-        for row in data_rows:
-            # Skip header repetitions
-            row_lower_set = {str(v).lower().strip() for v in row}
-            if row_lower_set & skip_keywords:
-                continue
-
-            txn = _parse_row(row, mapping)
-            if txn is None:
-                continue
-            transactions.append(txn)
+        txn = _parse_row(row, mapping)
+        if txn is None:
+            continue
+        transactions.append(txn)
 
     if not transactions:
         raise ValueError("No valid transactions could be parsed from the PDF file.")

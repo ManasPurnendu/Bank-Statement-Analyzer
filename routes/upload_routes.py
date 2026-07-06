@@ -9,9 +9,18 @@ from database.models import check_duplicate_statement, add_statement, add_transa
 upload_bp = Blueprint('upload', __name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'xls', 'xlsx', 'csv', 'json'}
+ALLOWED_MIMETYPES = {
+    'application/pdf', 
+    'application/vnd.ms-excel', 
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/csv',
+    'application/json'
+}
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_file(file):
+    filename_ok = '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    mimetype_ok = file.content_type in ALLOWED_MIMETYPES
+    return filename_ok and mimetype_ok
 
 @upload_bp.route('/upload', methods=['POST'])
 @login_required
@@ -89,7 +98,7 @@ def upload_file():
     total_transactions_parsed = 0
     
     for file in files:
-        if not file or not allowed_file(file.filename):
+        if not file or not allowed_file(file):
             return jsonify({
                 "success": False,
                 "message": f"Unsupported file type: {file.filename}. Supported formats are PDF, XLS, XLSX."
@@ -129,7 +138,18 @@ def upload_file():
                         "message": "Incorrect password. The password does not match the uploaded file."
                     }), 401
                 else:
-                    raise ve
+                    current_app.logger.warning(f"Validation Error [{filename}]: {ve}")
+                    # DEBUG: Save failed files for inspection before they are deleted
+                    import shutil
+                    debug_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], '..', 'debug_uploads')
+                    os.makedirs(debug_dir, exist_ok=True)
+                    shutil.copy(temp_path, os.path.join(debug_dir, filename))
+                    
+                    return jsonify({
+                        "success": False,
+                        "error": "ValidationError",
+                        "message": str(ve)
+                    }), 422
                 
             metadata = parsed_data["metadata"]
             transactions = parsed_data["transactions"]
@@ -188,6 +208,7 @@ def upload_file():
             uploaded_statements.append(stmt_id)
             
         except Exception as e:
+            current_app.logger.error(f"System Error parsing [{filename}]: {e}", exc_info=True)
             if stmt_id is not None:
                 try:
                     delete_statement(stmt_id, user_id=user_id)
@@ -196,7 +217,7 @@ def upload_file():
             # Cleanup and return error
             return jsonify({
                 "success": False, 
-                "message": f"Error parsing '{filename}': {str(e)}"
+                "message": f"An unexpected system error occurred while parsing '{filename}'."
             }), 500
         finally:
             # Delete uploaded file immediately after parsing
