@@ -93,7 +93,7 @@ The analytical brain of the project consists of multiple decoupled "Engines" tha
 - **Format-Agnostic Ingestion:** A unified pipeline capable of processing PDFs, CSVs, and Excel files interchangeably.
 - **Decryption Support:** Integrates `msoffcrypto` to seamlessly bypass file encryption on password-protected documents (common with official bank statements).
 - **Graceful Error Handling:** Advanced Pandas date normalization handles `NaT` (Not-a-Time) edge cases and standardizes wildly varied date formats across different banks.
-- **Idempotency:** Implements SHA-256 cryptographic hashing on parsed transaction strings to guarantee idempotency and prevent duplicate database insertions upon re-uploads.
+- **Idempotency:** Implements dual-layer cryptographic hashing: SHA-256 on raw file bytes to prevent duplicate uploads, and MD5 on parsed transaction strings to guarantee granular idempotency and prevent duplicate database insertions.
 
 ---
 
