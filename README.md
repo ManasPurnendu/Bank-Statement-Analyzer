@@ -2,9 +2,9 @@
 
 ![Project Banner](https://img.shields.io/badge/Status-Active-success) ![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue) ![Flask](https://img.shields.io/badge/Framework-Flask-black) ![License](https://img.shields.io/badge/License-MIT-green)
 
-An enterprise-grade, full-stack financial analysis platform that automates the extraction, categorization, and risk assessment of raw bank statements to generate underwriter-grade credit profiles. 
+A full-stack financial analysis platform that automates the extraction, categorization, and risk assessment of raw bank statements to generate structured credit profiles. 
 
-Moving beyond naive "keyword matching", this engine utilizes **Explainable AI (XAI)** principles and statistical variance to mathematically detect true income stability, gig-economy cash flows, and hidden debt obligations.
+Moving beyond simple keyword matching, this engine utilizes a deterministic rule-based heuristic pipeline and statistical variance to mathematically detect true income stability, gig-economy cash flows, and hidden debt obligations.
 
 ---
 
@@ -31,7 +31,7 @@ Traditional financial underwriting relies heavily on manual statement reviews or
 
 ## 🏗 System Architecture
 
-The application is built on a monolithic MVC pattern using Flask Blueprints. It utilizes a highly optimized state management pattern (`StatementContext`) to prevent expensive $O(N^2)$ dataset loops when passing data through the various analytical engines.
+The application is structured using a Model-View-Controller (MVC) pattern utilizing Flask Blueprints, separating database models, API routing controllers, and Jinja2 templates. It utilizes an optimized state management pattern (`StatementContext`) to prevent expensive $O(N^2)$ dataset loops when passing data through the various analytical engines.
 
 ```mermaid
 graph TD
@@ -112,7 +112,7 @@ The analytical brain of the project consists of multiple decoupled "Engines" tha
 ### 1. The Dashboard View
 ![Dashboard](assets/screenshots/screenshot-1.png)
 ![Dashboard 2](assets/screenshots/screenshot-2.png)
-*Real-time data visualization via Chart.js, rendering asynchronous spending charts and predictive zero-balance dates.*
+*Real-time data visualization via Chart.js, rendering asynchronous spending charts driven by REST API endpoints.*
 
 ### 2. Upload & Parsing Flow
 ![Upload Flow](assets/screenshots/screenshot-3.png)
