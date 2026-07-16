@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5001"
+    environment:
+      - SECRET_KEY=generate_a_strong_secret_key_in_production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/bank_analyzer
+    depends_on:
+      - db
+    volumes:
+      - ./generated_reports:/app/generated_reports
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bank_analyzer
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
