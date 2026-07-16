@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app, session
 from utils.decorators import login_required
 import os
 import hashlib
+import tempfile
 from werkzeug.utils import secure_filename
 from parsers.unified_parser import parse_statement
 from database.models import check_duplicate_statement, add_statement, add_transactions_bulk, delete_statement, get_all_statements
@@ -104,11 +105,7 @@ def upload_file():
                 "message": f"Unsupported file type: {file.filename}. Supported formats are PDF, XLS, XLSX."
             }), 400
             
-        # Save file temporarily in uploads directory
         filename = secure_filename(file.filename)
-        upload_dir = current_app.config['UPLOAD_FOLDER']
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
             
         # Calculate file hash
         file.seek(0)
@@ -116,8 +113,12 @@ def upload_file():
         file_hash = hashlib.sha256(file_bytes).hexdigest()
         file.seek(0) # Reset stream pointer
 
-        temp_path = os.path.join(upload_dir, filename)
-        file.save(temp_path)
+        # Ephemeral file parsing (Phase 2 Data Minimization)
+        # We use a temp file that the OS automatically cleans up if the process dies.
+        temp_fd, temp_path = tempfile.mkstemp(suffix=f"_{filename}")
+        with os.fdopen(temp_fd, 'wb') as temp_out:
+            temp_out.write(file_bytes)
+            
         stmt_id = None
         try:
             # Parse statement through the unified parser
@@ -139,11 +140,8 @@ def upload_file():
                     }), 401
                 else:
                     current_app.logger.warning(f"Validation Error [{filename}]: {ve}")
-                    # DEBUG: Save failed files for inspection before they are deleted
-                    import shutil
-                    debug_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], '..', 'debug_uploads')
-                    os.makedirs(debug_dir, exist_ok=True)
-                    shutil.copy(temp_path, os.path.join(debug_dir, filename))
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
                     
                     return jsonify({
                         "success": False,

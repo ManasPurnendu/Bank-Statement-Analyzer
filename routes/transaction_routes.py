@@ -73,7 +73,7 @@ def edit_category():
         # Get transaction details
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT description, merchant_name, payee_name, amount FROM transactions WHERE transaction_id = ? AND user_id = ?', (transaction_id, user_id))
+        cursor.execute('SELECT description, merchant_name, payee_name, amount FROM transactions WHERE transaction_id = %s AND user_id = %s', (transaction_id, user_id))
         row = cursor.fetchone()
         conn.close()
         

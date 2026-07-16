@@ -45,7 +45,7 @@ def get_dashboard_data():
 @admin_required
 def get_all_users():
     conn = get_db_connection()
-    conn.row_factory = __import__('sqlite3').Row
+
     cursor = conn.cursor()
     
     # Fetch all users
@@ -64,7 +64,7 @@ def get_all_users():
             SELECT s.statement_id, s.file_name, s.upload_date,
                    (SELECT income_classification FROM income_intelligence_reports r WHERE r.statement_id = s.statement_id ORDER BY created_at DESC LIMIT 1) as income_classification
             FROM statements s
-            WHERE s.user_id = ?
+            WHERE s.user_id = %s
             ORDER BY s.upload_date DESC
         ''', (user_dict['user_id'],))
         
@@ -90,15 +90,20 @@ def get_all_users():
 def generate_intelligence_report(statement_id):
     try:
         conn = get_db_connection()
-        conn.row_factory = __import__('sqlite3').Row
+
         cursor = conn.cursor()
         
         # Get all transactions for statement
-        cursor.execute('SELECT * FROM transactions WHERE statement_id = ? ORDER BY transaction_date ASC', (statement_id,))
-        transactions = [dict(row) for row in cursor.fetchall()]
+        cursor.execute('SELECT * FROM transactions WHERE statement_id = %s ORDER BY transaction_date ASC', (statement_id,))
+        transactions = []
+        for row in cursor.fetchall():
+            d = dict(row)
+            if hasattr(d.get('transaction_date'), 'isoformat'):
+                d['transaction_date'] = d['transaction_date'].isoformat()
+            transactions.append(d)
         
         # Get user_id for the statement
-        cursor.execute('SELECT user_id FROM statements WHERE statement_id = ?', (statement_id,))
+        cursor.execute('SELECT user_id FROM statements WHERE statement_id = %s', (statement_id,))
         statement_row = cursor.fetchone()
         user_id = statement_row['user_id'] if statement_row and 'user_id' in statement_row.keys() else None
         # Actually user_id is in transactions, but in case there are no transactions, we can get it from statement.
