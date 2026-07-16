@@ -3,6 +3,7 @@ import os
 import secrets
 import logging
 from logging.handlers import RotatingFileHandler
+from pythonjsonlogger import jsonlogger
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 
@@ -22,7 +23,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # --- Setup Logging (ISS-003) ---
-log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+log_formatter = jsonlogger.JsonFormatter('%(asctime)s %(levelname)s %(message)s %(pathname)s %(lineno)d')
 log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app.log')
 file_handler = RotatingFileHandler(log_file, maxBytes=1024000, backupCount=10)
 file_handler.setFormatter(log_formatter)
@@ -32,7 +33,10 @@ app.logger.setLevel(logging.INFO)
 app.logger.info('Bank Statement Analyser startup')
 
 # --- Security: Flask Secret Key & CSRF (ISS-005) ---
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-fallback-secret-key-do-not-use-in-production')
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key:
+    raise RuntimeError("FATAL: SECRET_KEY environment variable is not set. Refusing to start in production.")
+app.secret_key = secret_key
 csrf = CSRFProtect(app)
 
 # Session configuration
@@ -41,10 +45,8 @@ app.permanent_session_lifetime = timedelta(hours=8)  # 8 hour session timeout
 
 # Configuration Directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 REPORT_FOLDER = os.path.join(BASE_DIR, 'generated_reports')
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['REPORT_FOLDER'] = REPORT_FOLDER
 
 # --- Security: File Upload Size Limit (S-03) ---
@@ -53,20 +55,24 @@ app.config['REPORT_FOLDER'] = REPORT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # Ensure folders exist
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(REPORT_FOLDER, exist_ok=True)
 
 # Initialize Database on Startup
 init_db()
 
-# Register Blueprints with /api Prefix
-app.register_blueprint(upload_bp, url_prefix='/api')
-app.register_blueprint(dashboard_bp, url_prefix='/api')
-app.register_blueprint(transaction_bp, url_prefix='/api')
-app.register_blueprint(analytics_bp, url_prefix='/api')
-app.register_blueprint(forecast_bp, url_prefix='/api')
-app.register_blueprint(report_bp, url_prefix='/api')
+# Register Blueprints with /api/v1 Prefix
+app.register_blueprint(upload_bp, url_prefix='/api/v1')
+app.register_blueprint(dashboard_bp, url_prefix='/api/v1')
+app.register_blueprint(transaction_bp, url_prefix='/api/v1')
+app.register_blueprint(analytics_bp, url_prefix='/api/v1')
+app.register_blueprint(forecast_bp, url_prefix='/api/v1')
+app.register_blueprint(report_bp, url_prefix='/api/v1')
 app.register_blueprint(auth_bp, url_prefix='/auth')
+
+# --- Health Check Route ---
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy", "version": "1.0.0"})
 
 # --- HTML Page Render Routes ---
 
@@ -119,5 +125,6 @@ def request_entity_too_large(error):
     }), 413
 
 if __name__ == '__main__':
-    # Run the server on port 5001 in debug mode
+    # During local development without Docker, use the built-in server.
+    # In production (via Docker), Gunicorn will import 'app' and serve it directly.
     app.run(host='0.0.0.0', port=5001, debug=True)
