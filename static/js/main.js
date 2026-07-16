@@ -52,7 +52,9 @@ function initTheme() {
     const currentTheme = localStorage.getItem("theme") || "light";
     
     document.documentElement.setAttribute("data-theme", currentTheme);
+    document.documentElement.setAttribute("data-bs-theme", currentTheme);
     document.body.setAttribute("data-theme", currentTheme);
+    document.body.setAttribute("data-bs-theme", currentTheme);
 
     // Set both toggles to current state
     if (toggle) toggle.checked = currentTheme === "dark";
@@ -60,7 +62,9 @@ function initTheme() {
 
     function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.setAttribute("data-bs-theme", theme);
         document.body.setAttribute("data-theme", theme);
+        document.body.setAttribute("data-bs-theme", theme);
         localStorage.setItem("theme", theme);
         // Sync both toggles
         if (toggle) toggle.checked = theme === "dark";
@@ -143,8 +147,8 @@ function setupActiveNav() {
 /* --- SIDEBAR META INGESTION --- */
 function fetchSidebarData() {
     Promise.all([
-        fetch('/api/statements').then(res => res.json()).catch(() => ({ success: false, statements: [] })),
-        fetch('/api/dashboard').then(res => res.json()).catch(() => ({ success: false }))
+        fetch('/api/v1/statements').then(res => res.json()).catch(() => ({ success: false, statements: [] })),
+        fetch('/api/v1/dashboard').then(res => res.json()).catch(() => ({ success: false }))
     ])
     .then(([stmtData, data]) => {
         const hasStatements = stmtData.success && stmtData.statements && stmtData.statements.length > 0;
@@ -321,7 +325,7 @@ function initUploadFlow() {
         const formData = new FormData();
         formData.append("demo", "true");
         
-        fetch('/api/upload', {
+        fetch('/api/v1/upload', {
             method: 'POST',
             body: formData
         })
@@ -401,7 +405,7 @@ function initUploadFlow() {
             startProcessingAnimation();
             updateProcessingStep('upload', 'active');
             
-            fetch('/api/upload', {
+            fetch('/api/v1/upload', {
                 method: 'POST',
                 body: formData
             })
@@ -576,7 +580,7 @@ function initUploadFlow() {
 /* --- DASHBOARD VIEW MANAGER --- */
 /* --- DASHBOARD VIEW MANAGER --- */
 function initDashboardPage(range = 'all') {
-    fetch(`/api/dashboard?range=${range}`)
+    fetch(`/api/v1/dashboard?range=${range}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.analytics && data.analytics.raw_count > 0) {
@@ -617,7 +621,7 @@ function initDashboardPage(range = 'all') {
         ieSelect.dataset.listenerBound = "true";
         ieSelect.addEventListener("change", function(e) {
             const r = e.target.value;
-            fetch(`/api/dashboard?range=${r}`)
+            fetch(`/api/v1/dashboard?range=${r}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.analytics) {
@@ -632,7 +636,7 @@ function initDashboardPage(range = 'all') {
         catSelect.dataset.listenerBound = "true";
         catSelect.addEventListener("change", function(e) {
             const r = e.target.value;
-            fetch(`/api/dashboard?range=${r}`)
+            fetch(`/api/v1/dashboard?range=${r}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.analytics) {
@@ -825,7 +829,7 @@ function renderDashboardMetrics(analytics, insights, range = 'this-year') {
     recentTxContainer.innerHTML = "";
     
     // We can fetch transactions list
-    fetch('/api/transactions?limit=5')
+    fetch('/api/v1/transactions?limit=5')
         .then(res => res.json())
         .then(txData => {
             if (txData.success && txData.transactions) {
@@ -967,7 +971,7 @@ function initTransactionsPage() {
     const catSelect = document.getElementById("categoryVal");
     const modalSelect = document.getElementById("modalCategorySelect");
     
-    fetch('/api/categories')
+    fetch('/api/v1/categories')
         .then(res => res.json())
         .then(data => {
             if (data.success && data.categories) {
@@ -1030,7 +1034,7 @@ function loadTransactions() {
     const start = document.getElementById("startDateVal").value;
     const end = document.getElementById("endDateVal").value;
     
-    let url = `/api/transactions?page=${currentTransactionsPage}&limit=15&sort_by=${currentSortCol}&sort_order=${currentSortOrd}`;
+    let url = `/api/v1/transactions?page=${currentTransactionsPage}&limit=15&sort_by=${currentSortCol}&sort_order=${currentSortOrd}`;
     if (q) url += `&q=${q}`;
     if (cat) url += `&category_id=${cat}`;
     if (type) url += `&type_filter=${type}`;
@@ -1185,7 +1189,7 @@ if (saveCategoryBtnEl) saveCategoryBtnEl.addEventListener("click", () => {
     const rememberAmountEl = document.getElementById("modalRememberAmountCheckbox");
     const rememberAmount = rememberAmountEl ? rememberAmountEl.checked : false;
     
-    fetch('/api/transaction/category', {
+    fetch('/api/v1/transaction/category', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1212,7 +1216,7 @@ if (saveCategoryBtnEl) saveCategoryBtnEl.addEventListener("click", () => {
 /* --- ANALYTICS DETAILED CHARTS & HEATMAPS --- */
 /* --- ANALYTICS DETAILED CHARTS & HEATMAPS --- */
 function initAnalyticsPage(range = 'all') {
-    fetch(`/api/analytics?range=${range}`)
+    fetch(`/api/v1/analytics?range=${range}`)
         .then(res => res.json())
         .then(data => {
             if (data.success && data.analytics && data.analytics.raw_count > 0) {
@@ -1245,7 +1249,7 @@ function initAnalyticsPage(range = 'all') {
         overviewSelect.dataset.listenerBound = "true";
         overviewSelect.addEventListener("change", function(e) {
             const r = e.target.value;
-            fetch(`/api/analytics?range=${r}`)
+            fetch(`/api/v1/analytics?range=${r}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.analytics) {
@@ -1609,7 +1613,7 @@ function renderAnalyticsView(analytics, range = 'this-year') {
     insightsContainer.innerHTML = "";
     
     // Generate fresh insights
-    fetch('/api/dashboard')
+    fetch('/api/v1/dashboard')
         .then(res => res.json())
         .then(iData => {
             if (iData.success && iData.insights) {
@@ -1670,7 +1674,7 @@ function initForecastPage() {
         const reduction = document.getElementById("whatIfReduction").value;
         const hVal = horizonSelect ? parseInt(horizonSelect.value) : 6;
         
-        fetch('/api/forecast/simulate', {
+        fetch('/api/v1/forecast/simulate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1723,7 +1727,7 @@ function initForecastPage() {
 }
 
 function fetchForecastData(horizon) {
-    fetch(`/api/forecast?horizon=${horizon}`)
+    fetch(`/api/v1/forecast?horizon=${horizon}`)
         .then(res => res.json())
         .then(data => {
             if (data.success === false) {
@@ -1872,13 +1876,13 @@ function renderForecastView(data, horizon = 6) {
                 <td class="amount-credit">+ ${formatCurrency(f.projected_income)}</td>
                 <td class="amount-debit">- ${formatCurrency(f.projected_expense)}</td>
                 <td class="text-primary font-semibold">${formatCurrency(f.projected_savings)}</td>
-                <td><span class="badge bg-light text-dark border px-2 py-1">${f.savings_rate.toFixed(1)}%</span></td>
+                <td><span class="badge bg-secondary bg-opacity-25 text-body border px-2 py-1">${f.savings_rate.toFixed(1)}%</span></td>
             </tr>`;
     });
     
     // Add total row at bottom
     tableBody.innerHTML += `
-        <tr class="table-primary border-top" style="background-color: var(--primary-light);">
+        <tr class="table-primary border-top">
             <td class="fw-bold">Total (${horizon} Months)</td>
             <td class="amount-credit fw-bold">+ ${formatCurrency(kpis.projected_income)}</td>
             <td class="amount-debit fw-bold">- ${formatCurrency(kpis.projected_expense)}</td>
@@ -2124,7 +2128,7 @@ function initReportsPage() {
 window.triggerReportBuild = function(type, range = 'all', sections = null) {
     showToast(`Generating ${type} Report PDF...`);
     
-    fetch('/api/report/generate', {
+    fetch('/api/v1/report/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2145,7 +2149,7 @@ window.triggerReportBuild = function(type, range = 'all', sections = null) {
 };
 
 function loadReportsList() {
-    fetch('/api/reports')
+    fetch('/api/v1/reports')
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById("reports-list-rows");
@@ -2200,7 +2204,7 @@ function loadReportsList() {
 
                     const downloadLink = document.createElement("a");
                     downloadLink.className = "btn btn-outline-success btn-xs px-2 py-1";
-                    downloadLink.href = `/api/report/download/${encodeURIComponent(r.filename)}`;
+                    downloadLink.href = `/api/v1/report/download/${encodeURIComponent(r.filename)}`;
                     const downloadIcon = document.createElement("i");
                     downloadIcon.className = "bi bi-download";
                     downloadLink.appendChild(downloadIcon);
@@ -2242,7 +2246,7 @@ window.viewReportPDF = function(filename) {
     const pane = document.getElementById("report-preview-pane");
     pane.innerHTML = "";
     const iframe = document.createElement("iframe");
-    iframe.src = `/api/report/view/${encodeURIComponent(filename)}`;
+    iframe.src = `/api/v1/report/view/${encodeURIComponent(filename)}`;
     iframe.width = "100%";
     iframe.height = "400px";
     iframe.style.border = "none";
@@ -2252,7 +2256,7 @@ window.viewReportPDF = function(filename) {
 
 window.deleteReportPDF = function(filename) {
     if (confirm("Are you sure you want to delete this generated report?")) {
-        fetch(`/api/report/${filename}`, {
+        fetch(`/api/v1/report/${filename}`, {
             method: 'DELETE'
         })
         .then(res => res.json())
@@ -2272,7 +2276,7 @@ window.deleteReportPDF = function(filename) {
 
 function loadReportInsights() {
     // Report insights are just dynamic key observations from our insights engine
-    fetch('/api/dashboard')
+    fetch('/api/v1/dashboard')
         .then(res => res.json())
         .then(data => {
             const container = document.getElementById("report-insights-list");
@@ -2483,7 +2487,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Deleting...`;
             
-            fetch(`/api/statement/${activeDeleteStatementId}`, {
+            fetch(`/api/v1/statement/${activeDeleteStatementId}`, {
                 method: 'DELETE'
             })
             .then(res => res.json())

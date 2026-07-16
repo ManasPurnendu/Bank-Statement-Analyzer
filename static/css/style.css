@@ -686,19 +686,24 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Dark Theme Table Overrides */
 [data-theme="dark"] .table-premium {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 [data-theme="dark"] .table-premium tbody tr {
-    background-color: #1A2238;
+    background-color: #1A2238 !important;
 }
 [data-theme="dark"] .table-premium th {
-    background-color: #111827;
-    color: #9CA3AF;
+    background-color: #111827 !important;
+    color: #9CA3AF !important;
     border-radius: 8px; /* So the header looks nicer with bg */
 }
 [data-theme="dark"] .table-premium td {
-    color: #E5E7EB;
-    border-color: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: transparent !important;
+}
+
+[data-theme="dark"] .badge-category {
+    filter: brightness(1.7) saturate(1.2);
 }
 
 /* Badges styling */
