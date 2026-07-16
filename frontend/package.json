@@ -1,0 +1,15 @@
+{
+  "name": "bank-statement-analyser",
+  "version": "1.0.0",
+  "description": "Frontend build pipeline for Bank Statement Analyser",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
