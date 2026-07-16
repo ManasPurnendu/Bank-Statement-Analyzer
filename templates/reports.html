@@ -6,7 +6,8 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
             <h2 class="fw-extrabold m-0" style="font-family: var(--font-heading);">Financial Reports</h2>
-            <p class="text-secondary small m-0">Generate and download professional, banking-style PDF reports containing executive summary stats, forecast lines, and audit tables</p>
+            <p class="text-secondary small m-0">Generate and download professional, banking-style PDF reports containing
+                executive summary stats, forecast lines, and audit tables</p>
         </div>
     </div>
 
@@ -17,8 +18,10 @@
             <div class="card-premium h-100 d-flex flex-column text-center">
                 <i class="bi bi-file-earmark-pdf text-primary fs-2 mb-3"></i>
                 <h6 class="fw-bold mb-2">Summary Report</h6>
-                <p class="small text-secondary mb-4 flex-grow-1">Overview of finances including category shares, top merchants, key insights, and savings rates.</p>
-                <button type="button" class="btn btn-outline-primary w-100 py-2 mt-auto" onclick="triggerReportBuild('Summary')">
+                <p class="small text-secondary mb-4 flex-grow-1">Overview of finances including category shares, top
+                    merchants, key insights, and savings rates.</p>
+                <button type="button" class="btn btn-outline-primary w-100 py-2 mt-auto"
+                    onclick="triggerReportBuild('Summary')">
                     Generate Summary Report
                 </button>
             </div>
@@ -28,8 +31,10 @@
             <div class="card-premium h-100 d-flex flex-column text-center">
                 <i class="bi bi-file-earmark-spreadsheet text-success fs-2 mb-3"></i>
                 <h6 class="fw-bold mb-2">Detailed Report</h6>
-                <p class="small text-secondary mb-4 flex-grow-1">Everything in the Summary report plus a comprehensive, formatted transaction ledger audit.</p>
-                <button type="button" class="btn btn-outline-success w-100 py-2 mt-auto" onclick="triggerReportBuild('Detailed')">
+                <p class="small text-secondary mb-4 flex-grow-1">Everything in the Summary report plus a comprehensive,
+                    formatted transaction ledger audit.</p>
+                <button type="button" class="btn btn-outline-success w-100 py-2 mt-auto"
+                    onclick="triggerReportBuild('Detailed')">
                     Generate Detailed Report
                 </button>
             </div>
@@ -39,8 +44,11 @@
             <div class="card-premium h-100 d-flex flex-column text-center">
                 <i class="bi bi-pie-chart text-purple fs-2 mb-3" style="color: var(--warning)"></i>
                 <h6 class="fw-bold mb-2">Analytics Report</h6>
-                <p class="small text-secondary mb-4 flex-grow-1">Focused strictly on category splits, MoM trend lines, payment mode ratios, and day-of-week heatmaps.</p>
-                <button type="button" class="btn btn-outline-warning w-100 py-2 mt-auto" style="border-color: var(--warning); color: var(--warning);" onclick="triggerReportBuild('Analytics')">
+                <p class="small text-secondary mb-4 flex-grow-1">Focused strictly on category splits, MoM trend lines,
+                    payment mode ratios, and day-of-week heatmaps.</p>
+                <button type="button" class="btn btn-outline-warning w-100 py-2 mt-auto"
+                    style="border-color: var(--warning); color: var(--warning);"
+                    onclick="triggerReportBuild('Analytics')">
                     Generate Analytics Report
                 </button>
             </div>
@@ -50,8 +58,10 @@
             <div class="card-premium h-100 d-flex flex-column text-center">
                 <i class="bi bi-sliders text-danger fs-2 mb-3"></i>
                 <h6 class="fw-bold mb-2">Custom Report</h6>
-                <p class="small text-secondary mb-4 flex-grow-1">Select dates, toggle sections, and filter specific categories to build a tailored PDF report.</p>
-                <button type="button" class="btn btn-outline-danger w-100 py-2 mt-auto" data-bs-toggle="modal" data-bs-target="#customReportModal">
+                <p class="small text-secondary mb-4 flex-grow-1">Select dates, toggle sections, and filter specific
+                    categories to build a tailored PDF report.</p>
+                <button type="button" class="btn btn-outline-danger w-100 py-2 mt-auto" data-bs-toggle="modal"
+                    data-bs-target="#customReportModal">
                     Create Custom Report
                 </button>
             </div>
@@ -62,7 +72,8 @@
     <div class="card-premium mb-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="fw-bold m-0"><i class="bi bi-clock-history text-primary me-2"></i> Recent Reports</h6>
-            <button class="btn btn-link text-decoration-none btn-sm" id="refreshReportsBtn"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
+            <button class="btn btn-link text-decoration-none btn-sm" id="refreshReportsBtn"><i
+                    class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
         </div>
         <div class="table-responsive">
             <table class="table table-premium text-nowrap align-middle">
@@ -81,7 +92,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Empty Table State -->
         <div class="text-center py-5" id="reports-empty-state" style="display: none;">
             <i class="bi bi-file-earmark-pdf text-muted fs-1 mb-2"></i>
@@ -96,13 +107,15 @@
         <div class="col-lg-6 mb-4 mb-lg-0">
             <div class="card-premium h-100" style="min-height: 250px;">
                 <h6 class="fw-bold mb-3"><i class="bi bi-file-pdf text-primary me-2"></i> Report Preview</h6>
-                <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center py-4 border rounded-3 bg-light" id="report-preview-pane">
+                <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center py-4 border rounded-3 bg-body-secondary"
+                    id="report-preview-pane">
                     <i class="bi bi-eye-fill text-muted fs-2 mb-2"></i>
-                    <p class="small text-muted mb-0">Select a report from the list above and click "View" to open the PDF preview pane.</p>
+                    <p class="small text-muted mb-0">Select a report from the list above and click "View" to open the
+                        PDF preview pane.</p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Right: PDF Summary Recommendations -->
         <div class="col-lg-6">
             <div class="card-premium h-100">
@@ -121,7 +134,8 @@
 <!-- Custom Report Generator Modal -->
 <div class="modal fade" id="customReportModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
+        <div class="modal-content border-0 shadow-lg"
+            style="border-radius: var(--card-radius); background-color: var(--bg-surface);">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold"><i class="bi bi-sliders text-danger me-2"></i> Build Custom Report</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -142,10 +156,11 @@
                         </div>
                         <div class="col-sm-6">
                             <label class="form-label small fw-bold">Report Title</label>
-                            <input type="text" class="form-control" id="customReportTitle" value="Custom Report" placeholder="Custom report name...">
+                            <input type="text" class="form-control" id="customReportTitle" value="Custom Report"
+                                placeholder="Custom report name...">
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label small fw-bold d-block">Choose Sections to Include</label>
                         <div class="form-check mb-1">
@@ -170,7 +185,8 @@
                         </div>
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="checkbox" id="sec-txs" value="transactions">
-                            <label class="form-check-label small" for="sec-txs">Comprehensive Transaction Log (Adds index pages)</label>
+                            <label class="form-check-label small" for="sec-txs">Comprehensive Transaction Log (Adds
+                                index pages)</label>
                         </div>
                     </div>
                 </form>
