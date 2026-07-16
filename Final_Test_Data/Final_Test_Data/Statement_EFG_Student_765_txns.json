@@ -1,0 +1,5364 @@
+{
+    "account": {
+        "account_holder": "Sample User",
+        "account_number": "XXXX1519",
+        "bank": "HDFC Bank"
+    },
+    "transactions": [
+        {
+            "Date": "01/06/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 17219.0,
+            "Balance": 46975.0
+        },
+        {
+            "Date": "01/06/2024",
+            "Description": "UPI/MCDONALDS/REF_737695",
+            "Debit": 615.0,
+            "Credit": "",
+            "Balance": 46360.0
+        },
+        {
+            "Date": "01/06/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_188660",
+            "Debit": 1939.0,
+            "Credit": "",
+            "Balance": 44421.0
+        },
+        {
+            "Date": "01/06/2024",
+            "Description": "UPI/ZOMATO/REF_241846",
+            "Debit": 688.0,
+            "Credit": "",
+            "Balance": 43733.0
+        },
+        {
+            "Date": "02/06/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 499.0,
+            "Credit": "",
+            "Balance": 43234.0
+        },
+        {
+            "Date": "02/06/2024",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": 43035.0
+        },
+        {
+            "Date": "02/06/2024",
+            "Description": "UPI/MCDONALDS/REF_191512",
+            "Debit": 597.0,
+            "Credit": "",
+            "Balance": 42438.0
+        },
+        {
+            "Date": "02/06/2024",
+            "Description": "UPI/1MG/REF_304902",
+            "Debit": 1946.0,
+            "Credit": "",
+            "Balance": 40492.0
+        },
+        {
+            "Date": "02/06/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_179603",
+            "Debit": 549.0,
+            "Credit": "",
+            "Balance": 39943.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "ACH/GYM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": 38444.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": 38245.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": 37246.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_656896",
+            "Debit": 3418.0,
+            "Credit": "",
+            "Balance": 33828.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/UBER/REF_807545",
+            "Debit": 281.0,
+            "Credit": "",
+            "Balance": 33547.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/KFC/REF_988403",
+            "Debit": 726.0,
+            "Credit": "",
+            "Balance": 32821.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/1MG/REF_678716",
+            "Debit": 330.0,
+            "Credit": "",
+            "Balance": 32491.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_788408",
+            "Debit": 2538.0,
+            "Credit": "",
+            "Balance": 29953.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/KFC/REF_105807",
+            "Debit": 454.0,
+            "Credit": "",
+            "Balance": 29499.0
+        },
+        {
+            "Date": "03/06/2024",
+            "Description": "UPI/DOMINOS/REF_599922",
+            "Debit": 740.0,
+            "Credit": "",
+            "Balance": 28759.0
+        },
+        {
+            "Date": "04/06/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_133053",
+            "Debit": 807.0,
+            "Credit": "",
+            "Balance": 27952.0
+        },
+        {
+            "Date": "05/06/2024",
+            "Description": "ACH/HOTSTAR_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 499.0,
+            "Credit": "",
+            "Balance": 27453.0
+        },
+        {
+            "Date": "05/06/2024",
+            "Description": "UPI/MCDONALDS/REF_913683",
+            "Debit": 673.0,
+            "Credit": "",
+            "Balance": 26780.0
+        },
+        {
+            "Date": "05/06/2024",
+            "Description": "UPI/FORTIS/REF_426190",
+            "Debit": 669.0,
+            "Credit": "",
+            "Balance": 26111.0
+        },
+        {
+            "Date": "05/06/2024",
+            "Description": "UPI/UBER/REF_161494",
+            "Debit": 689.0,
+            "Credit": "",
+            "Balance": 25422.0
+        },
+        {
+            "Date": "05/06/2024",
+            "Description": "UPI/PHARMEASY/REF_867675",
+            "Debit": 1412.0,
+            "Credit": "",
+            "Balance": 24010.0
+        },
+        {
+            "Date": "06/06/2024",
+            "Description": "UPI/AMAZON/REF_336548",
+            "Debit": 2230.0,
+            "Credit": "",
+            "Balance": 21780.0
+        },
+        {
+            "Date": "06/06/2024",
+            "Description": "UPI/DOMINOS/REF_752926",
+            "Debit": 231.0,
+            "Credit": "",
+            "Balance": 21549.0
+        },
+        {
+            "Date": "07/06/2024",
+            "Description": "UPI/1MG/REF_132963",
+            "Debit": 1610.0,
+            "Credit": "",
+            "Balance": 19939.0
+        },
+        {
+            "Date": "07/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_898652",
+            "Debit": 2217.0,
+            "Credit": "",
+            "Balance": 17722.0
+        },
+        {
+            "Date": "07/06/2024",
+            "Description": "UPI/FLIPKART/REF_777874",
+            "Debit": 2299.0,
+            "Credit": "",
+            "Balance": 15423.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 1170.0,
+            "Credit": "",
+            "Balance": 14253.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 2074.0,
+            "Credit": "",
+            "Balance": 12179.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/PHARMEASY/REF_312227",
+            "Debit": 934.0,
+            "Credit": "",
+            "Balance": 11245.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/KFC/REF_580465",
+            "Debit": 695.0,
+            "Credit": "",
+            "Balance": 10550.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/CROMA/REF_882270",
+            "Debit": 1105.0,
+            "Credit": "",
+            "Balance": 9445.0
+        },
+        {
+            "Date": "08/06/2024",
+            "Description": "UPI/STARBUCKS/REF_939077",
+            "Debit": 434.0,
+            "Credit": "",
+            "Balance": 9011.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 3624.0,
+            "Credit": "",
+            "Balance": 5387.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/BILLDESK/BESCOM/PAYMENT",
+            "Debit": 3665.0,
+            "Credit": "",
+            "Balance": 1722.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 3972.0,
+            "Credit": "",
+            "Balance": -2250.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/PHARMEASY/REF_472772",
+            "Debit": 1873.0,
+            "Credit": "",
+            "Balance": -4123.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/KFC/REF_553915",
+            "Debit": 446.0,
+            "Credit": "",
+            "Balance": -4569.0
+        },
+        {
+            "Date": "09/06/2024",
+            "Description": "UPI/KFC/REF_580731",
+            "Debit": 708.0,
+            "Credit": "",
+            "Balance": -5277.0
+        },
+        {
+            "Date": "10/06/2024",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 2891.0,
+            "Credit": "",
+            "Balance": -8168.0
+        },
+        {
+            "Date": "10/06/2024",
+            "Description": "UPI/1MG/REF_485426",
+            "Debit": 462.0,
+            "Credit": "",
+            "Balance": -8630.0
+        },
+        {
+            "Date": "10/06/2024",
+            "Description": "UPI/AMAZON/REF_274893",
+            "Debit": 4138.0,
+            "Credit": "",
+            "Balance": -12768.0
+        },
+        {
+            "Date": "10/06/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_768609",
+            "Debit": 1616.0,
+            "Credit": "",
+            "Balance": -14384.0
+        },
+        {
+            "Date": "10/06/2024",
+            "Description": "UPI/KFC/REF_778607",
+            "Debit": 608.0,
+            "Credit": "",
+            "Balance": -14992.0
+        },
+        {
+            "Date": "11/06/2024",
+            "Description": "UPI/FORTIS/REF_178915",
+            "Debit": 1051.0,
+            "Credit": "",
+            "Balance": -16043.0
+        },
+        {
+            "Date": "11/06/2024",
+            "Description": "UPI/STARBUCKS/REF_610159",
+            "Debit": 327.0,
+            "Credit": "",
+            "Balance": -16370.0
+        },
+        {
+            "Date": "12/06/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_540248",
+            "Debit": 1322.0,
+            "Credit": "",
+            "Balance": -17692.0
+        },
+        {
+            "Date": "13/06/2024",
+            "Description": "UPI/INDIGO/REF_797923",
+            "Debit": 117.0,
+            "Credit": "",
+            "Balance": -17809.0
+        },
+        {
+            "Date": "13/06/2024",
+            "Description": "UPI/1MG/REF_748107",
+            "Debit": 646.0,
+            "Credit": "",
+            "Balance": -18455.0
+        },
+        {
+            "Date": "13/06/2024",
+            "Description": "UPI/FLIPKART/REF_744228",
+            "Debit": 857.0,
+            "Credit": "",
+            "Balance": -19312.0
+        },
+        {
+            "Date": "14/06/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_110048",
+            "Debit": 1531.0,
+            "Credit": "",
+            "Balance": -20843.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/MCDONALDS/REF_538460",
+            "Debit": 318.0,
+            "Credit": "",
+            "Balance": -21161.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/AMAZON/REF_466866",
+            "Debit": 2660.0,
+            "Credit": "",
+            "Balance": -23821.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/DOMINOS/REF_491788",
+            "Debit": 721.0,
+            "Credit": "",
+            "Balance": -24542.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/STARBUCKS/REF_539146",
+            "Debit": 496.0,
+            "Credit": "",
+            "Balance": -25038.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_984346",
+            "Debit": 1761.0,
+            "Credit": "",
+            "Balance": -26799.0
+        },
+        {
+            "Date": "15/06/2024",
+            "Description": "UPI/SWIGGY/REF_547363",
+            "Debit": 304.0,
+            "Credit": "",
+            "Balance": -27103.0
+        },
+        {
+            "Date": "16/06/2024",
+            "Description": "UPI/KFC/REF_813682",
+            "Debit": 461.0,
+            "Credit": "",
+            "Balance": -27564.0
+        },
+        {
+            "Date": "16/06/2024",
+            "Description": "UPI/FLIPKART/REF_756708",
+            "Debit": 3722.0,
+            "Credit": "",
+            "Balance": -31286.0
+        },
+        {
+            "Date": "16/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_687345",
+            "Debit": 3462.0,
+            "Credit": "",
+            "Balance": -34748.0
+        },
+        {
+            "Date": "17/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_933830",
+            "Debit": 1081.0,
+            "Credit": "",
+            "Balance": -35829.0
+        },
+        {
+            "Date": "17/06/2024",
+            "Description": "UPI/AIRASIA/REF_826087",
+            "Debit": 767.0,
+            "Credit": "",
+            "Balance": -36596.0
+        },
+        {
+            "Date": "17/06/2024",
+            "Description": "UPI/PHARMEASY/REF_189343",
+            "Debit": 636.0,
+            "Credit": "",
+            "Balance": -37232.0
+        },
+        {
+            "Date": "19/06/2024",
+            "Description": "UPI/1MG/REF_947498",
+            "Debit": 314.0,
+            "Credit": "",
+            "Balance": -37546.0
+        },
+        {
+            "Date": "19/06/2024",
+            "Description": "UPI/AJIO/REF_112672",
+            "Debit": 1525.0,
+            "Credit": "",
+            "Balance": -39071.0
+        },
+        {
+            "Date": "20/06/2024",
+            "Description": "UPI/MCDONALDS/REF_995687",
+            "Debit": 372.0,
+            "Credit": "",
+            "Balance": -39443.0
+        },
+        {
+            "Date": "20/06/2024",
+            "Description": "UPI/OLA/REF_987145",
+            "Debit": 1169.0,
+            "Credit": "",
+            "Balance": -40612.0
+        },
+        {
+            "Date": "20/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_783161",
+            "Debit": 675.0,
+            "Credit": "",
+            "Balance": -41287.0
+        },
+        {
+            "Date": "20/06/2024",
+            "Description": "UPI/SWIGGY/REF_925386",
+            "Debit": 660.0,
+            "Credit": "",
+            "Balance": -41947.0
+        },
+        {
+            "Date": "21/06/2024",
+            "Description": "UPI/UBER/REF_573336",
+            "Debit": 1430.0,
+            "Credit": "",
+            "Balance": -43377.0
+        },
+        {
+            "Date": "22/06/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_557843",
+            "Debit": 940.0,
+            "Credit": "",
+            "Balance": -44317.0
+        },
+        {
+            "Date": "22/06/2024",
+            "Description": "UPI/SWIGGY/REF_910323",
+            "Debit": 169.0,
+            "Credit": "",
+            "Balance": -44486.0
+        },
+        {
+            "Date": "22/06/2024",
+            "Description": "UPI/FORTIS/REF_712373",
+            "Debit": 1687.0,
+            "Credit": "",
+            "Balance": -46173.0
+        },
+        {
+            "Date": "23/06/2024",
+            "Description": "UPI/CROMA/REF_736833",
+            "Debit": 1039.0,
+            "Credit": "",
+            "Balance": -47212.0
+        },
+        {
+            "Date": "23/06/2024",
+            "Description": "UPI/SWIGGY/REF_502164",
+            "Debit": 583.0,
+            "Credit": "",
+            "Balance": -47795.0
+        },
+        {
+            "Date": "23/06/2024",
+            "Description": "UPI/ZOMATO/REF_151540",
+            "Debit": 477.0,
+            "Credit": "",
+            "Balance": -48272.0
+        },
+        {
+            "Date": "24/06/2024",
+            "Description": "UPI/MCDONALDS/REF_792169",
+            "Debit": 448.0,
+            "Credit": "",
+            "Balance": -48720.0
+        },
+        {
+            "Date": "24/06/2024",
+            "Description": "UPI/INDIGO/REF_354432",
+            "Debit": 1242.0,
+            "Credit": "",
+            "Balance": -49962.0
+        },
+        {
+            "Date": "25/06/2024",
+            "Description": "UPI/MCDONALDS/REF_707306",
+            "Debit": 728.0,
+            "Credit": "",
+            "Balance": -50690.0
+        },
+        {
+            "Date": "25/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_204603",
+            "Debit": 1934.0,
+            "Credit": "",
+            "Balance": -52624.0
+        },
+        {
+            "Date": "25/06/2024",
+            "Description": "UPI/UBER/REF_527190",
+            "Debit": 432.0,
+            "Credit": "",
+            "Balance": -53056.0
+        },
+        {
+            "Date": "25/06/2024",
+            "Description": "UPI/STARBUCKS/REF_320661",
+            "Debit": 719.0,
+            "Credit": "",
+            "Balance": -53775.0
+        },
+        {
+            "Date": "26/06/2024",
+            "Description": "UPI/AMAZON/REF_743713",
+            "Debit": 4372.0,
+            "Credit": "",
+            "Balance": -58147.0
+        },
+        {
+            "Date": "27/06/2024",
+            "Description": "UPI/PHARMEASY/REF_759823",
+            "Debit": 1255.0,
+            "Credit": "",
+            "Balance": -59402.0
+        },
+        {
+            "Date": "27/06/2024",
+            "Description": "UPI/UBER/REF_873423",
+            "Debit": 1485.0,
+            "Credit": "",
+            "Balance": -60887.0
+        },
+        {
+            "Date": "27/06/2024",
+            "Description": "UPI/INDIGO/REF_195632",
+            "Debit": 849.0,
+            "Credit": "",
+            "Balance": -61736.0
+        },
+        {
+            "Date": "28/06/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_686768",
+            "Debit": 870.0,
+            "Credit": "",
+            "Balance": -62606.0
+        },
+        {
+            "Date": "28/06/2024",
+            "Description": "UPI/MCDONALDS/REF_993171",
+            "Debit": 393.0,
+            "Credit": "",
+            "Balance": -62999.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 14685.0,
+            "Balance": -48314.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/1MG/REF_204065",
+            "Debit": 1066.0,
+            "Credit": "",
+            "Balance": -49380.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/CROMA/REF_789175",
+            "Debit": 1888.0,
+            "Credit": "",
+            "Balance": -51268.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/FLIPKART/REF_875452",
+            "Debit": 2173.0,
+            "Credit": "",
+            "Balance": -53441.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/STARBUCKS/REF_826613",
+            "Debit": 514.0,
+            "Credit": "",
+            "Balance": -53955.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 13937.0,
+            "Balance": -40018.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/1MG/REF_338497",
+            "Debit": 784.0,
+            "Credit": "",
+            "Balance": -40802.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/STARBUCKS/REF_240799",
+            "Debit": 165.0,
+            "Credit": "",
+            "Balance": -40967.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/AMAZON/REF_119814",
+            "Debit": 4583.0,
+            "Credit": "",
+            "Balance": -45550.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/MCDONALDS/REF_400555",
+            "Debit": 501.0,
+            "Credit": "",
+            "Balance": -46051.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/IRCTC/REF_342578",
+            "Debit": 552.0,
+            "Credit": "",
+            "Balance": -46603.0
+        },
+        {
+            "Date": "01/07/2024",
+            "Description": "UPI/FORTIS/REF_398313",
+            "Debit": 1972.0,
+            "Credit": "",
+            "Balance": -48575.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "ACH/HOTSTAR_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -49574.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": -49773.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/INDIGO/REF_330982",
+            "Debit": 529.0,
+            "Credit": "",
+            "Balance": -50302.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/UBER/REF_507497",
+            "Debit": 1040.0,
+            "Credit": "",
+            "Balance": -51342.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_952427",
+            "Debit": 938.0,
+            "Credit": "",
+            "Balance": -52280.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/DOMINOS/REF_161867",
+            "Debit": 223.0,
+            "Credit": "",
+            "Balance": -52503.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/UBER/REF_648510",
+            "Debit": 1325.0,
+            "Credit": "",
+            "Balance": -53828.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_672006",
+            "Debit": 1572.0,
+            "Credit": "",
+            "Balance": -55400.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": -55599.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/1MG/REF_772752",
+            "Debit": 848.0,
+            "Credit": "",
+            "Balance": -56447.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/UBER/REF_544268",
+            "Debit": 295.0,
+            "Credit": "",
+            "Balance": -56742.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/STARBUCKS/REF_306267",
+            "Debit": 287.0,
+            "Credit": "",
+            "Balance": -57029.0
+        },
+        {
+            "Date": "02/07/2024",
+            "Description": "UPI/CROMA/REF_899179",
+            "Debit": 4771.0,
+            "Credit": "",
+            "Balance": -61800.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/UBER/REF_103384",
+            "Debit": 795.0,
+            "Credit": "",
+            "Balance": -62595.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_484451",
+            "Debit": 1119.0,
+            "Credit": "",
+            "Balance": -63714.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/UBER/REF_470390",
+            "Debit": 1183.0,
+            "Credit": "",
+            "Balance": -64897.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/AJIO/REF_444974",
+            "Debit": 833.0,
+            "Credit": "",
+            "Balance": -65730.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/DOMINOS/REF_307181",
+            "Debit": 259.0,
+            "Credit": "",
+            "Balance": -65989.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/PHARMEASY/REF_920691",
+            "Debit": 561.0,
+            "Credit": "",
+            "Balance": -66550.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/PHARMEASY/REF_858214",
+            "Debit": 1802.0,
+            "Credit": "",
+            "Balance": -68352.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/OLA/REF_642600",
+            "Debit": 403.0,
+            "Credit": "",
+            "Balance": -68755.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/INDIGO/REF_347179",
+            "Debit": 1083.0,
+            "Credit": "",
+            "Balance": -69838.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/UBER/REF_134008",
+            "Debit": 250.0,
+            "Credit": "",
+            "Balance": -70088.0
+        },
+        {
+            "Date": "03/07/2024",
+            "Description": "UPI/AIRASIA/REF_520277",
+            "Debit": 590.0,
+            "Credit": "",
+            "Balance": -70678.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 499.0,
+            "Credit": "",
+            "Balance": -71177.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -72676.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_924402",
+            "Debit": 1436.0,
+            "Credit": "",
+            "Balance": -74112.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/1MG/REF_558666",
+            "Debit": 1599.0,
+            "Credit": "",
+            "Balance": -75711.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -77210.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 499.0,
+            "Credit": "",
+            "Balance": -77709.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/MCDONALDS/REF_979162",
+            "Debit": 294.0,
+            "Credit": "",
+            "Balance": -78003.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/KFC/REF_318355",
+            "Debit": 661.0,
+            "Credit": "",
+            "Balance": -78664.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/UBEREATS/REF_459089",
+            "Debit": 370.0,
+            "Credit": "",
+            "Balance": -79034.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/AIRASIA/REF_231348",
+            "Debit": 406.0,
+            "Credit": "",
+            "Balance": -79440.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/ZOMATO/REF_127391",
+            "Debit": 701.0,
+            "Credit": "",
+            "Balance": -80141.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/AJIO/REF_501770",
+            "Debit": 3020.0,
+            "Credit": "",
+            "Balance": -83161.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/FLIPKART/REF_314310",
+            "Debit": 4677.0,
+            "Credit": "",
+            "Balance": -87838.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/MCDONALDS/REF_527062",
+            "Debit": 533.0,
+            "Credit": "",
+            "Balance": -88371.0
+        },
+        {
+            "Date": "04/07/2024",
+            "Description": "UPI/FLIPKART/REF_409673",
+            "Debit": 2336.0,
+            "Credit": "",
+            "Balance": -90707.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/FORTIS/REF_627320",
+            "Debit": 439.0,
+            "Credit": "",
+            "Balance": -91146.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/PHARMEASY/REF_973329",
+            "Debit": 716.0,
+            "Credit": "",
+            "Balance": -91862.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/KFC/REF_853382",
+            "Debit": 657.0,
+            "Credit": "",
+            "Balance": -92519.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/STARBUCKS/REF_301481",
+            "Debit": 571.0,
+            "Credit": "",
+            "Balance": -93090.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/PHARMEASY/REF_793730",
+            "Debit": 344.0,
+            "Credit": "",
+            "Balance": -93434.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": -93633.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/AIRASIA/REF_369947",
+            "Debit": 1141.0,
+            "Credit": "",
+            "Balance": -94774.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/AJIO/REF_418497",
+            "Debit": 902.0,
+            "Credit": "",
+            "Balance": -95676.0
+        },
+        {
+            "Date": "05/07/2024",
+            "Description": "UPI/1MG/REF_927343",
+            "Debit": 1332.0,
+            "Credit": "",
+            "Balance": -97008.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 1424.0,
+            "Credit": "",
+            "Balance": -98432.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 2267.0,
+            "Credit": "",
+            "Balance": -100699.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_208722",
+            "Debit": 805.0,
+            "Credit": "",
+            "Balance": -101504.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/AJIO/REF_763579",
+            "Debit": 3793.0,
+            "Credit": "",
+            "Balance": -105297.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 1818.0,
+            "Credit": "",
+            "Balance": -107115.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/AIRASIA/REF_204192",
+            "Debit": 1391.0,
+            "Credit": "",
+            "Balance": -108506.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/MYNTRA/REF_681708",
+            "Debit": 1853.0,
+            "Credit": "",
+            "Balance": -110359.0
+        },
+        {
+            "Date": "06/07/2024",
+            "Description": "UPI/UBER/REF_527180",
+            "Debit": 115.0,
+            "Credit": "",
+            "Balance": -110474.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 2678.0,
+            "Credit": "",
+            "Balance": -113152.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/UBER/REF_164288",
+            "Debit": 1054.0,
+            "Credit": "",
+            "Balance": -114206.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/PHARMEASY/REF_951191",
+            "Debit": 1004.0,
+            "Credit": "",
+            "Balance": -115210.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_557976",
+            "Debit": 573.0,
+            "Credit": "",
+            "Balance": -115783.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/MYNTRA/REF_335219",
+            "Debit": 2114.0,
+            "Credit": "",
+            "Balance": -117897.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 4403.0,
+            "Credit": "",
+            "Balance": -122300.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/BILLDESK/BESCOM/PAYMENT",
+            "Debit": 2161.0,
+            "Credit": "",
+            "Balance": -124461.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 3265.0,
+            "Credit": "",
+            "Balance": -127726.0
+        },
+        {
+            "Date": "07/07/2024",
+            "Description": "UPI/MYNTRA/REF_608988",
+            "Debit": 4883.0,
+            "Credit": "",
+            "Balance": -132609.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_817705",
+            "Debit": 881.0,
+            "Credit": "",
+            "Balance": -133490.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/ZOMATO/REF_821492",
+            "Debit": 715.0,
+            "Credit": "",
+            "Balance": -134205.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/INDIGO/REF_928264",
+            "Debit": 555.0,
+            "Credit": "",
+            "Balance": -134760.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/OLA/REF_442538",
+            "Debit": 669.0,
+            "Credit": "",
+            "Balance": -135429.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/MYNTRA/REF_413822",
+            "Debit": 2532.0,
+            "Credit": "",
+            "Balance": -137961.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/UBER/REF_628197",
+            "Debit": 211.0,
+            "Credit": "",
+            "Balance": -138172.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/OLA/REF_150777",
+            "Debit": 347.0,
+            "Credit": "",
+            "Balance": -138519.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/1MG/REF_156843",
+            "Debit": 418.0,
+            "Credit": "",
+            "Balance": -138937.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/SWIGGY/REF_907156",
+            "Debit": 332.0,
+            "Credit": "",
+            "Balance": -139269.0
+        },
+        {
+            "Date": "08/07/2024",
+            "Description": "UPI/AMAZON/REF_212313",
+            "Debit": 956.0,
+            "Credit": "",
+            "Balance": -140225.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/BILLDESK/BESCOM/PAYMENT",
+            "Debit": 4461.0,
+            "Credit": "",
+            "Balance": -144686.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/ZOMATO/REF_259603",
+            "Debit": 375.0,
+            "Credit": "",
+            "Balance": -145061.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/KFC/REF_971305",
+            "Debit": 152.0,
+            "Credit": "",
+            "Balance": -145213.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/AIRASIA/REF_206688",
+            "Debit": 1140.0,
+            "Credit": "",
+            "Balance": -146353.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/FORTIS/REF_949568",
+            "Debit": 1728.0,
+            "Credit": "",
+            "Balance": -148081.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/DOMINOS/REF_513857",
+            "Debit": 450.0,
+            "Credit": "",
+            "Balance": -148531.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_644657",
+            "Debit": 831.0,
+            "Credit": "",
+            "Balance": -149362.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_345935",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -150861.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/IRCTC/REF_292414",
+            "Debit": 262.0,
+            "Credit": "",
+            "Balance": -151123.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/CROMA/REF_178914",
+            "Debit": 697.0,
+            "Credit": "",
+            "Balance": -151820.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 902.0,
+            "Credit": "",
+            "Balance": -152722.0
+        },
+        {
+            "Date": "09/07/2024",
+            "Description": "UPI/CROMA/REF_476017",
+            "Debit": 2844.0,
+            "Credit": "",
+            "Balance": -155566.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/KFC/REF_269089",
+            "Debit": 742.0,
+            "Credit": "",
+            "Balance": -156308.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/UBER/REF_851357",
+            "Debit": 100.0,
+            "Credit": "",
+            "Balance": -156408.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/UBER/REF_231780",
+            "Debit": 1342.0,
+            "Credit": "",
+            "Balance": -157750.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/OLA/REF_486394",
+            "Debit": 141.0,
+            "Credit": "",
+            "Balance": -157891.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/FORTIS/REF_249508",
+            "Debit": 1790.0,
+            "Credit": "",
+            "Balance": -159681.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 2816.0,
+            "Credit": "",
+            "Balance": -162497.0
+        },
+        {
+            "Date": "10/07/2024",
+            "Description": "UPI/FLIPKART/REF_856177",
+            "Debit": 1606.0,
+            "Credit": "",
+            "Balance": -164103.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/AIRASIA/REF_288031",
+            "Debit": 1162.0,
+            "Credit": "",
+            "Balance": -165265.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_470495",
+            "Debit": 4498.0,
+            "Credit": "",
+            "Balance": -169763.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/DOMINOS/REF_505627",
+            "Debit": 303.0,
+            "Credit": "",
+            "Balance": -170066.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/UBEREATS/REF_881221",
+            "Debit": 590.0,
+            "Credit": "",
+            "Balance": -170656.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_401280",
+            "Debit": 1349.0,
+            "Credit": "",
+            "Balance": -172005.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/MYNTRA/REF_372780",
+            "Debit": 2428.0,
+            "Credit": "",
+            "Balance": -174433.0
+        },
+        {
+            "Date": "11/07/2024",
+            "Description": "UPI/CROMA/REF_609890",
+            "Debit": 4499.0,
+            "Credit": "",
+            "Balance": -178932.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/SWIGGY/REF_193677",
+            "Debit": 478.0,
+            "Credit": "",
+            "Balance": -179410.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/FORTIS/REF_396109",
+            "Debit": 595.0,
+            "Credit": "",
+            "Balance": -180005.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/MYNTRA/REF_396735",
+            "Debit": 752.0,
+            "Credit": "",
+            "Balance": -180757.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_369676",
+            "Debit": 987.0,
+            "Credit": "",
+            "Balance": -181744.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/DOMINOS/REF_304331",
+            "Debit": 409.0,
+            "Credit": "",
+            "Balance": -182153.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/INDIGO/REF_501917",
+            "Debit": 529.0,
+            "Credit": "",
+            "Balance": -182682.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/OLA/REF_575920",
+            "Debit": 856.0,
+            "Credit": "",
+            "Balance": -183538.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/MCDONALDS/REF_177352",
+            "Debit": 669.0,
+            "Credit": "",
+            "Balance": -184207.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/MCDONALDS/REF_101289",
+            "Debit": 157.0,
+            "Credit": "",
+            "Balance": -184364.0
+        },
+        {
+            "Date": "12/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_741717",
+            "Debit": 472.0,
+            "Credit": "",
+            "Balance": -184836.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/STARBUCKS/REF_580955",
+            "Debit": 289.0,
+            "Credit": "",
+            "Balance": -185125.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/PHARMEASY/REF_682002",
+            "Debit": 936.0,
+            "Credit": "",
+            "Balance": -186061.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/INDIGO/REF_745467",
+            "Debit": 870.0,
+            "Credit": "",
+            "Balance": -186931.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/AMAZON/REF_159178",
+            "Debit": 3219.0,
+            "Credit": "",
+            "Balance": -190150.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/STARBUCKS/REF_881145",
+            "Debit": 346.0,
+            "Credit": "",
+            "Balance": -190496.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/CROMA/REF_966080",
+            "Debit": 2849.0,
+            "Credit": "",
+            "Balance": -193345.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/1MG/REF_804544",
+            "Debit": 741.0,
+            "Credit": "",
+            "Balance": -194086.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/UBER/REF_103386",
+            "Debit": 1426.0,
+            "Credit": "",
+            "Balance": -195512.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_745783",
+            "Debit": 3674.0,
+            "Credit": "",
+            "Balance": -199186.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/PHARMEASY/REF_547196",
+            "Debit": 1578.0,
+            "Credit": "",
+            "Balance": -200764.0
+        },
+        {
+            "Date": "13/07/2024",
+            "Description": "UPI/1MG/REF_790465",
+            "Debit": 1618.0,
+            "Credit": "",
+            "Balance": -202382.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/FLIPKART/REF_222475",
+            "Debit": 1828.0,
+            "Credit": "",
+            "Balance": -204210.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_788106",
+            "Debit": 1677.0,
+            "Credit": "",
+            "Balance": -205887.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/PHARMEASY/REF_414366",
+            "Debit": 1461.0,
+            "Credit": "",
+            "Balance": -207348.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/STARBUCKS/REF_196172",
+            "Debit": 396.0,
+            "Credit": "",
+            "Balance": -207744.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/KFC/REF_161808",
+            "Debit": 412.0,
+            "Credit": "",
+            "Balance": -208156.0
+        },
+        {
+            "Date": "14/07/2024",
+            "Description": "UPI/FLIPKART/REF_351794",
+            "Debit": 2393.0,
+            "Credit": "",
+            "Balance": -210549.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/MYNTRA/REF_860926",
+            "Debit": 589.0,
+            "Credit": "",
+            "Balance": -211138.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/DOMINOS/REF_450636",
+            "Debit": 246.0,
+            "Credit": "",
+            "Balance": -211384.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/FORTIS/REF_444942",
+            "Debit": 1345.0,
+            "Credit": "",
+            "Balance": -212729.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/ZOMATO/REF_967372",
+            "Debit": 494.0,
+            "Credit": "",
+            "Balance": -213223.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/OLA/REF_714257",
+            "Debit": 610.0,
+            "Credit": "",
+            "Balance": -213833.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/INDIGO/REF_290348",
+            "Debit": 951.0,
+            "Credit": "",
+            "Balance": -214784.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/PHARMEASY/REF_254276",
+            "Debit": 1836.0,
+            "Credit": "",
+            "Balance": -216620.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/ZOMATO/REF_677117",
+            "Debit": 527.0,
+            "Credit": "",
+            "Balance": -217147.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/IRCTC/REF_421201",
+            "Debit": 510.0,
+            "Credit": "",
+            "Balance": -217657.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/MCDONALDS/REF_200924",
+            "Debit": 787.0,
+            "Credit": "",
+            "Balance": -218444.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_891833",
+            "Debit": 1779.0,
+            "Credit": "",
+            "Balance": -220223.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/INDIGO/REF_773050",
+            "Debit": 1464.0,
+            "Credit": "",
+            "Balance": -221687.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/1MG/REF_180422",
+            "Debit": 1738.0,
+            "Credit": "",
+            "Balance": -223425.0
+        },
+        {
+            "Date": "15/07/2024",
+            "Description": "UPI/AJIO/REF_619990",
+            "Debit": 3490.0,
+            "Credit": "",
+            "Balance": -226915.0
+        },
+        {
+            "Date": "16/07/2024",
+            "Description": "UPI/AMAZON/REF_965218",
+            "Debit": 4637.0,
+            "Credit": "",
+            "Balance": -231552.0
+        },
+        {
+            "Date": "16/07/2024",
+            "Description": "UPI/PHARMEASY/REF_712157",
+            "Debit": 554.0,
+            "Credit": "",
+            "Balance": -232106.0
+        },
+        {
+            "Date": "17/07/2024",
+            "Description": "UPI/PHARMEASY/REF_650411",
+            "Debit": 1688.0,
+            "Credit": "",
+            "Balance": -233794.0
+        },
+        {
+            "Date": "17/07/2024",
+            "Description": "UPI/CROMA/REF_389264",
+            "Debit": 4492.0,
+            "Credit": "",
+            "Balance": -238286.0
+        },
+        {
+            "Date": "17/07/2024",
+            "Description": "UPI/SWIGGY/REF_564272",
+            "Debit": 729.0,
+            "Credit": "",
+            "Balance": -239015.0
+        },
+        {
+            "Date": "17/07/2024",
+            "Description": "UPI/PHARMEASY/REF_746823",
+            "Debit": 1379.0,
+            "Credit": "",
+            "Balance": -240394.0
+        },
+        {
+            "Date": "17/07/2024",
+            "Description": "UPI/UBER/REF_587849",
+            "Debit": 628.0,
+            "Credit": "",
+            "Balance": -241022.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/UBER/REF_745914",
+            "Debit": 447.0,
+            "Credit": "",
+            "Balance": -241469.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_815552",
+            "Debit": 1326.0,
+            "Credit": "",
+            "Balance": -242795.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_690969",
+            "Debit": 1406.0,
+            "Credit": "",
+            "Balance": -244201.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_669632",
+            "Debit": 902.0,
+            "Credit": "",
+            "Balance": -245103.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/ZOMATO/REF_233130",
+            "Debit": 340.0,
+            "Credit": "",
+            "Balance": -245443.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/IRCTC/REF_391256",
+            "Debit": 632.0,
+            "Credit": "",
+            "Balance": -246075.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/OLA/REF_601670",
+            "Debit": 1157.0,
+            "Credit": "",
+            "Balance": -247232.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_697569",
+            "Debit": 1962.0,
+            "Credit": "",
+            "Balance": -249194.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/1MG/REF_286850",
+            "Debit": 1004.0,
+            "Credit": "",
+            "Balance": -250198.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/FORTIS/REF_121694",
+            "Debit": 401.0,
+            "Credit": "",
+            "Balance": -250599.0
+        },
+        {
+            "Date": "18/07/2024",
+            "Description": "UPI/AIRASIA/REF_553888",
+            "Debit": 452.0,
+            "Credit": "",
+            "Balance": -251051.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/UBER/REF_615319",
+            "Debit": 352.0,
+            "Credit": "",
+            "Balance": -251403.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/PHARMEASY/REF_217610",
+            "Debit": 933.0,
+            "Credit": "",
+            "Balance": -252336.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/UBER/REF_330936",
+            "Debit": 803.0,
+            "Credit": "",
+            "Balance": -253139.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/KFC/REF_242030",
+            "Debit": 440.0,
+            "Credit": "",
+            "Balance": -253579.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/FLIPKART/REF_814543",
+            "Debit": 1519.0,
+            "Credit": "",
+            "Balance": -255098.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/1MG/REF_763175",
+            "Debit": 1390.0,
+            "Credit": "",
+            "Balance": -256488.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/AJIO/REF_146765",
+            "Debit": 2908.0,
+            "Credit": "",
+            "Balance": -259396.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/PHARMEASY/REF_708962",
+            "Debit": 605.0,
+            "Credit": "",
+            "Balance": -260001.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/UBEREATS/REF_780602",
+            "Debit": 506.0,
+            "Credit": "",
+            "Balance": -260507.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/CROMA/REF_204169",
+            "Debit": 4641.0,
+            "Credit": "",
+            "Balance": -265148.0
+        },
+        {
+            "Date": "19/07/2024",
+            "Description": "UPI/STARBUCKS/REF_336531",
+            "Debit": 393.0,
+            "Credit": "",
+            "Balance": -265541.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/STARBUCKS/REF_966246",
+            "Debit": 296.0,
+            "Credit": "",
+            "Balance": -265837.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/UBER/REF_188318",
+            "Debit": 1237.0,
+            "Credit": "",
+            "Balance": -267074.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/UBER/REF_470816",
+            "Debit": 671.0,
+            "Credit": "",
+            "Balance": -267745.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/FORTIS/REF_698266",
+            "Debit": 336.0,
+            "Credit": "",
+            "Balance": -268081.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/PHARMEASY/REF_960926",
+            "Debit": 1242.0,
+            "Credit": "",
+            "Balance": -269323.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/PHARMEASY/REF_708962",
+            "Debit": 737.0,
+            "Credit": "",
+            "Balance": -270060.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/INDIGO/REF_782022",
+            "Debit": 1062.0,
+            "Credit": "",
+            "Balance": -271122.0
+        },
+        {
+            "Date": "20/07/2024",
+            "Description": "UPI/DOMINOS/REF_660173",
+            "Debit": 276.0,
+            "Credit": "",
+            "Balance": -271398.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/SWIGGY/REF_413077",
+            "Debit": 228.0,
+            "Credit": "",
+            "Balance": -271626.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/1MG/REF_554553",
+            "Debit": 713.0,
+            "Credit": "",
+            "Balance": -272339.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/AMAZON/REF_718715",
+            "Debit": 2969.0,
+            "Credit": "",
+            "Balance": -275308.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/AIRASIA/REF_530013",
+            "Debit": 512.0,
+            "Credit": "",
+            "Balance": -275820.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/MCDONALDS/REF_273186",
+            "Debit": 452.0,
+            "Credit": "",
+            "Balance": -276272.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/AJIO/REF_728458",
+            "Debit": 2270.0,
+            "Credit": "",
+            "Balance": -278542.0
+        },
+        {
+            "Date": "21/07/2024",
+            "Description": "UPI/INDIGO/REF_803315",
+            "Debit": 616.0,
+            "Credit": "",
+            "Balance": -279158.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/ZOMATO/REF_891487",
+            "Debit": 219.0,
+            "Credit": "",
+            "Balance": -279377.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_976949",
+            "Debit": 3730.0,
+            "Credit": "",
+            "Balance": -283107.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/AMAZON/REF_277016",
+            "Debit": 4762.0,
+            "Credit": "",
+            "Balance": -287869.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/AIRASIA/REF_212917",
+            "Debit": 1156.0,
+            "Credit": "",
+            "Balance": -289025.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/SWIGGY/REF_282311",
+            "Debit": 277.0,
+            "Credit": "",
+            "Balance": -289302.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/UBEREATS/REF_747200",
+            "Debit": 536.0,
+            "Credit": "",
+            "Balance": -289838.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_282794",
+            "Debit": 3180.0,
+            "Credit": "",
+            "Balance": -293018.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_450942",
+            "Debit": 4850.0,
+            "Credit": "",
+            "Balance": -297868.0
+        },
+        {
+            "Date": "22/07/2024",
+            "Description": "UPI/MCDONALDS/REF_299136",
+            "Debit": 279.0,
+            "Credit": "",
+            "Balance": -298147.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/CROMA/REF_488742",
+            "Debit": 3709.0,
+            "Credit": "",
+            "Balance": -301856.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/KFC/REF_927627",
+            "Debit": 261.0,
+            "Credit": "",
+            "Balance": -302117.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_544060",
+            "Debit": 1309.0,
+            "Credit": "",
+            "Balance": -303426.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/UBER/REF_271017",
+            "Debit": 254.0,
+            "Credit": "",
+            "Balance": -303680.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/IRCTC/REF_976724",
+            "Debit": 1023.0,
+            "Credit": "",
+            "Balance": -304703.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/UBER/REF_887328",
+            "Debit": 724.0,
+            "Credit": "",
+            "Balance": -305427.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/AIRASIA/REF_243356",
+            "Debit": 1215.0,
+            "Credit": "",
+            "Balance": -306642.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/STARBUCKS/REF_922717",
+            "Debit": 637.0,
+            "Credit": "",
+            "Balance": -307279.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/CROMA/REF_100909",
+            "Debit": 1165.0,
+            "Credit": "",
+            "Balance": -308444.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/DOMINOS/REF_554220",
+            "Debit": 527.0,
+            "Credit": "",
+            "Balance": -308971.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/FORTIS/REF_932236",
+            "Debit": 1050.0,
+            "Credit": "",
+            "Balance": -310021.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/AJIO/REF_865130",
+            "Debit": 1960.0,
+            "Credit": "",
+            "Balance": -311981.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_627592",
+            "Debit": 998.0,
+            "Credit": "",
+            "Balance": -312979.0
+        },
+        {
+            "Date": "23/07/2024",
+            "Description": "UPI/1MG/REF_309992",
+            "Debit": 1612.0,
+            "Credit": "",
+            "Balance": -314591.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/IRCTC/REF_258634",
+            "Debit": 655.0,
+            "Credit": "",
+            "Balance": -315246.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_316560",
+            "Debit": 275.0,
+            "Credit": "",
+            "Balance": -315521.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/AJIO/REF_401859",
+            "Debit": 2000.0,
+            "Credit": "",
+            "Balance": -317521.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/KFC/REF_716197",
+            "Debit": 789.0,
+            "Credit": "",
+            "Balance": -318310.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/DOMINOS/REF_124405",
+            "Debit": 323.0,
+            "Credit": "",
+            "Balance": -318633.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/MYNTRA/REF_447790",
+            "Debit": 1956.0,
+            "Credit": "",
+            "Balance": -320589.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/KFC/REF_825853",
+            "Debit": 706.0,
+            "Credit": "",
+            "Balance": -321295.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_877162",
+            "Debit": 338.0,
+            "Credit": "",
+            "Balance": -321633.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_878581",
+            "Debit": 4677.0,
+            "Credit": "",
+            "Balance": -326310.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_172173",
+            "Debit": 1386.0,
+            "Credit": "",
+            "Balance": -327696.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/FORTIS/REF_692379",
+            "Debit": 1463.0,
+            "Credit": "",
+            "Balance": -329159.0
+        },
+        {
+            "Date": "24/07/2024",
+            "Description": "UPI/FORTIS/REF_860443",
+            "Debit": 967.0,
+            "Credit": "",
+            "Balance": -330126.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/FORTIS/REF_671459",
+            "Debit": 1234.0,
+            "Credit": "",
+            "Balance": -331360.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/DOMINOS/REF_410662",
+            "Debit": 401.0,
+            "Credit": "",
+            "Balance": -331761.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/SWIGGY/REF_854850",
+            "Debit": 263.0,
+            "Credit": "",
+            "Balance": -332024.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/FLIPKART/REF_914991",
+            "Debit": 3432.0,
+            "Credit": "",
+            "Balance": -335456.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/SWIGGY/REF_278500",
+            "Debit": 665.0,
+            "Credit": "",
+            "Balance": -336121.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/AIRASIA/REF_545488",
+            "Debit": 1396.0,
+            "Credit": "",
+            "Balance": -337517.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/MYNTRA/REF_385648",
+            "Debit": 2770.0,
+            "Credit": "",
+            "Balance": -340287.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/INDIGO/REF_900606",
+            "Debit": 726.0,
+            "Credit": "",
+            "Balance": -341013.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/SWIGGY/REF_114799",
+            "Debit": 347.0,
+            "Credit": "",
+            "Balance": -341360.0
+        },
+        {
+            "Date": "25/07/2024",
+            "Description": "UPI/1MG/REF_403915",
+            "Debit": 788.0,
+            "Credit": "",
+            "Balance": -342148.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/SWIGGY/REF_201716",
+            "Debit": 276.0,
+            "Credit": "",
+            "Balance": -342424.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/AIRASIA/REF_156509",
+            "Debit": 605.0,
+            "Credit": "",
+            "Balance": -343029.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/FORTIS/REF_693082",
+            "Debit": 751.0,
+            "Credit": "",
+            "Balance": -343780.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/PHARMEASY/REF_809058",
+            "Debit": 740.0,
+            "Credit": "",
+            "Balance": -344520.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/MCDONALDS/REF_728418",
+            "Debit": 204.0,
+            "Credit": "",
+            "Balance": -344724.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/MYNTRA/REF_840863",
+            "Debit": 2126.0,
+            "Credit": "",
+            "Balance": -346850.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/PHARMEASY/REF_302399",
+            "Debit": 421.0,
+            "Credit": "",
+            "Balance": -347271.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/1MG/REF_549734",
+            "Debit": 787.0,
+            "Credit": "",
+            "Balance": -348058.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/MCDONALDS/REF_774560",
+            "Debit": 344.0,
+            "Credit": "",
+            "Balance": -348402.0
+        },
+        {
+            "Date": "26/07/2024",
+            "Description": "UPI/DOMINOS/REF_480826",
+            "Debit": 536.0,
+            "Credit": "",
+            "Balance": -348938.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/CROMA/REF_639793",
+            "Debit": 1450.0,
+            "Credit": "",
+            "Balance": -350388.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_134069",
+            "Debit": 1556.0,
+            "Credit": "",
+            "Balance": -351944.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/MCDONALDS/REF_144265",
+            "Debit": 690.0,
+            "Credit": "",
+            "Balance": -352634.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/FORTIS/REF_243510",
+            "Debit": 412.0,
+            "Credit": "",
+            "Balance": -353046.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/AJIO/REF_553478",
+            "Debit": 4441.0,
+            "Credit": "",
+            "Balance": -357487.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/OLA/REF_216110",
+            "Debit": 569.0,
+            "Credit": "",
+            "Balance": -358056.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/PHARMEASY/REF_963087",
+            "Debit": 1903.0,
+            "Credit": "",
+            "Balance": -359959.0
+        },
+        {
+            "Date": "27/07/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_103582",
+            "Debit": 930.0,
+            "Credit": "",
+            "Balance": -360889.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/AIRASIA/REF_264165",
+            "Debit": 515.0,
+            "Credit": "",
+            "Balance": -361404.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/MYNTRA/REF_803384",
+            "Debit": 4769.0,
+            "Credit": "",
+            "Balance": -366173.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/FORTIS/REF_534383",
+            "Debit": 1343.0,
+            "Credit": "",
+            "Balance": -367516.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/MCDONALDS/REF_869541",
+            "Debit": 498.0,
+            "Credit": "",
+            "Balance": -368014.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/OLA/REF_858887",
+            "Debit": 565.0,
+            "Credit": "",
+            "Balance": -368579.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_254712",
+            "Debit": 901.0,
+            "Credit": "",
+            "Balance": -369480.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/FORTIS/REF_291783",
+            "Debit": 1489.0,
+            "Credit": "",
+            "Balance": -370969.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/AMAZON/REF_495332",
+            "Debit": 2111.0,
+            "Credit": "",
+            "Balance": -373080.0
+        },
+        {
+            "Date": "28/07/2024",
+            "Description": "UPI/IRCTC/REF_599320",
+            "Debit": 129.0,
+            "Credit": "",
+            "Balance": -373209.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 10575.0,
+            "Balance": -362634.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/OLA/REF_494885",
+            "Debit": 870.0,
+            "Credit": "",
+            "Balance": -363504.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/FLIPKART/REF_479933",
+            "Debit": 3130.0,
+            "Credit": "",
+            "Balance": -366634.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/STARBUCKS/REF_437676",
+            "Debit": 740.0,
+            "Credit": "",
+            "Balance": -367374.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/FLIPKART/REF_763414",
+            "Debit": 800.0,
+            "Credit": "",
+            "Balance": -368174.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_724180",
+            "Debit": 1372.0,
+            "Credit": "",
+            "Balance": -369546.0
+        },
+        {
+            "Date": "01/08/2024",
+            "Description": "UPI/FORTIS/REF_932738",
+            "Debit": 1767.0,
+            "Credit": "",
+            "Balance": -371313.0
+        },
+        {
+            "Date": "02/08/2024",
+            "Description": "UPI/UBEREATS/REF_429069",
+            "Debit": 719.0,
+            "Credit": "",
+            "Balance": -372032.0
+        },
+        {
+            "Date": "02/08/2024",
+            "Description": "UPI/1MG/REF_687037",
+            "Debit": 1076.0,
+            "Credit": "",
+            "Balance": -373108.0
+        },
+        {
+            "Date": "02/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_124901",
+            "Debit": 1052.0,
+            "Credit": "",
+            "Balance": -374160.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": -374459.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_210316",
+            "Debit": 1098.0,
+            "Credit": "",
+            "Balance": -375557.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "UPI/ZOMATO/REF_855523",
+            "Debit": 182.0,
+            "Credit": "",
+            "Balance": -375739.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "UPI/INDIGO/REF_467289",
+            "Debit": 517.0,
+            "Credit": "",
+            "Balance": -376256.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_108702",
+            "Debit": 1973.0,
+            "Credit": "",
+            "Balance": -378229.0
+        },
+        {
+            "Date": "03/08/2024",
+            "Description": "UPI/MYNTRA/REF_494735",
+            "Debit": 2904.0,
+            "Credit": "",
+            "Balance": -381133.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -382632.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "ACH/GYM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": -382931.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -383930.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "UPI/STARBUCKS/REF_988951",
+            "Debit": 355.0,
+            "Credit": "",
+            "Balance": -384285.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "UPI/AJIO/REF_948922",
+            "Debit": 2927.0,
+            "Credit": "",
+            "Balance": -387212.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "UPI/FORTIS/REF_678583",
+            "Debit": 1167.0,
+            "Credit": "",
+            "Balance": -388379.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "UPI/CROMA/REF_703680",
+            "Debit": 3693.0,
+            "Credit": "",
+            "Balance": -392072.0
+        },
+        {
+            "Date": "04/08/2024",
+            "Description": "UPI/OLA/REF_301733",
+            "Debit": 261.0,
+            "Credit": "",
+            "Balance": -392333.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -393332.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "ACH/HOTSTAR_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -394831.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 677.0,
+            "Credit": "",
+            "Balance": -395508.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 3359.0,
+            "Credit": "",
+            "Balance": -398867.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 1910.0,
+            "Credit": "",
+            "Balance": -400777.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/MYNTRA/REF_585221",
+            "Debit": 4874.0,
+            "Credit": "",
+            "Balance": -405651.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_115062",
+            "Debit": 800.0,
+            "Credit": "",
+            "Balance": -406451.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_563928",
+            "Debit": 1866.0,
+            "Credit": "",
+            "Balance": -408317.0
+        },
+        {
+            "Date": "05/08/2024",
+            "Description": "UPI/AIRASIA/REF_298722",
+            "Debit": 1482.0,
+            "Credit": "",
+            "Balance": -409799.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 1792.0,
+            "Credit": "",
+            "Balance": -411591.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/INDIGO/REF_205932",
+            "Debit": 427.0,
+            "Credit": "",
+            "Balance": -412018.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/ZOMATO/REF_982784",
+            "Debit": 617.0,
+            "Credit": "",
+            "Balance": -412635.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/AJIO/REF_719536",
+            "Debit": 1553.0,
+            "Credit": "",
+            "Balance": -414188.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/UBEREATS/REF_736001",
+            "Debit": 341.0,
+            "Credit": "",
+            "Balance": -414529.0
+        },
+        {
+            "Date": "06/08/2024",
+            "Description": "UPI/MYNTRA/REF_457025",
+            "Debit": 796.0,
+            "Credit": "",
+            "Balance": -415325.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/BILLDESK/BESCOM/PAYMENT",
+            "Debit": 1665.0,
+            "Credit": "",
+            "Balance": -416990.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/IRCTC/REF_708625",
+            "Debit": 563.0,
+            "Credit": "",
+            "Balance": -417553.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/PHARMEASY/REF_459925",
+            "Debit": 1064.0,
+            "Credit": "",
+            "Balance": -418617.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/SWIGGY/REF_879334",
+            "Debit": 466.0,
+            "Credit": "",
+            "Balance": -419083.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/CROMA/REF_932239",
+            "Debit": 4253.0,
+            "Credit": "",
+            "Balance": -423336.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/DOMINOS/REF_811837",
+            "Debit": 437.0,
+            "Credit": "",
+            "Balance": -423773.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/PHARMEASY/REF_662681",
+            "Debit": 839.0,
+            "Credit": "",
+            "Balance": -424612.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/FORTIS/REF_552478",
+            "Debit": 1534.0,
+            "Credit": "",
+            "Balance": -426146.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/PHARMEASY/REF_882792",
+            "Debit": 726.0,
+            "Credit": "",
+            "Balance": -426872.0
+        },
+        {
+            "Date": "07/08/2024",
+            "Description": "UPI/MYNTRA/REF_396810",
+            "Debit": 4239.0,
+            "Credit": "",
+            "Balance": -431111.0
+        },
+        {
+            "Date": "08/08/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 3017.0,
+            "Credit": "",
+            "Balance": -434128.0
+        },
+        {
+            "Date": "08/08/2024",
+            "Description": "UPI/AMAZON/REF_548484",
+            "Debit": 2363.0,
+            "Credit": "",
+            "Balance": -436491.0
+        },
+        {
+            "Date": "08/08/2024",
+            "Description": "UPI/SWIGGY/REF_884414",
+            "Debit": 679.0,
+            "Credit": "",
+            "Balance": -437170.0
+        },
+        {
+            "Date": "08/08/2024",
+            "Description": "UPI/MYNTRA/REF_960114",
+            "Debit": 1930.0,
+            "Credit": "",
+            "Balance": -439100.0
+        },
+        {
+            "Date": "08/08/2024",
+            "Description": "UPI/MYNTRA/REF_669820",
+            "Debit": 2409.0,
+            "Credit": "",
+            "Balance": -441509.0
+        },
+        {
+            "Date": "09/08/2024",
+            "Description": "UPI/FLIPKART/REF_160086",
+            "Debit": 908.0,
+            "Credit": "",
+            "Balance": -442417.0
+        },
+        {
+            "Date": "09/08/2024",
+            "Description": "UPI/AMAZON/REF_612294",
+            "Debit": 4996.0,
+            "Credit": "",
+            "Balance": -447413.0
+        },
+        {
+            "Date": "09/08/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_831334",
+            "Debit": 1656.0,
+            "Credit": "",
+            "Balance": -449069.0
+        },
+        {
+            "Date": "10/08/2024",
+            "Description": "UPI/DOMINOS/REF_594314",
+            "Debit": 352.0,
+            "Credit": "",
+            "Balance": -449421.0
+        },
+        {
+            "Date": "10/08/2024",
+            "Description": "UPI/MCDONALDS/REF_153208",
+            "Debit": 282.0,
+            "Credit": "",
+            "Balance": -449703.0
+        },
+        {
+            "Date": "10/08/2024",
+            "Description": "UPI/AJIO/REF_842771",
+            "Debit": 2907.0,
+            "Credit": "",
+            "Balance": -452610.0
+        },
+        {
+            "Date": "10/08/2024",
+            "Description": "UPI/INDIGO/REF_957860",
+            "Debit": 1010.0,
+            "Credit": "",
+            "Balance": -453620.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/PHARMEASY/REF_753765",
+            "Debit": 494.0,
+            "Credit": "",
+            "Balance": -454114.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/FORTIS/REF_837705",
+            "Debit": 1820.0,
+            "Credit": "",
+            "Balance": -455934.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/AMAZON/REF_708414",
+            "Debit": 993.0,
+            "Credit": "",
+            "Balance": -456927.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/PHARMEASY/REF_652898",
+            "Debit": 888.0,
+            "Credit": "",
+            "Balance": -457815.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/CROMA/REF_980446",
+            "Debit": 2645.0,
+            "Credit": "",
+            "Balance": -460460.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/FLIPKART/REF_206734",
+            "Debit": 4399.0,
+            "Credit": "",
+            "Balance": -464859.0
+        },
+        {
+            "Date": "11/08/2024",
+            "Description": "UPI/1MG/REF_269937",
+            "Debit": 949.0,
+            "Credit": "",
+            "Balance": -465808.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/AJIO/REF_356669",
+            "Debit": 747.0,
+            "Credit": "",
+            "Balance": -466555.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/DOMINOS/REF_380096",
+            "Debit": 656.0,
+            "Credit": "",
+            "Balance": -467211.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/AMAZON/REF_939776",
+            "Debit": 3840.0,
+            "Credit": "",
+            "Balance": -471051.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/OLA/REF_918803",
+            "Debit": 1035.0,
+            "Credit": "",
+            "Balance": -472086.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/INDIGO/REF_256560",
+            "Debit": 985.0,
+            "Credit": "",
+            "Balance": -473071.0
+        },
+        {
+            "Date": "12/08/2024",
+            "Description": "UPI/FLIPKART/REF_878257",
+            "Debit": 4117.0,
+            "Credit": "",
+            "Balance": -477188.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/AMAZON/REF_617918",
+            "Debit": 3629.0,
+            "Credit": "",
+            "Balance": -480817.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/MCDONALDS/REF_558042",
+            "Debit": 224.0,
+            "Credit": "",
+            "Balance": -481041.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/OLA/REF_716635",
+            "Debit": 1306.0,
+            "Credit": "",
+            "Balance": -482347.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/SWIGGY/REF_619233",
+            "Debit": 478.0,
+            "Credit": "",
+            "Balance": -482825.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/UBER/REF_710851",
+            "Debit": 818.0,
+            "Credit": "",
+            "Balance": -483643.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/STARBUCKS/REF_672767",
+            "Debit": 282.0,
+            "Credit": "",
+            "Balance": -483925.0
+        },
+        {
+            "Date": "13/08/2024",
+            "Description": "UPI/KFC/REF_966680",
+            "Debit": 251.0,
+            "Credit": "",
+            "Balance": -484176.0
+        },
+        {
+            "Date": "14/08/2024",
+            "Description": "UPI/MCDONALDS/REF_874711",
+            "Debit": 424.0,
+            "Credit": "",
+            "Balance": -484600.0
+        },
+        {
+            "Date": "14/08/2024",
+            "Description": "UPI/OLA/REF_220633",
+            "Debit": 1463.0,
+            "Credit": "",
+            "Balance": -486063.0
+        },
+        {
+            "Date": "14/08/2024",
+            "Description": "UPI/1MG/REF_190201",
+            "Debit": 684.0,
+            "Credit": "",
+            "Balance": -486747.0
+        },
+        {
+            "Date": "14/08/2024",
+            "Description": "UPI/INDIGO/REF_783716",
+            "Debit": 1241.0,
+            "Credit": "",
+            "Balance": -487988.0
+        },
+        {
+            "Date": "14/08/2024",
+            "Description": "UPI/UBEREATS/REF_230332",
+            "Debit": 162.0,
+            "Credit": "",
+            "Balance": -488150.0
+        },
+        {
+            "Date": "15/08/2024",
+            "Description": "UPI/UBER/REF_897125",
+            "Debit": 1459.0,
+            "Credit": "",
+            "Balance": -489609.0
+        },
+        {
+            "Date": "15/08/2024",
+            "Description": "UPI/SWIGGY/REF_230824",
+            "Debit": 646.0,
+            "Credit": "",
+            "Balance": -490255.0
+        },
+        {
+            "Date": "15/08/2024",
+            "Description": "UPI/IRCTC/REF_584162",
+            "Debit": 1493.0,
+            "Credit": "",
+            "Balance": -491748.0
+        },
+        {
+            "Date": "15/08/2024",
+            "Description": "UPI/IRCTC/REF_680301",
+            "Debit": 423.0,
+            "Credit": "",
+            "Balance": -492171.0
+        },
+        {
+            "Date": "15/08/2024",
+            "Description": "UPI/PHARMEASY/REF_273670",
+            "Debit": 437.0,
+            "Credit": "",
+            "Balance": -492608.0
+        },
+        {
+            "Date": "16/08/2024",
+            "Description": "UPI/ZOMATO/REF_483145",
+            "Debit": 771.0,
+            "Credit": "",
+            "Balance": -493379.0
+        },
+        {
+            "Date": "16/08/2024",
+            "Description": "UPI/FORTIS/REF_390321",
+            "Debit": 1141.0,
+            "Credit": "",
+            "Balance": -494520.0
+        },
+        {
+            "Date": "16/08/2024",
+            "Description": "UPI/MYNTRA/REF_724890",
+            "Debit": 3373.0,
+            "Credit": "",
+            "Balance": -497893.0
+        },
+        {
+            "Date": "16/08/2024",
+            "Description": "UPI/UBER/REF_539260",
+            "Debit": 981.0,
+            "Credit": "",
+            "Balance": -498874.0
+        },
+        {
+            "Date": "16/08/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_118204",
+            "Debit": 2052.0,
+            "Credit": "",
+            "Balance": -500926.0
+        },
+        {
+            "Date": "17/08/2024",
+            "Description": "UPI/FORTIS/REF_663317",
+            "Debit": 1314.0,
+            "Credit": "",
+            "Balance": -502240.0
+        },
+        {
+            "Date": "17/08/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_759767",
+            "Debit": 2186.0,
+            "Credit": "",
+            "Balance": -504426.0
+        },
+        {
+            "Date": "17/08/2024",
+            "Description": "UPI/STARBUCKS/REF_151502",
+            "Debit": 250.0,
+            "Credit": "",
+            "Balance": -504676.0
+        },
+        {
+            "Date": "17/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_320673",
+            "Debit": 352.0,
+            "Credit": "",
+            "Balance": -505028.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/CROMA/REF_603502",
+            "Debit": 1117.0,
+            "Credit": "",
+            "Balance": -506145.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/UBER/REF_407272",
+            "Debit": 328.0,
+            "Credit": "",
+            "Balance": -506473.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/AJIO/REF_204113",
+            "Debit": 3917.0,
+            "Credit": "",
+            "Balance": -510390.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/1MG/REF_806455",
+            "Debit": 1426.0,
+            "Credit": "",
+            "Balance": -511816.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/1MG/REF_526023",
+            "Debit": 747.0,
+            "Credit": "",
+            "Balance": -512563.0
+        },
+        {
+            "Date": "18/08/2024",
+            "Description": "UPI/FORTIS/REF_223735",
+            "Debit": 1585.0,
+            "Credit": "",
+            "Balance": -514148.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/UBEREATS/REF_431986",
+            "Debit": 764.0,
+            "Credit": "",
+            "Balance": -514912.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/AMAZON/REF_272115",
+            "Debit": 3251.0,
+            "Credit": "",
+            "Balance": -518163.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_871146",
+            "Debit": 701.0,
+            "Credit": "",
+            "Balance": -518864.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/STARBUCKS/REF_579632",
+            "Debit": 594.0,
+            "Credit": "",
+            "Balance": -519458.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/AMAZON/REF_992270",
+            "Debit": 4633.0,
+            "Credit": "",
+            "Balance": -524091.0
+        },
+        {
+            "Date": "19/08/2024",
+            "Description": "UPI/DOMINOS/REF_615213",
+            "Debit": 288.0,
+            "Credit": "",
+            "Balance": -524379.0
+        },
+        {
+            "Date": "20/08/2024",
+            "Description": "UPI/FORTIS/REF_567469",
+            "Debit": 686.0,
+            "Credit": "",
+            "Balance": -525065.0
+        },
+        {
+            "Date": "20/08/2024",
+            "Description": "UPI/MYNTRA/REF_136950",
+            "Debit": 2717.0,
+            "Credit": "",
+            "Balance": -527782.0
+        },
+        {
+            "Date": "20/08/2024",
+            "Description": "UPI/DOMINOS/REF_462184",
+            "Debit": 718.0,
+            "Credit": "",
+            "Balance": -528500.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/AMAZON/REF_870092",
+            "Debit": 3230.0,
+            "Credit": "",
+            "Balance": -531730.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/FORTIS/REF_394167",
+            "Debit": 1482.0,
+            "Credit": "",
+            "Balance": -533212.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_894280",
+            "Debit": 1098.0,
+            "Credit": "",
+            "Balance": -534310.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/1MG/REF_693163",
+            "Debit": 1332.0,
+            "Credit": "",
+            "Balance": -535642.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/UBEREATS/REF_999393",
+            "Debit": 171.0,
+            "Credit": "",
+            "Balance": -535813.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/AIRASIA/REF_166047",
+            "Debit": 1123.0,
+            "Credit": "",
+            "Balance": -536936.0
+        },
+        {
+            "Date": "21/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_595148",
+            "Debit": 359.0,
+            "Credit": "",
+            "Balance": -537295.0
+        },
+        {
+            "Date": "22/08/2024",
+            "Description": "UPI/SWIGGY/REF_640773",
+            "Debit": 188.0,
+            "Credit": "",
+            "Balance": -537483.0
+        },
+        {
+            "Date": "23/08/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_190047",
+            "Debit": 4666.0,
+            "Credit": "",
+            "Balance": -542149.0
+        },
+        {
+            "Date": "23/08/2024",
+            "Description": "UPI/AIRASIA/REF_671198",
+            "Debit": 1426.0,
+            "Credit": "",
+            "Balance": -543575.0
+        },
+        {
+            "Date": "24/08/2024",
+            "Description": "UPI/1MG/REF_227940",
+            "Debit": 849.0,
+            "Credit": "",
+            "Balance": -544424.0
+        },
+        {
+            "Date": "24/08/2024",
+            "Description": "UPI/IRCTC/REF_460544",
+            "Debit": 1333.0,
+            "Credit": "",
+            "Balance": -545757.0
+        },
+        {
+            "Date": "24/08/2024",
+            "Description": "UPI/1MG/REF_816960",
+            "Debit": 1789.0,
+            "Credit": "",
+            "Balance": -547546.0
+        },
+        {
+            "Date": "25/08/2024",
+            "Description": "UPI/INDIGO/REF_463858",
+            "Debit": 129.0,
+            "Credit": "",
+            "Balance": -547675.0
+        },
+        {
+            "Date": "26/08/2024",
+            "Description": "UPI/PHARMEASY/REF_917957",
+            "Debit": 1169.0,
+            "Credit": "",
+            "Balance": -548844.0
+        },
+        {
+            "Date": "26/08/2024",
+            "Description": "UPI/FORTIS/REF_520377",
+            "Debit": 1489.0,
+            "Credit": "",
+            "Balance": -550333.0
+        },
+        {
+            "Date": "27/08/2024",
+            "Description": "UPI/CROMA/REF_201453",
+            "Debit": 4940.0,
+            "Credit": "",
+            "Balance": -555273.0
+        },
+        {
+            "Date": "27/08/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_204041",
+            "Debit": 430.0,
+            "Credit": "",
+            "Balance": -555703.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_267850",
+            "Debit": 1327.0,
+            "Credit": "",
+            "Balance": -557030.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/AJIO/REF_150214",
+            "Debit": 4401.0,
+            "Credit": "",
+            "Balance": -561431.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/FORTIS/REF_391776",
+            "Debit": 1156.0,
+            "Credit": "",
+            "Balance": -562587.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/AMAZON/REF_533323",
+            "Debit": 4023.0,
+            "Credit": "",
+            "Balance": -566610.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/SWIGGY/REF_267749",
+            "Debit": 568.0,
+            "Credit": "",
+            "Balance": -567178.0
+        },
+        {
+            "Date": "28/08/2024",
+            "Description": "UPI/IRCTC/REF_314606",
+            "Debit": 685.0,
+            "Credit": "",
+            "Balance": -567863.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 14006.0,
+            "Balance": -553857.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/UBER/REF_529015",
+            "Debit": 316.0,
+            "Credit": "",
+            "Balance": -554173.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_147624",
+            "Debit": 3296.0,
+            "Credit": "",
+            "Balance": -557469.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/PHARMEASY/REF_197196",
+            "Debit": 1281.0,
+            "Credit": "",
+            "Balance": -558750.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/1MG/REF_610168",
+            "Debit": 1248.0,
+            "Credit": "",
+            "Balance": -559998.0
+        },
+        {
+            "Date": "01/09/2024",
+            "Description": "UPI/INDIGO/REF_498945",
+            "Debit": 977.0,
+            "Credit": "",
+            "Balance": -560975.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -561974.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/DOMINOS/REF_393432",
+            "Debit": 533.0,
+            "Credit": "",
+            "Balance": -562507.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/UBEREATS/REF_653638",
+            "Debit": 501.0,
+            "Credit": "",
+            "Balance": -563008.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_424595",
+            "Debit": 535.0,
+            "Credit": "",
+            "Balance": -563543.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/STARBUCKS/REF_235563",
+            "Debit": 545.0,
+            "Credit": "",
+            "Balance": -564088.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/AIRASIA/REF_626881",
+            "Debit": 670.0,
+            "Credit": "",
+            "Balance": -564758.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/ZOMATO/REF_411513",
+            "Debit": 535.0,
+            "Credit": "",
+            "Balance": -565293.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/INDIGO/REF_443996",
+            "Debit": 958.0,
+            "Credit": "",
+            "Balance": -566251.0
+        },
+        {
+            "Date": "02/09/2024",
+            "Description": "UPI/FLIPKART/REF_768726",
+            "Debit": 1988.0,
+            "Credit": "",
+            "Balance": -568239.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -569238.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/UBEREATS/REF_396136",
+            "Debit": 377.0,
+            "Credit": "",
+            "Balance": -569615.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_227874",
+            "Debit": 685.0,
+            "Credit": "",
+            "Balance": -570300.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/CROMA/REF_437650",
+            "Debit": 4271.0,
+            "Credit": "",
+            "Balance": -574571.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/PHARMEASY/REF_509500",
+            "Debit": 667.0,
+            "Credit": "",
+            "Balance": -575238.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_112189",
+            "Debit": 4779.0,
+            "Credit": "",
+            "Balance": -580017.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/FORTIS/REF_779006",
+            "Debit": 888.0,
+            "Credit": "",
+            "Balance": -580905.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/CROMA/REF_539777",
+            "Debit": 522.0,
+            "Credit": "",
+            "Balance": -581427.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/OLA/REF_204057",
+            "Debit": 642.0,
+            "Credit": "",
+            "Balance": -582069.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_918558",
+            "Debit": 472.0,
+            "Credit": "",
+            "Balance": -582541.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/UBEREATS/REF_834382",
+            "Debit": 648.0,
+            "Credit": "",
+            "Balance": -583189.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/MYNTRA/REF_980415",
+            "Debit": 3282.0,
+            "Credit": "",
+            "Balance": -586471.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/INDIGO/REF_686688",
+            "Debit": 1083.0,
+            "Credit": "",
+            "Balance": -587554.0
+        },
+        {
+            "Date": "03/09/2024",
+            "Description": "UPI/CROMA/REF_980356",
+            "Debit": 4665.0,
+            "Credit": "",
+            "Balance": -592219.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "ACH/GYM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -593218.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": -593517.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "UPI/1MG/REF_731618",
+            "Debit": 1721.0,
+            "Credit": "",
+            "Balance": -595238.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "UPI/FORTIS/REF_759407",
+            "Debit": 1250.0,
+            "Credit": "",
+            "Balance": -596488.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "UPI/FLIPKART/REF_971350",
+            "Debit": 671.0,
+            "Credit": "",
+            "Balance": -597159.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "UPI/FORTIS/REF_377431",
+            "Debit": 1291.0,
+            "Credit": "",
+            "Balance": -598450.0
+        },
+        {
+            "Date": "04/09/2024",
+            "Description": "UPI/ZOMATO/REF_225282",
+            "Debit": 288.0,
+            "Credit": "",
+            "Balance": -598738.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -599737.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 3995.0,
+            "Credit": "",
+            "Balance": -603732.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 2649.0,
+            "Credit": "",
+            "Balance": -606381.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/FORTIS/REF_249371",
+            "Debit": 952.0,
+            "Credit": "",
+            "Balance": -607333.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/ZOMATO/REF_936858",
+            "Debit": 600.0,
+            "Credit": "",
+            "Balance": -607933.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_183623",
+            "Debit": 1705.0,
+            "Credit": "",
+            "Balance": -609638.0
+        },
+        {
+            "Date": "05/09/2024",
+            "Description": "UPI/INDIGO/REF_190508",
+            "Debit": 1296.0,
+            "Credit": "",
+            "Balance": -610934.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 4453.0,
+            "Credit": "",
+            "Balance": -615387.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/ZOMATO/REF_483065",
+            "Debit": 179.0,
+            "Credit": "",
+            "Balance": -615566.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/INDIGO/REF_543889",
+            "Debit": 1115.0,
+            "Credit": "",
+            "Balance": -616681.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/UBEREATS/REF_591678",
+            "Debit": 214.0,
+            "Credit": "",
+            "Balance": -616895.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/PHARMEASY/REF_231738",
+            "Debit": 351.0,
+            "Credit": "",
+            "Balance": -617246.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_796969",
+            "Debit": 1351.0,
+            "Credit": "",
+            "Balance": -618597.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/CROMA/REF_189152",
+            "Debit": 2008.0,
+            "Credit": "",
+            "Balance": -620605.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/SWIGGY/REF_884158",
+            "Debit": 205.0,
+            "Credit": "",
+            "Balance": -620810.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/MCDONALDS/REF_924028",
+            "Debit": 519.0,
+            "Credit": "",
+            "Balance": -621329.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/UBEREATS/REF_117458",
+            "Debit": 520.0,
+            "Credit": "",
+            "Balance": -621849.0
+        },
+        {
+            "Date": "06/09/2024",
+            "Description": "UPI/IRCTC/REF_819863",
+            "Debit": 258.0,
+            "Credit": "",
+            "Balance": -622107.0
+        },
+        {
+            "Date": "07/09/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 3347.0,
+            "Credit": "",
+            "Balance": -625454.0
+        },
+        {
+            "Date": "07/09/2024",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 1577.0,
+            "Credit": "",
+            "Balance": -627031.0
+        },
+        {
+            "Date": "07/09/2024",
+            "Description": "UPI/ZOMATO/REF_697407",
+            "Debit": 289.0,
+            "Credit": "",
+            "Balance": -627320.0
+        },
+        {
+            "Date": "07/09/2024",
+            "Description": "UPI/1MG/REF_531255",
+            "Debit": 722.0,
+            "Credit": "",
+            "Balance": -628042.0
+        },
+        {
+            "Date": "07/09/2024",
+            "Description": "UPI/AJIO/REF_103324",
+            "Debit": 1661.0,
+            "Credit": "",
+            "Balance": -629703.0
+        },
+        {
+            "Date": "08/09/2024",
+            "Description": "UPI/BILLDESK/BESCOM/PAYMENT",
+            "Debit": 2894.0,
+            "Credit": "",
+            "Balance": -632597.0
+        },
+        {
+            "Date": "08/09/2024",
+            "Description": "UPI/MYNTRA/REF_593743",
+            "Debit": 4443.0,
+            "Credit": "",
+            "Balance": -637040.0
+        },
+        {
+            "Date": "08/09/2024",
+            "Description": "UPI/CROMA/REF_431147",
+            "Debit": 1737.0,
+            "Credit": "",
+            "Balance": -638777.0
+        },
+        {
+            "Date": "08/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_252447",
+            "Debit": 1534.0,
+            "Credit": "",
+            "Balance": -640311.0
+        },
+        {
+            "Date": "08/09/2024",
+            "Description": "UPI/FLIPKART/REF_944889",
+            "Debit": 2454.0,
+            "Credit": "",
+            "Balance": -642765.0
+        },
+        {
+            "Date": "09/09/2024",
+            "Description": "UPI/SWIGGY/REF_415919",
+            "Debit": 347.0,
+            "Credit": "",
+            "Balance": -643112.0
+        },
+        {
+            "Date": "09/09/2024",
+            "Description": "UPI/AMAZON/REF_234128",
+            "Debit": 1362.0,
+            "Credit": "",
+            "Balance": -644474.0
+        },
+        {
+            "Date": "09/09/2024",
+            "Description": "UPI/AMAZON/REF_649890",
+            "Debit": 4034.0,
+            "Credit": "",
+            "Balance": -648508.0
+        },
+        {
+            "Date": "09/09/2024",
+            "Description": "UPI/FORTIS/REF_362459",
+            "Debit": 1574.0,
+            "Credit": "",
+            "Balance": -650082.0
+        },
+        {
+            "Date": "10/09/2024",
+            "Description": "UPI/FORTIS/REF_758788",
+            "Debit": 819.0,
+            "Credit": "",
+            "Balance": -650901.0
+        },
+        {
+            "Date": "10/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_754996",
+            "Debit": 1678.0,
+            "Credit": "",
+            "Balance": -652579.0
+        },
+        {
+            "Date": "10/09/2024",
+            "Description": "UPI/FORTIS/REF_328752",
+            "Debit": 1136.0,
+            "Credit": "",
+            "Balance": -653715.0
+        },
+        {
+            "Date": "11/09/2024",
+            "Description": "UPI/FORTIS/REF_945435",
+            "Debit": 1643.0,
+            "Credit": "",
+            "Balance": -655358.0
+        },
+        {
+            "Date": "11/09/2024",
+            "Description": "UPI/MYNTRA/REF_634621",
+            "Debit": 2030.0,
+            "Credit": "",
+            "Balance": -657388.0
+        },
+        {
+            "Date": "11/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_126361",
+            "Debit": 1367.0,
+            "Credit": "",
+            "Balance": -658755.0
+        },
+        {
+            "Date": "11/09/2024",
+            "Description": "UPI/UBEREATS/REF_159829",
+            "Debit": 316.0,
+            "Credit": "",
+            "Balance": -659071.0
+        },
+        {
+            "Date": "11/09/2024",
+            "Description": "UPI/PHARMEASY/REF_201386",
+            "Debit": 1520.0,
+            "Credit": "",
+            "Balance": -660591.0
+        },
+        {
+            "Date": "12/09/2024",
+            "Description": "UPI/SWIGGY/REF_388748",
+            "Debit": 755.0,
+            "Credit": "",
+            "Balance": -661346.0
+        },
+        {
+            "Date": "12/09/2024",
+            "Description": "UPI/INDIGO/REF_970654",
+            "Debit": 181.0,
+            "Credit": "",
+            "Balance": -661527.0
+        },
+        {
+            "Date": "12/09/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_851819",
+            "Debit": 1360.0,
+            "Credit": "",
+            "Balance": -662887.0
+        },
+        {
+            "Date": "12/09/2024",
+            "Description": "UPI/PHARMEASY/REF_358965",
+            "Debit": 947.0,
+            "Credit": "",
+            "Balance": -663834.0
+        },
+        {
+            "Date": "12/09/2024",
+            "Description": "UPI/KFC/REF_891151",
+            "Debit": 464.0,
+            "Credit": "",
+            "Balance": -664298.0
+        },
+        {
+            "Date": "13/09/2024",
+            "Description": "UPI/UBEREATS/REF_266124",
+            "Debit": 709.0,
+            "Credit": "",
+            "Balance": -665007.0
+        },
+        {
+            "Date": "13/09/2024",
+            "Description": "UPI/OLA/REF_859131",
+            "Debit": 802.0,
+            "Credit": "",
+            "Balance": -665809.0
+        },
+        {
+            "Date": "13/09/2024",
+            "Description": "UPI/MYNTRA/REF_480585",
+            "Debit": 4340.0,
+            "Credit": "",
+            "Balance": -670149.0
+        },
+        {
+            "Date": "13/09/2024",
+            "Description": "UPI/FORTIS/REF_634197",
+            "Debit": 1942.0,
+            "Credit": "",
+            "Balance": -672091.0
+        },
+        {
+            "Date": "14/09/2024",
+            "Description": "UPI/PHARMEASY/REF_580322",
+            "Debit": 1603.0,
+            "Credit": "",
+            "Balance": -673694.0
+        },
+        {
+            "Date": "14/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_931378",
+            "Debit": 784.0,
+            "Credit": "",
+            "Balance": -674478.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/KFC/REF_300095",
+            "Debit": 540.0,
+            "Credit": "",
+            "Balance": -675018.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/STARBUCKS/REF_818510",
+            "Debit": 373.0,
+            "Credit": "",
+            "Balance": -675391.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/AMAZON/REF_180355",
+            "Debit": 2307.0,
+            "Credit": "",
+            "Balance": -677698.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/ZOMATO/REF_829976",
+            "Debit": 738.0,
+            "Credit": "",
+            "Balance": -678436.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/AMAZON/REF_623932",
+            "Debit": 2848.0,
+            "Credit": "",
+            "Balance": -681284.0
+        },
+        {
+            "Date": "15/09/2024",
+            "Description": "UPI/1MG/REF_188150",
+            "Debit": 694.0,
+            "Credit": "",
+            "Balance": -681978.0
+        },
+        {
+            "Date": "16/09/2024",
+            "Description": "UPI/OLA/REF_827898",
+            "Debit": 171.0,
+            "Credit": "",
+            "Balance": -682149.0
+        },
+        {
+            "Date": "16/09/2024",
+            "Description": "UPI/UBEREATS/REF_432222",
+            "Debit": 778.0,
+            "Credit": "",
+            "Balance": -682927.0
+        },
+        {
+            "Date": "16/09/2024",
+            "Description": "UPI/AMAZON/REF_254879",
+            "Debit": 3786.0,
+            "Credit": "",
+            "Balance": -686713.0
+        },
+        {
+            "Date": "16/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_687278",
+            "Debit": 4828.0,
+            "Credit": "",
+            "Balance": -691541.0
+        },
+        {
+            "Date": "16/09/2024",
+            "Description": "UPI/UBER/REF_728224",
+            "Debit": 1102.0,
+            "Credit": "",
+            "Balance": -692643.0
+        },
+        {
+            "Date": "17/09/2024",
+            "Description": "UPI/FORTIS/REF_396287",
+            "Debit": 1844.0,
+            "Credit": "",
+            "Balance": -694487.0
+        },
+        {
+            "Date": "17/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_379398",
+            "Debit": 936.0,
+            "Credit": "",
+            "Balance": -695423.0
+        },
+        {
+            "Date": "17/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_988659",
+            "Debit": 371.0,
+            "Credit": "",
+            "Balance": -695794.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_836729",
+            "Debit": 457.0,
+            "Credit": "",
+            "Balance": -696251.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/STARBUCKS/REF_233132",
+            "Debit": 720.0,
+            "Credit": "",
+            "Balance": -696971.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_334825",
+            "Debit": 1055.0,
+            "Credit": "",
+            "Balance": -698026.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/INDIGO/REF_302805",
+            "Debit": 534.0,
+            "Credit": "",
+            "Balance": -698560.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/ZOMATO/REF_140321",
+            "Debit": 250.0,
+            "Credit": "",
+            "Balance": -698810.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/AJIO/REF_721795",
+            "Debit": 1329.0,
+            "Credit": "",
+            "Balance": -700139.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/MYNTRA/REF_747862",
+            "Debit": 3749.0,
+            "Credit": "",
+            "Balance": -703888.0
+        },
+        {
+            "Date": "18/09/2024",
+            "Description": "UPI/DOMINOS/REF_562886",
+            "Debit": 212.0,
+            "Credit": "",
+            "Balance": -704100.0
+        },
+        {
+            "Date": "19/09/2024",
+            "Description": "UPI/UBEREATS/REF_945486",
+            "Debit": 648.0,
+            "Credit": "",
+            "Balance": -704748.0
+        },
+        {
+            "Date": "19/09/2024",
+            "Description": "UPI/IRCTC/REF_329958",
+            "Debit": 1299.0,
+            "Credit": "",
+            "Balance": -706047.0
+        },
+        {
+            "Date": "19/09/2024",
+            "Description": "UPI/AMAZON/REF_575342",
+            "Debit": 2267.0,
+            "Credit": "",
+            "Balance": -708314.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/FORTIS/REF_237127",
+            "Debit": 1183.0,
+            "Credit": "",
+            "Balance": -709497.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/INDIGO/REF_277163",
+            "Debit": 1489.0,
+            "Credit": "",
+            "Balance": -710986.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/SWIGGY/REF_896622",
+            "Debit": 547.0,
+            "Credit": "",
+            "Balance": -711533.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/AMAZON/REF_385141",
+            "Debit": 1467.0,
+            "Credit": "",
+            "Balance": -713000.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/INDIGO/REF_644296",
+            "Debit": 901.0,
+            "Credit": "",
+            "Balance": -713901.0
+        },
+        {
+            "Date": "20/09/2024",
+            "Description": "UPI/1MG/REF_890724",
+            "Debit": 1995.0,
+            "Credit": "",
+            "Balance": -715896.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_677553",
+            "Debit": 1333.0,
+            "Credit": "",
+            "Balance": -717229.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/AMAZON/REF_356310",
+            "Debit": 1678.0,
+            "Credit": "",
+            "Balance": -718907.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/PHARMEASY/REF_590318",
+            "Debit": 971.0,
+            "Credit": "",
+            "Balance": -719878.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/1MG/REF_254333",
+            "Debit": 1875.0,
+            "Credit": "",
+            "Balance": -721753.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/IRCTC/REF_301133",
+            "Debit": 1017.0,
+            "Credit": "",
+            "Balance": -722770.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/AIRASIA/REF_312629",
+            "Debit": 1342.0,
+            "Credit": "",
+            "Balance": -724112.0
+        },
+        {
+            "Date": "21/09/2024",
+            "Description": "UPI/KFC/REF_784925",
+            "Debit": 430.0,
+            "Credit": "",
+            "Balance": -724542.0
+        },
+        {
+            "Date": "22/09/2024",
+            "Description": "UPI/AIRASIA/REF_421807",
+            "Debit": 488.0,
+            "Credit": "",
+            "Balance": -725030.0
+        },
+        {
+            "Date": "22/09/2024",
+            "Description": "UPI/ZOMATO/REF_428666",
+            "Debit": 247.0,
+            "Credit": "",
+            "Balance": -725277.0
+        },
+        {
+            "Date": "22/09/2024",
+            "Description": "UPI/AJIO/REF_232237",
+            "Debit": 2006.0,
+            "Credit": "",
+            "Balance": -727283.0
+        },
+        {
+            "Date": "22/09/2024",
+            "Description": "UPI/FORTIS/REF_308046",
+            "Debit": 618.0,
+            "Credit": "",
+            "Balance": -727901.0
+        },
+        {
+            "Date": "22/09/2024",
+            "Description": "UPI/AIRASIA/REF_533982",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -729400.0
+        },
+        {
+            "Date": "23/09/2024",
+            "Description": "UPI/SWIGGY/REF_578073",
+            "Debit": 441.0,
+            "Credit": "",
+            "Balance": -729841.0
+        },
+        {
+            "Date": "23/09/2024",
+            "Description": "UPI/OLA/REF_267556",
+            "Debit": 1140.0,
+            "Credit": "",
+            "Balance": -730981.0
+        },
+        {
+            "Date": "23/09/2024",
+            "Description": "UPI/PHARMEASY/REF_548958",
+            "Debit": 1047.0,
+            "Credit": "",
+            "Balance": -732028.0
+        },
+        {
+            "Date": "24/09/2024",
+            "Description": "UPI/SWIGGY/REF_155216",
+            "Debit": 321.0,
+            "Credit": "",
+            "Balance": -732349.0
+        },
+        {
+            "Date": "24/09/2024",
+            "Description": "UPI/1MG/REF_419800",
+            "Debit": 765.0,
+            "Credit": "",
+            "Balance": -733114.0
+        },
+        {
+            "Date": "24/09/2024",
+            "Description": "UPI/PHARMEASY/REF_285068",
+            "Debit": 1563.0,
+            "Credit": "",
+            "Balance": -734677.0
+        },
+        {
+            "Date": "25/09/2024",
+            "Description": "UPI/MCDONALDS/REF_947835",
+            "Debit": 205.0,
+            "Credit": "",
+            "Balance": -734882.0
+        },
+        {
+            "Date": "25/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_920659",
+            "Debit": 2615.0,
+            "Credit": "",
+            "Balance": -737497.0
+        },
+        {
+            "Date": "25/09/2024",
+            "Description": "UPI/PHARMEASY/REF_509626",
+            "Debit": 343.0,
+            "Credit": "",
+            "Balance": -737840.0
+        },
+        {
+            "Date": "25/09/2024",
+            "Description": "UPI/SWIGGY/REF_391259",
+            "Debit": 632.0,
+            "Credit": "",
+            "Balance": -738472.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_692385",
+            "Debit": 1495.0,
+            "Credit": "",
+            "Balance": -739967.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_485809",
+            "Debit": 1119.0,
+            "Credit": "",
+            "Balance": -741086.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/1MG/REF_860988",
+            "Debit": 1581.0,
+            "Credit": "",
+            "Balance": -742667.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_472702",
+            "Debit": 1389.0,
+            "Credit": "",
+            "Balance": -744056.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/MCDONALDS/REF_247226",
+            "Debit": 158.0,
+            "Credit": "",
+            "Balance": -744214.0
+        },
+        {
+            "Date": "26/09/2024",
+            "Description": "UPI/AIRASIA/REF_429582",
+            "Debit": 1132.0,
+            "Credit": "",
+            "Balance": -745346.0
+        },
+        {
+            "Date": "27/09/2024",
+            "Description": "UPI/FORTIS/REF_114174",
+            "Debit": 1608.0,
+            "Credit": "",
+            "Balance": -746954.0
+        },
+        {
+            "Date": "27/09/2024",
+            "Description": "UPI/MYNTRA/REF_208341",
+            "Debit": 2643.0,
+            "Credit": "",
+            "Balance": -749597.0
+        },
+        {
+            "Date": "27/09/2024",
+            "Description": "UPI/PHARMEASY/REF_197315",
+            "Debit": 1607.0,
+            "Credit": "",
+            "Balance": -751204.0
+        },
+        {
+            "Date": "27/09/2024",
+            "Description": "UPI/AJIO/REF_686707",
+            "Debit": 3605.0,
+            "Credit": "",
+            "Balance": -754809.0
+        },
+        {
+            "Date": "27/09/2024",
+            "Description": "UPI/1MG/REF_379983",
+            "Debit": 1833.0,
+            "Credit": "",
+            "Balance": -756642.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/UBER/REF_600962",
+            "Debit": 522.0,
+            "Credit": "",
+            "Balance": -757164.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/PHARMEASY/REF_710045",
+            "Debit": 806.0,
+            "Credit": "",
+            "Balance": -757970.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/IRCTC/REF_661268",
+            "Debit": 649.0,
+            "Credit": "",
+            "Balance": -758619.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/SWIGGY/REF_374215",
+            "Debit": 701.0,
+            "Credit": "",
+            "Balance": -759320.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/IRCTC/REF_114431",
+            "Debit": 580.0,
+            "Credit": "",
+            "Balance": -759900.0
+        },
+        {
+            "Date": "28/09/2024",
+            "Description": "UPI/AMAZON/REF_982293",
+            "Debit": 3557.0,
+            "Credit": "",
+            "Balance": -763457.0
+        },
+        {
+            "Date": "01/10/2024",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 16495.0,
+            "Balance": -746962.0
+        },
+        {
+            "Date": "01/10/2024",
+            "Description": "UPI/1MG/REF_610865",
+            "Debit": 644.0,
+            "Credit": "",
+            "Balance": -747606.0
+        },
+        {
+            "Date": "01/10/2024",
+            "Description": "UPI/KFC/REF_639491",
+            "Debit": 412.0,
+            "Credit": "",
+            "Balance": -748018.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "ACH/GYM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -749517.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 499.0,
+            "Credit": "",
+            "Balance": -750016.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "ACH/HOTSTAR_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": -750215.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_850451",
+            "Debit": 1998.0,
+            "Credit": "",
+            "Balance": -752213.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "UPI/INDIGO/REF_472391",
+            "Debit": 1407.0,
+            "Credit": "",
+            "Balance": -753620.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "UPI/AMAZON/REF_337974",
+            "Debit": 918.0,
+            "Credit": "",
+            "Balance": -754538.0
+        },
+        {
+            "Date": "02/10/2024",
+            "Description": "UPI/FORTIS/REF_365117",
+            "Debit": 582.0,
+            "Credit": "",
+            "Balance": -755120.0
+        },
+        {
+            "Date": "03/10/2024",
+            "Description": "UPI/CROMA/REF_266606",
+            "Debit": 4422.0,
+            "Credit": "",
+            "Balance": -759542.0
+        },
+        {
+            "Date": "03/10/2024",
+            "Description": "UPI/MCDONALDS/REF_129494",
+            "Debit": 786.0,
+            "Credit": "",
+            "Balance": -760328.0
+        },
+        {
+            "Date": "03/10/2024",
+            "Description": "UPI/PHARMEASY/REF_219325",
+            "Debit": 1434.0,
+            "Credit": "",
+            "Balance": -761762.0
+        },
+        {
+            "Date": "03/10/2024",
+            "Description": "UPI/UBEREATS/REF_855444",
+            "Debit": 222.0,
+            "Credit": "",
+            "Balance": -761984.0
+        },
+        {
+            "Date": "04/10/2024",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": -762983.0
+        },
+        {
+            "Date": "04/10/2024",
+            "Description": "UPI/UBER/REF_370315",
+            "Debit": 655.0,
+            "Credit": "",
+            "Balance": -763638.0
+        },
+        {
+            "Date": "04/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_246957",
+            "Debit": 1278.0,
+            "Credit": "",
+            "Balance": -764916.0
+        },
+        {
+            "Date": "05/10/2024",
+            "Description": "ACH/AMAZON PRIME_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 1499.0,
+            "Credit": "",
+            "Balance": -766415.0
+        },
+        {
+            "Date": "05/10/2024",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": -766614.0
+        },
+        {
+            "Date": "05/10/2024",
+            "Description": "UPI/BILLDESK/JIO/PAYMENT",
+            "Debit": 2623.0,
+            "Credit": "",
+            "Balance": -769237.0
+        },
+        {
+            "Date": "06/10/2024",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 1742.0,
+            "Credit": "",
+            "Balance": -770979.0
+        },
+        {
+            "Date": "06/10/2024",
+            "Description": "UPI/FORTIS/REF_903030",
+            "Debit": 1271.0,
+            "Credit": "",
+            "Balance": -772250.0
+        },
+        {
+            "Date": "06/10/2024",
+            "Description": "UPI/FLIPKART/REF_260080",
+            "Debit": 3049.0,
+            "Credit": "",
+            "Balance": -775299.0
+        },
+        {
+            "Date": "06/10/2024",
+            "Description": "UPI/AMAZON/REF_437565",
+            "Debit": 4052.0,
+            "Credit": "",
+            "Balance": -779351.0
+        },
+        {
+            "Date": "06/10/2024",
+            "Description": "UPI/CROMA/REF_119455",
+            "Debit": 2014.0,
+            "Credit": "",
+            "Balance": -781365.0
+        },
+        {
+            "Date": "07/10/2024",
+            "Description": "UPI/IRCTC/REF_519746",
+            "Debit": 117.0,
+            "Credit": "",
+            "Balance": -781482.0
+        },
+        {
+            "Date": "07/10/2024",
+            "Description": "UPI/OLA/REF_173964",
+            "Debit": 1026.0,
+            "Credit": "",
+            "Balance": -782508.0
+        },
+        {
+            "Date": "07/10/2024",
+            "Description": "UPI/SWIGGY/REF_487569",
+            "Debit": 225.0,
+            "Credit": "",
+            "Balance": -782733.0
+        },
+        {
+            "Date": "07/10/2024",
+            "Description": "UPI/MCDONALDS/REF_459522",
+            "Debit": 633.0,
+            "Credit": "",
+            "Balance": -783366.0
+        },
+        {
+            "Date": "07/10/2024",
+            "Description": "UPI/MYNTRA/REF_370017",
+            "Debit": 4505.0,
+            "Credit": "",
+            "Balance": -787871.0
+        },
+        {
+            "Date": "08/10/2024",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 2059.0,
+            "Credit": "",
+            "Balance": -789930.0
+        },
+        {
+            "Date": "08/10/2024",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 1409.0,
+            "Credit": "",
+            "Balance": -791339.0
+        },
+        {
+            "Date": "08/10/2024",
+            "Description": "UPI/FORTIS/REF_153058",
+            "Debit": 1683.0,
+            "Credit": "",
+            "Balance": -793022.0
+        },
+        {
+            "Date": "09/10/2024",
+            "Description": "UPI/IRCTC/REF_542953",
+            "Debit": 1397.0,
+            "Credit": "",
+            "Balance": -794419.0
+        },
+        {
+            "Date": "09/10/2024",
+            "Description": "UPI/ZOMATO/REF_393945",
+            "Debit": 639.0,
+            "Credit": "",
+            "Balance": -795058.0
+        },
+        {
+            "Date": "09/10/2024",
+            "Description": "UPI/INDIGO/REF_781581",
+            "Debit": 1392.0,
+            "Credit": "",
+            "Balance": -796450.0
+        },
+        {
+            "Date": "10/10/2024",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 3903.0,
+            "Credit": "",
+            "Balance": -800353.0
+        },
+        {
+            "Date": "10/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_389758",
+            "Debit": 415.0,
+            "Credit": "",
+            "Balance": -800768.0
+        },
+        {
+            "Date": "10/10/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_934334",
+            "Debit": 4364.0,
+            "Credit": "",
+            "Balance": -805132.0
+        },
+        {
+            "Date": "10/10/2024",
+            "Description": "UPI/DOMINOS/REF_227621",
+            "Debit": 178.0,
+            "Credit": "",
+            "Balance": -805310.0
+        },
+        {
+            "Date": "10/10/2024",
+            "Description": "UPI/PHARMEASY/REF_457558",
+            "Debit": 1210.0,
+            "Credit": "",
+            "Balance": -806520.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/AIRASIA/REF_476389",
+            "Debit": 1283.0,
+            "Credit": "",
+            "Balance": -807803.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/STARBUCKS/REF_400048",
+            "Debit": 696.0,
+            "Credit": "",
+            "Balance": -808499.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/FLIPKART/REF_247840",
+            "Debit": 754.0,
+            "Credit": "",
+            "Balance": -809253.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/MYNTRA/REF_796988",
+            "Debit": 3068.0,
+            "Credit": "",
+            "Balance": -812321.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_461106",
+            "Debit": 1606.0,
+            "Credit": "",
+            "Balance": -813927.0
+        },
+        {
+            "Date": "11/10/2024",
+            "Description": "UPI/AJIO/REF_194609",
+            "Debit": 1034.0,
+            "Credit": "",
+            "Balance": -814961.0
+        },
+        {
+            "Date": "12/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_329758",
+            "Debit": 1745.0,
+            "Credit": "",
+            "Balance": -816706.0
+        },
+        {
+            "Date": "12/10/2024",
+            "Description": "UPI/MCDONALDS/REF_827785",
+            "Debit": 616.0,
+            "Credit": "",
+            "Balance": -817322.0
+        },
+        {
+            "Date": "12/10/2024",
+            "Description": "UPI/AMAZON/REF_593158",
+            "Debit": 1055.0,
+            "Credit": "",
+            "Balance": -818377.0
+        },
+        {
+            "Date": "13/10/2024",
+            "Description": "UPI/AIRASIA/REF_374105",
+            "Debit": 1331.0,
+            "Credit": "",
+            "Balance": -819708.0
+        },
+        {
+            "Date": "13/10/2024",
+            "Description": "UPI/IRCTC/REF_899111",
+            "Debit": 755.0,
+            "Credit": "",
+            "Balance": -820463.0
+        },
+        {
+            "Date": "13/10/2024",
+            "Description": "UPI/OLA/REF_864621",
+            "Debit": 1345.0,
+            "Credit": "",
+            "Balance": -821808.0
+        },
+        {
+            "Date": "13/10/2024",
+            "Description": "UPI/INDIGO/REF_517799",
+            "Debit": 371.0,
+            "Credit": "",
+            "Balance": -822179.0
+        },
+        {
+            "Date": "14/10/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_437068",
+            "Debit": 1328.0,
+            "Credit": "",
+            "Balance": -823507.0
+        },
+        {
+            "Date": "14/10/2024",
+            "Description": "UPI/ZOMATO/REF_701039",
+            "Debit": 250.0,
+            "Credit": "",
+            "Balance": -823757.0
+        },
+        {
+            "Date": "14/10/2024",
+            "Description": "UPI/1MG/REF_962012",
+            "Debit": 1591.0,
+            "Credit": "",
+            "Balance": -825348.0
+        },
+        {
+            "Date": "14/10/2024",
+            "Description": "UPI/UBEREATS/REF_216675",
+            "Debit": 670.0,
+            "Credit": "",
+            "Balance": -826018.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_585890",
+            "Debit": 428.0,
+            "Credit": "",
+            "Balance": -826446.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/MYNTRA/REF_348771",
+            "Debit": 1237.0,
+            "Credit": "",
+            "Balance": -827683.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/MCDONALDS/REF_633386",
+            "Debit": 673.0,
+            "Credit": "",
+            "Balance": -828356.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/OLA/REF_531722",
+            "Debit": 362.0,
+            "Credit": "",
+            "Balance": -828718.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/KFC/REF_743722",
+            "Debit": 642.0,
+            "Credit": "",
+            "Balance": -829360.0
+        },
+        {
+            "Date": "15/10/2024",
+            "Description": "UPI/IRCTC/REF_921423",
+            "Debit": 939.0,
+            "Credit": "",
+            "Balance": -830299.0
+        },
+        {
+            "Date": "16/10/2024",
+            "Description": "UPI/1MG/REF_855912",
+            "Debit": 1797.0,
+            "Credit": "",
+            "Balance": -832096.0
+        },
+        {
+            "Date": "17/10/2024",
+            "Description": "UPI/KFC/REF_886598",
+            "Debit": 691.0,
+            "Credit": "",
+            "Balance": -832787.0
+        },
+        {
+            "Date": "17/10/2024",
+            "Description": "UPI/SWIGGY/REF_297856",
+            "Debit": 387.0,
+            "Credit": "",
+            "Balance": -833174.0
+        },
+        {
+            "Date": "17/10/2024",
+            "Description": "UPI/1MG/REF_187327",
+            "Debit": 1438.0,
+            "Credit": "",
+            "Balance": -834612.0
+        },
+        {
+            "Date": "17/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_972576",
+            "Debit": 633.0,
+            "Credit": "",
+            "Balance": -835245.0
+        },
+        {
+            "Date": "17/10/2024",
+            "Description": "UPI/MCDONALDS/REF_834518",
+            "Debit": 568.0,
+            "Credit": "",
+            "Balance": -835813.0
+        },
+        {
+            "Date": "18/10/2024",
+            "Description": "UPI/STARBUCKS/REF_541682",
+            "Debit": 247.0,
+            "Credit": "",
+            "Balance": -836060.0
+        },
+        {
+            "Date": "18/10/2024",
+            "Description": "UPI/AMAZON/REF_336264",
+            "Debit": 3915.0,
+            "Credit": "",
+            "Balance": -839975.0
+        },
+        {
+            "Date": "19/10/2024",
+            "Description": "UPI/INDIGO/REF_406504",
+            "Debit": 493.0,
+            "Credit": "",
+            "Balance": -840468.0
+        },
+        {
+            "Date": "19/10/2024",
+            "Description": "UPI/AMAZON/REF_809001",
+            "Debit": 2401.0,
+            "Credit": "",
+            "Balance": -842869.0
+        },
+        {
+            "Date": "19/10/2024",
+            "Description": "UPI/FORTIS/REF_303647",
+            "Debit": 989.0,
+            "Credit": "",
+            "Balance": -843858.0
+        },
+        {
+            "Date": "19/10/2024",
+            "Description": "UPI/OLA/REF_939695",
+            "Debit": 126.0,
+            "Credit": "",
+            "Balance": -843984.0
+        },
+        {
+            "Date": "19/10/2024",
+            "Description": "UPI/SWIGGY/REF_690800",
+            "Debit": 637.0,
+            "Credit": "",
+            "Balance": -844621.0
+        },
+        {
+            "Date": "20/10/2024",
+            "Description": "UPI/INDIGO/REF_726499",
+            "Debit": 792.0,
+            "Credit": "",
+            "Balance": -845413.0
+        },
+        {
+            "Date": "20/10/2024",
+            "Description": "UPI/FORTIS/REF_679496",
+            "Debit": 424.0,
+            "Credit": "",
+            "Balance": -845837.0
+        },
+        {
+            "Date": "20/10/2024",
+            "Description": "UPI/IRCTC/REF_110929",
+            "Debit": 1131.0,
+            "Credit": "",
+            "Balance": -846968.0
+        },
+        {
+            "Date": "20/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_770725",
+            "Debit": 1182.0,
+            "Credit": "",
+            "Balance": -848150.0
+        },
+        {
+            "Date": "20/10/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_323633",
+            "Debit": 659.0,
+            "Credit": "",
+            "Balance": -848809.0
+        },
+        {
+            "Date": "21/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_669495",
+            "Debit": 1285.0,
+            "Credit": "",
+            "Balance": -850094.0
+        },
+        {
+            "Date": "21/10/2024",
+            "Description": "UPI/IRCTC/REF_442625",
+            "Debit": 1095.0,
+            "Credit": "",
+            "Balance": -851189.0
+        },
+        {
+            "Date": "21/10/2024",
+            "Description": "UPI/PHARMEASY/REF_306858",
+            "Debit": 840.0,
+            "Credit": "",
+            "Balance": -852029.0
+        },
+        {
+            "Date": "21/10/2024",
+            "Description": "UPI/MAKEMYTRIP/REF_327764",
+            "Debit": 1280.0,
+            "Credit": "",
+            "Balance": -853309.0
+        },
+        {
+            "Date": "22/10/2024",
+            "Description": "UPI/UBEREATS/REF_821374",
+            "Debit": 334.0,
+            "Credit": "",
+            "Balance": -853643.0
+        },
+        {
+            "Date": "22/10/2024",
+            "Description": "UPI/UBEREATS/REF_815886",
+            "Debit": 781.0,
+            "Credit": "",
+            "Balance": -854424.0
+        },
+        {
+            "Date": "23/10/2024",
+            "Description": "UPI/FORTIS/REF_833632",
+            "Debit": 1662.0,
+            "Credit": "",
+            "Balance": -856086.0
+        },
+        {
+            "Date": "23/10/2024",
+            "Description": "UPI/RELIANCE DIGITAL/REF_877860",
+            "Debit": 2469.0,
+            "Credit": "",
+            "Balance": -858555.0
+        },
+        {
+            "Date": "23/10/2024",
+            "Description": "UPI/AJIO/REF_102736",
+            "Debit": 850.0,
+            "Credit": "",
+            "Balance": -859405.0
+        },
+        {
+            "Date": "23/10/2024",
+            "Description": "UPI/APOLLO PHARMACY/REF_198498",
+            "Debit": 403.0,
+            "Credit": "",
+            "Balance": -859808.0
+        },
+        {
+            "Date": "24/10/2024",
+            "Description": "UPI/FORTIS/REF_427243",
+            "Debit": 2000.0,
+            "Credit": "",
+            "Balance": -861808.0
+        },
+        {
+            "Date": "24/10/2024",
+            "Description": "UPI/UBEREATS/REF_277638",
+            "Debit": 197.0,
+            "Credit": "",
+            "Balance": -862005.0
+        },
+        {
+            "Date": "25/10/2024",
+            "Description": "UPI/IRCTC/REF_402870",
+            "Debit": 550.0,
+            "Credit": "",
+            "Balance": -862555.0
+        },
+        {
+            "Date": "25/10/2024",
+            "Description": "UPI/AMAZON/REF_484236",
+            "Debit": 3308.0,
+            "Credit": "",
+            "Balance": -865863.0
+        },
+        {
+            "Date": "26/10/2024",
+            "Description": "UPI/UBEREATS/REF_341281",
+            "Debit": 675.0,
+            "Credit": "",
+            "Balance": -866538.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/MYNTRA/REF_423164",
+            "Debit": 3453.0,
+            "Credit": "",
+            "Balance": -869991.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/STARBUCKS/REF_556588",
+            "Debit": 702.0,
+            "Credit": "",
+            "Balance": -870693.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/PHARMEASY/REF_296385",
+            "Debit": 1814.0,
+            "Credit": "",
+            "Balance": -872507.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/FORTIS/REF_723542",
+            "Debit": 1064.0,
+            "Credit": "",
+            "Balance": -873571.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/SWIGGY/REF_706161",
+            "Debit": 333.0,
+            "Credit": "",
+            "Balance": -873904.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/AIRASIA/REF_559272",
+            "Debit": 353.0,
+            "Credit": "",
+            "Balance": -874257.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/MCDONALDS/REF_232556",
+            "Debit": 535.0,
+            "Credit": "",
+            "Balance": -874792.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/PHARMEASY/REF_848117",
+            "Debit": 1068.0,
+            "Credit": "",
+            "Balance": -875860.0
+        },
+        {
+            "Date": "27/10/2024",
+            "Description": "UPI/OLA/REF_432417",
+            "Debit": 1159.0,
+            "Credit": "",
+            "Balance": -877019.0
+        },
+        {
+            "Date": "28/10/2024",
+            "Description": "UPI/AJIO/REF_910522",
+            "Debit": 1471.0,
+            "Credit": "",
+            "Balance": -878490.0
+        },
+        {
+            "Date": "28/10/2024",
+            "Description": "UPI/PHARMEASY/REF_454133",
+            "Debit": 1657.0,
+            "Credit": "",
+            "Balance": -880147.0
+        }
+    ]
+}

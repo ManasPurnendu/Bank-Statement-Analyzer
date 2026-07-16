@@ -1,0 +1,478 @@
+{
+    "account": {
+        "account_holder": "Sample User",
+        "account_number": "XXXX4256",
+        "bank": "HDFC Bank"
+    },
+    "transactions": [
+        {
+            "Date": "01/03/2026",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 13006.0,
+            "Balance": 36410.0
+        },
+        {
+            "Date": "01/03/2026",
+            "Description": "UPI/DAD_ALLOWANCE/TRANSFER",
+            "Debit": "",
+            "Credit": 11880.0,
+            "Balance": 48290.0
+        },
+        {
+            "Date": "01/03/2026",
+            "Description": "UPI/RELIANCE DIGITAL/REF_787224",
+            "Debit": 3361.0,
+            "Credit": "",
+            "Balance": 44929.0
+        },
+        {
+            "Date": "02/03/2026",
+            "Description": "ACH/YOUTUBE PREMIUM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": 44730.0
+        },
+        {
+            "Date": "02/03/2026",
+            "Description": "UPI/AIRASIA/REF_728266",
+            "Debit": 663.0,
+            "Credit": "",
+            "Balance": 44067.0
+        },
+        {
+            "Date": "02/03/2026",
+            "Description": "UPI/ZOMATO/REF_781935",
+            "Debit": 229.0,
+            "Credit": "",
+            "Balance": 43838.0
+        },
+        {
+            "Date": "03/03/2026",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": 43539.0
+        },
+        {
+            "Date": "03/03/2026",
+            "Description": "ACH/SPOTIFY_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": 43240.0
+        },
+        {
+            "Date": "03/03/2026",
+            "Description": "ACH/HOTSTAR_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": 42241.0
+        },
+        {
+            "Date": "03/03/2026",
+            "Description": "UPI/OLA/REF_621373",
+            "Debit": 1444.0,
+            "Credit": "",
+            "Balance": 40797.0
+        },
+        {
+            "Date": "04/03/2026",
+            "Description": "UPI/STARBUCKS/REF_297742",
+            "Debit": 475.0,
+            "Credit": "",
+            "Balance": 40322.0
+        },
+        {
+            "Date": "04/03/2026",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 199.0,
+            "Credit": "",
+            "Balance": 40123.0
+        },
+        {
+            "Date": "05/03/2026",
+            "Description": "ACH/NETFLIX_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 299.0,
+            "Credit": "",
+            "Balance": 39824.0
+        },
+        {
+            "Date": "05/03/2026",
+            "Description": "UPI/BILLDESK/ACT FIBERNET/PAYMENT",
+            "Debit": 1108.0,
+            "Credit": "",
+            "Balance": 38716.0
+        },
+        {
+            "Date": "05/03/2026",
+            "Description": "ACH/GYM_SUBSCRIPTION/AUTO_DEBIT",
+            "Debit": 999.0,
+            "Credit": "",
+            "Balance": 37717.0
+        },
+        {
+            "Date": "05/03/2026",
+            "Description": "UPI/BILLDESK/VI/PAYMENT",
+            "Debit": 1945.0,
+            "Credit": "",
+            "Balance": 35772.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/KFC/REF_979101",
+            "Debit": 684.0,
+            "Credit": "",
+            "Balance": 35088.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/KFC/REF_685570",
+            "Debit": 574.0,
+            "Credit": "",
+            "Balance": 34514.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/STARBUCKS/REF_252678",
+            "Debit": 635.0,
+            "Credit": "",
+            "Balance": 33879.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/PHARMEASY/REF_971034",
+            "Debit": 1750.0,
+            "Credit": "",
+            "Balance": 32129.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/STARBUCKS/REF_489705",
+            "Debit": 742.0,
+            "Credit": "",
+            "Balance": 31387.0
+        },
+        {
+            "Date": "06/03/2026",
+            "Description": "UPI/STARBUCKS/REF_921571",
+            "Debit": 773.0,
+            "Credit": "",
+            "Balance": 30614.0
+        },
+        {
+            "Date": "07/03/2026",
+            "Description": "UPI/FLIPKART/REF_114014",
+            "Debit": 3956.0,
+            "Credit": "",
+            "Balance": 26658.0
+        },
+        {
+            "Date": "07/03/2026",
+            "Description": "UPI/DOMINOS/REF_767535",
+            "Debit": 401.0,
+            "Credit": "",
+            "Balance": 26257.0
+        },
+        {
+            "Date": "07/03/2026",
+            "Description": "UPI/UBEREATS/REF_522892",
+            "Debit": 446.0,
+            "Credit": "",
+            "Balance": 25811.0
+        },
+        {
+            "Date": "08/03/2026",
+            "Description": "UPI/UBER/REF_368541",
+            "Debit": 549.0,
+            "Credit": "",
+            "Balance": 25262.0
+        },
+        {
+            "Date": "08/03/2026",
+            "Description": "UPI/BILLDESK/HP GAS/PAYMENT",
+            "Debit": 1282.0,
+            "Credit": "",
+            "Balance": 23980.0
+        },
+        {
+            "Date": "09/03/2026",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 568.0,
+            "Credit": "",
+            "Balance": 23412.0
+        },
+        {
+            "Date": "09/03/2026",
+            "Description": "UPI/1MG/REF_344553",
+            "Debit": 1165.0,
+            "Credit": "",
+            "Balance": 22247.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/BILLDESK/AIRTEL/PAYMENT",
+            "Debit": 1292.0,
+            "Credit": "",
+            "Balance": 20955.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/INDIGO/REF_333517",
+            "Debit": 794.0,
+            "Credit": "",
+            "Balance": 20161.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/DOMINOS/REF_448214",
+            "Debit": 196.0,
+            "Credit": "",
+            "Balance": 19965.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/AIRASIA/REF_476215",
+            "Debit": 868.0,
+            "Credit": "",
+            "Balance": 19097.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/CROMA/REF_671331",
+            "Debit": 929.0,
+            "Credit": "",
+            "Balance": 18168.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/DOMINOS/REF_303306",
+            "Debit": 328.0,
+            "Credit": "",
+            "Balance": 17840.0
+        },
+        {
+            "Date": "10/03/2026",
+            "Description": "UPI/OLA/REF_443621",
+            "Debit": 748.0,
+            "Credit": "",
+            "Balance": 17092.0
+        },
+        {
+            "Date": "11/03/2026",
+            "Description": "UPI/APOLLO PHARMACY/REF_695591",
+            "Debit": 457.0,
+            "Credit": "",
+            "Balance": 16635.0
+        },
+        {
+            "Date": "11/03/2026",
+            "Description": "UPI/FORTIS/REF_419190",
+            "Debit": 990.0,
+            "Credit": "",
+            "Balance": 15645.0
+        },
+        {
+            "Date": "11/03/2026",
+            "Description": "UPI/FORTIS/REF_315594",
+            "Debit": 1156.0,
+            "Credit": "",
+            "Balance": 14489.0
+        },
+        {
+            "Date": "12/03/2026",
+            "Description": "UPI/UBER/REF_531915",
+            "Debit": 851.0,
+            "Credit": "",
+            "Balance": 13638.0
+        },
+        {
+            "Date": "13/03/2026",
+            "Description": "UPI/STARBUCKS/REF_523274",
+            "Debit": 251.0,
+            "Credit": "",
+            "Balance": 13387.0
+        },
+        {
+            "Date": "13/03/2026",
+            "Description": "UPI/MYNTRA/REF_717786",
+            "Debit": 4598.0,
+            "Credit": "",
+            "Balance": 8789.0
+        },
+        {
+            "Date": "14/03/2026",
+            "Description": "UPI/PHARMEASY/REF_367673",
+            "Debit": 932.0,
+            "Credit": "",
+            "Balance": 7857.0
+        },
+        {
+            "Date": "14/03/2026",
+            "Description": "UPI/FORTIS/REF_955892",
+            "Debit": 335.0,
+            "Credit": "",
+            "Balance": 7522.0
+        },
+        {
+            "Date": "14/03/2026",
+            "Description": "UPI/STARBUCKS/REF_887094",
+            "Debit": 449.0,
+            "Credit": "",
+            "Balance": 7073.0
+        },
+        {
+            "Date": "15/03/2026",
+            "Description": "UPI/AIRASIA/REF_467405",
+            "Debit": 1076.0,
+            "Credit": "",
+            "Balance": 5997.0
+        },
+        {
+            "Date": "16/03/2026",
+            "Description": "UPI/AJIO/REF_823385",
+            "Debit": 1819.0,
+            "Credit": "",
+            "Balance": 4178.0
+        },
+        {
+            "Date": "18/03/2026",
+            "Description": "UPI/APOLLO PHARMACY/REF_375688",
+            "Debit": 1534.0,
+            "Credit": "",
+            "Balance": 2644.0
+        },
+        {
+            "Date": "18/03/2026",
+            "Description": "UPI/AJIO/REF_786094",
+            "Debit": 4792.0,
+            "Credit": "",
+            "Balance": -2148.0
+        },
+        {
+            "Date": "18/03/2026",
+            "Description": "UPI/MCDONALDS/REF_836447",
+            "Debit": 194.0,
+            "Credit": "",
+            "Balance": -2342.0
+        },
+        {
+            "Date": "18/03/2026",
+            "Description": "UPI/AMAZON/REF_469420",
+            "Debit": 2125.0,
+            "Credit": "",
+            "Balance": -4467.0
+        },
+        {
+            "Date": "18/03/2026",
+            "Description": "UPI/ZOMATO/REF_802254",
+            "Debit": 595.0,
+            "Credit": "",
+            "Balance": -5062.0
+        },
+        {
+            "Date": "21/03/2026",
+            "Description": "UPI/AIRASIA/REF_247900",
+            "Debit": 1210.0,
+            "Credit": "",
+            "Balance": -6272.0
+        },
+        {
+            "Date": "22/03/2026",
+            "Description": "UPI/DOMINOS/REF_366247",
+            "Debit": 791.0,
+            "Credit": "",
+            "Balance": -7063.0
+        },
+        {
+            "Date": "23/03/2026",
+            "Description": "UPI/1MG/REF_819169",
+            "Debit": 420.0,
+            "Credit": "",
+            "Balance": -7483.0
+        },
+        {
+            "Date": "23/03/2026",
+            "Description": "UPI/FLIPKART/REF_550987",
+            "Debit": 2683.0,
+            "Credit": "",
+            "Balance": -10166.0
+        },
+        {
+            "Date": "23/03/2026",
+            "Description": "UPI/UBER/REF_108534",
+            "Debit": 1016.0,
+            "Credit": "",
+            "Balance": -11182.0
+        },
+        {
+            "Date": "24/03/2026",
+            "Description": "UPI/SWIGGY/REF_205627",
+            "Debit": 288.0,
+            "Credit": "",
+            "Balance": -11470.0
+        },
+        {
+            "Date": "24/03/2026",
+            "Description": "UPI/IRCTC/REF_725831",
+            "Debit": 450.0,
+            "Credit": "",
+            "Balance": -11920.0
+        },
+        {
+            "Date": "25/03/2026",
+            "Description": "UPI/1MG/REF_335697",
+            "Debit": 1907.0,
+            "Credit": "",
+            "Balance": -13827.0
+        },
+        {
+            "Date": "26/03/2026",
+            "Description": "UPI/RELIANCE DIGITAL/REF_864533",
+            "Debit": 2151.0,
+            "Credit": "",
+            "Balance": -15978.0
+        },
+        {
+            "Date": "26/03/2026",
+            "Description": "UPI/FLIPKART/REF_613848",
+            "Debit": 4178.0,
+            "Credit": "",
+            "Balance": -20156.0
+        },
+        {
+            "Date": "26/03/2026",
+            "Description": "UPI/STARBUCKS/REF_725408",
+            "Debit": 660.0,
+            "Credit": "",
+            "Balance": -20816.0
+        },
+        {
+            "Date": "27/03/2026",
+            "Description": "UPI/SWIGGY/REF_318915",
+            "Debit": 471.0,
+            "Credit": "",
+            "Balance": -21287.0
+        },
+        {
+            "Date": "27/03/2026",
+            "Description": "UPI/UBEREATS/REF_301960",
+            "Debit": 286.0,
+            "Credit": "",
+            "Balance": -21573.0
+        },
+        {
+            "Date": "27/03/2026",
+            "Description": "UPI/PHARMEASY/REF_565959",
+            "Debit": 565.0,
+            "Credit": "",
+            "Balance": -22138.0
+        },
+        {
+            "Date": "27/03/2026",
+            "Description": "UPI/CROMA/REF_870542",
+            "Debit": 4996.0,
+            "Credit": "",
+            "Balance": -27134.0
+        }
+    ]
+}
