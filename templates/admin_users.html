@@ -52,7 +52,7 @@
                 <h5 class="modal-title fw-bold text-dark"><i class="bi bi-shield-check text-success me-2"></i> Intelligence Report</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body bg-light p-4" id="reportModalBody">
+            <div class="modal-body bg-body-secondary p-4" id="reportModalBody">
                 <!-- Report Content Injected Here -->
             </div>
             <div class="modal-footer border-top py-2 px-4">
@@ -83,7 +83,7 @@ function getBadgeClass(status) {
 
 async function fetchUsers() {
     try {
-        const response = await fetch('/api/admin/api/users');
+        const response = await fetch('/api/v1/admin/api/users');
         const data = await response.json();
         
         const tbody = document.getElementById('usersTableBody');
@@ -97,7 +97,7 @@ async function fetchUsers() {
         data.users.forEach(user => {
             const statusBadge = user.income_classification 
                 ? `<span class="badge ${getBadgeClass(user.income_classification)} px-3 py-2 rounded-pill">${user.income_classification}</span>`
-                : `<span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">Not Assessed</span>`;
+                : `<span class="badge bg-body-secondary text-secondary border px-3 py-2 rounded-pill">Not Assessed</span>`;
                 
             let actionButtons = `
                 <button class="btn btn-sm btn-outline-secondary fw-semibold me-2" onclick="openUploadForUser(${user.user_id})" title="Upload Data">
@@ -131,7 +131,7 @@ async function fetchUsers() {
             if (user.statements && user.statements.length > 0) {
                 const subTr = document.createElement('tr');
                 let stmtsHtml = user.statements.map(stmt => `
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-white py-3 px-4 border-start-0 border-end-0">
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 border-start-0 border-end-0">
                         <div>
                             <div class="fw-bold text-dark d-flex align-items-center">
                                 <i class="bi bi-file-earmark-pdf text-danger me-2"></i> ${stmt.file_name}
@@ -150,8 +150,8 @@ async function fetchUsers() {
                 
                 subTr.innerHTML = `
                     <td colspan="5" class="p-0 border-0">
-                        <div class="collapse bg-light p-0 border-bottom border-top shadow-inner" id="statements-${user.user_id}">
-                            <div class="p-3 ps-4 bg-white border-bottom fw-bold text-secondary d-flex align-items-center gap-2">
+                        <div class="collapse bg-body-secondary p-0 border-bottom border-top shadow-inner" id="statements-${user.user_id}">
+                            <div class="p-3 ps-4 border-bottom fw-bold text-secondary d-flex align-items-center gap-2">
                                 <i class="bi bi-folder2-open"></i> Uploaded Statements for User #${user.user_id}
                             </div>
                             <ul class="list-group list-group-flush rounded-0 m-0">
@@ -186,7 +186,7 @@ async function runIntelligence(statementId) {
     
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const response = await fetch(`/api/admin/intelligence/generate/${statementId}`, { 
+        const response = await fetch(`/api/v1/admin/intelligence/generate/${statementId}`, { 
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrfToken
@@ -246,7 +246,7 @@ function showAdminToast(title, message, type) {
 
 async function viewReport(statementId) {
     try {
-        const response = await fetch(`/api/admin/intelligence/report/${statementId}`);
+        const response = await fetch(`/api/v1/admin/intelligence/report/${statementId}`);
         const data = await response.json();
         
         if (data.success) {
