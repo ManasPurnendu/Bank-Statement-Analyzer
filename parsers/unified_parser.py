@@ -40,41 +40,52 @@ caller receives the same canonical dict:
 import os
 
 
+from abc import ABC, abstractmethod
+
+class ParserStrategy(ABC):
+    @abstractmethod
+    def parse(self, file_path: str, original_filename: str, password: str = None) -> dict:
+        pass
+
+class PDFParserStrategy(ParserStrategy):
+    def parse(self, file_path: str, original_filename: str, password: str = None) -> dict:
+        from parsers.pdf_parser import parse_pdf_statement
+        return parse_pdf_statement(file_path, original_filename, password=password)
+
+class ExcelParserStrategy(ParserStrategy):
+    def parse(self, file_path: str, original_filename: str, password: str = None) -> dict:
+        from parsers.excel_parser import parse_excel_statement
+        return parse_excel_statement(file_path, original_filename, password=password)
+
+class CSVParserStrategy(ParserStrategy):
+    def parse(self, file_path: str, original_filename: str, password: str = None) -> dict:
+        from parsers.csv_parser import parse_csv_statement
+        return parse_csv_statement(file_path, original_filename)
+
+class JSONParserStrategy(ParserStrategy):
+    def parse(self, file_path: str, original_filename: str, password: str = None) -> dict:
+        from parsers.json_parser import parse_json_statement
+        return parse_json_statement(file_path, original_filename)
+
 def parse_statement(file_path: str, original_filename: str, password: str = None) -> dict:
-    """
-    Detect the file type from its extension and route to the correct parser.
-
-    Returns the canonical parsed-statement dict described above.
-
-    Raises:
-        ValueError  – "PasswordRequired" | "IncorrectPassword" | descriptive message
-        RuntimeError – unrecoverable internal error (propagated from sub-parser)
-    """
     if not os.path.exists(file_path):
         raise ValueError(f"File not found: {file_path}")
 
     ext = original_filename.rsplit('.', 1)[-1].lower() if '.' in original_filename else ''
-
-    if ext == 'pdf':
-        from parsers.pdf_parser import parse_pdf_statement
-        result = parse_pdf_statement(file_path, original_filename, password=password)
-
-    elif ext in ('xls', 'xlsx'):
-        from parsers.excel_parser import parse_excel_statement
-        result = parse_excel_statement(file_path, original_filename, password=password)
-
-    elif ext == 'csv':
-        from parsers.csv_parser import parse_csv_statement
-        result = parse_csv_statement(file_path, original_filename)
-
-    elif ext == 'json':
-        from parsers.json_parser import parse_json_statement
-        result = parse_json_statement(file_path, original_filename)
-
-    else:
-        raise ValueError(
-            f"Unsupported file type: '{ext}'. Supported formats: PDF, XLS, XLSX, CSV, JSON."
-        )
+    
+    strategies = {
+        'pdf': PDFParserStrategy(),
+        'xls': ExcelParserStrategy(),
+        'xlsx': ExcelParserStrategy(),
+        'csv': CSVParserStrategy(),
+        'json': JSONParserStrategy()
+    }
+    
+    strategy = strategies.get(ext)
+    if not strategy:
+        raise ValueError(f"Unsupported file type: '{ext}'. Supported formats: PDF, XLS, XLSX, CSV, JSON.")
+        
+    result = strategy.parse(file_path, original_filename, password=password)
 
     # Guarantee canonical structure after every parser
     result = _canonicalize(result, original_filename, ext)

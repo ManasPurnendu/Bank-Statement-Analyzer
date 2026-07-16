@@ -161,7 +161,7 @@ def categorize_transaction(description, transaction_type, rules=None, amount=Non
     # Default category
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT category_id FROM categories WHERE category_name = "Uncategorized"')
+    cursor.execute("SELECT category_id FROM categories WHERE category_name = 'Uncategorized'")
     row = cursor.fetchone()
     conn.close()
     return row['category_id'] if row else 12
