@@ -127,7 +127,7 @@ def generate_insights(analytics_data=None):
         curr_month = monthly_trends[-1]
         
         # Expenses comparison
-        if prev_month["expense"] > 0:
+        if prev_month.get("expense") and prev_month["expense"] > 0 and curr_month.get("expense") is not None:
             exp_change = (curr_month["expense"] - prev_month["expense"]) / prev_month["expense"] * 100
             if exp_change > 10:
                 insights.append({
@@ -145,7 +145,7 @@ def generate_insights(analytics_data=None):
                 })
                 
         # Income comparison
-        if prev_month["income"] > 0:
+        if prev_month.get("income") and prev_month["income"] > 0 and curr_month.get("income") is not None:
             inc_change = (curr_month["income"] - prev_month["income"]) / prev_month["income"] * 100
             if inc_change > 5:
                 insights.append({

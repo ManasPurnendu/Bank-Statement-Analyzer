@@ -10,10 +10,19 @@ class StatementContext:
     """
     def __init__(self, transactions, statement_metadata=None):
         # Sort transactions by date for reliable chronological processing
+        def parse_dt(d):
+            if isinstance(d, str):
+                return datetime.strptime(d, '%Y-%m-%d')
+            # If it's a datetime.date from psycopg2, convert to datetime.datetime to allow subtraction
+            from datetime import datetime as dt_class, date
+            if type(d) is date:
+                return dt_class.combine(d, dt_class.min.time())
+            return d
+
         try:
             self.transactions = sorted(
                 transactions, 
-                key=lambda t: datetime.strptime(t['transaction_date'], '%Y-%m-%d')
+                key=lambda t: parse_dt(t['transaction_date'])
             )
         except Exception:
             self.transactions = sorted(
@@ -27,8 +36,8 @@ class StatementContext:
         self.total_transactions = len(self.transactions)
         
         if self.transactions:
-            self.start_date = datetime.strptime(self.transactions[0]['transaction_date'], '%Y-%m-%d')
-            self.end_date = datetime.strptime(self.transactions[-1]['transaction_date'], '%Y-%m-%d')
+            self.start_date = parse_dt(self.transactions[0]['transaction_date'])
+            self.end_date = parse_dt(self.transactions[-1]['transaction_date'])
             delta = self.end_date - self.start_date
             self.months_of_data = max(1, math.ceil(delta.days / 30.0))
         else:

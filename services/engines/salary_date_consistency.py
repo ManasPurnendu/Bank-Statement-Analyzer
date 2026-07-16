@@ -34,7 +34,10 @@ class SalaryDateConsistencyEngine:
             
         dates = []
         for t in ctx.salary_candidates:
-            dt = datetime.strptime(t['transaction_date'], '%Y-%m-%d')
+            if isinstance(t['transaction_date'], str):
+                dt = datetime.strptime(t['transaction_date'], '%Y-%m-%d')
+            else:
+                dt = t['transaction_date']
             # If the date is near the end of the month (28-31), normalize it to 0 for variance comparison
             # against the 1st/2nd. E.g., 29th and 1st have a distance of 2-3 days, not 28 days.
             
