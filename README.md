@@ -214,5 +214,3 @@ The Bank Statement Analyzer & Income Intelligence Engine bridges data engineerin
 4. [pdfplumber Library](https://github.com/jsvine/pdfplumber)
 5. [Docker Containerization Platform](https://www.docker.com/)
 
----
-*Built for the Analytics Department, State Bank of India (SBI).*
